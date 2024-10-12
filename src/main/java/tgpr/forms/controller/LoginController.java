@@ -42,7 +42,7 @@ public class LoginController extends Controller<LoginView> {
     }
 
     public void signup(){
-        showMessage("Le use case signup est en préparation :)","Info","Close");
+        Controller.navigateTo(new SignupController());
     }
 
     @Override
