@@ -1,11 +1,11 @@
 package tgpr.forms.controller;
 
 import tgpr.forms.FormsApp;
-import tgpr.forms.model.Form;
 import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
 import tgpr.forms.view.LoginView;
 import tgpr.framework.Controller;
+import tgpr.framework.Error;
 import tgpr.framework.ErrorList;
 import tgpr.framework.Model;
 
@@ -18,13 +18,18 @@ public class LoginController extends Controller<LoginView> {
 
     public boolean login(String pseudo, String password) {
         var errors = new ErrorList();
-
+        //Vérifier si email existe !!!!!PEUT ETRE METTRE DANS MODEL
+        List<User> users = User.getAll();
+        boolean emailExists = users.stream().allMatch(user -> user.getEmail().equals(pseudo));
+        if(!emailExists){
+            errors.add(new Error("The email address does not exist"));
+        }
         if (errors.isEmpty()) {
             var member = User.checkCredentials(pseudo, password);
             if (member != null) {
                 Security.login(member);
                 //navigateTo(new TestController());
-                showMessage("Connexion réussie, le use case view_forms est en préparation :)","Info","Close");
+                showMessage("Connexion réussie avec user : "+ member.getFullName() +" role -->"+member.getRole()+", le use case view_forms est en préparation :)","Info","Close");
             } else
                 showError(String.valueOf(new Error("invalid credentials")));
         } else

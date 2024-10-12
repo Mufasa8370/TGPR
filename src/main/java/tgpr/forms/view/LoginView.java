@@ -6,7 +6,6 @@ import tgpr.forms.controller.LoginController;
 
 import java.util.List;
 
-import static tgpr.framework.Controller.showError;
 
 public class LoginView extends BasicWindow {
 
@@ -40,7 +39,8 @@ public class LoginView extends BasicWindow {
         btnExit = new Button("Exit", this::exit).addTo(buttons);
         Panel buttonLog = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
                 .setLayoutData(Layouts.LINEAR_CENTER).addTo(root);
-        //Le Guest ne peut rien faire appart login et signup, du coup que dois faire ce boutton ?
+
+
         btnLoginAsGuest = new Button("Login as guest", this::logAsGuest).addTo(buttonLog);
         new EmptySpace().addTo(root);
 
@@ -59,7 +59,7 @@ public class LoginView extends BasicWindow {
     }
 
     private void logAsGuest() {
-        controller.login(Configuration.get("default.user.mail.guest"), "");
+        controller.login(Configuration.get("default.user.mail.guest"), Configuration.get("default.user.password"));
     }
 
     private void logAsXavierPigeolet() {
@@ -85,7 +85,8 @@ public class LoginView extends BasicWindow {
             txtEmail.takeFocus();
         }
     }
-///////////////////////////////////////////
+
+
     private void signup() {
         controller.signup();
     }
