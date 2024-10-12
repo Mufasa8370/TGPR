@@ -6,7 +6,6 @@ import tgpr.forms.controller.LoginController;
 
 import java.util.List;
 
-import static tgpr.framework.Controller.showError;
 
 public class LoginView extends BasicWindow {
 
