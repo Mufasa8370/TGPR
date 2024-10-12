@@ -20,7 +20,7 @@ public class LoginController extends Controller<LoginView> {
         var errors = new ErrorList();
         //Vérifier si email existe !!!!!PEUT ETRE METTRE DANS MODEL
         List<User> users = User.getAll();
-        boolean emailExists = users.stream().allMatch(user -> user.getEmail().equals(pseudo));
+        boolean emailExists = users.stream().anyMatch(user -> user.getEmail().equals(pseudo));
         if(!emailExists){
             errors.add(new Error("The email address does not exist"));
         }
