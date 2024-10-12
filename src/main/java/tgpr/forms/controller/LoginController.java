@@ -24,7 +24,7 @@ public class LoginController extends Controller<LoginView> {
             if (member != null) {
                 Security.login(member);
                 //navigateTo(new TestController());
-                showMessage("Connexion réussie, le use case view_forms est en préparation :)","Info","Close");
+                showMessage("Connexion réussie avec user : "+ member.getFullName() +" role -->"+member.getRole()+", le use case view_forms est en préparation :)","Info","Close");
             } else
                 showError(String.valueOf(new Error("invalid credentials")));
         } else
