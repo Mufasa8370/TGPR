@@ -23,7 +23,8 @@ public class LoginController extends Controller<LoginView> {
             var member = User.checkCredentials(pseudo, password);
             if (member != null) {
                 Security.login(member);
-                navigateTo(new TestController());
+                //navigateTo(new TestController());
+                showMessage("Connexion réussie, le use case view_forms est en préparation :)","Info","Close");
             } else
                 showError(String.valueOf(new Error("invalid credentials")));
         } else
@@ -36,7 +37,7 @@ public class LoginController extends Controller<LoginView> {
     }
 
     public void signup(){
-        showError(String.valueOf(new Error("In Progress")));
+        showMessage("Le use case signup est en préparation :)","Info","Close");
     }
 
     @Override

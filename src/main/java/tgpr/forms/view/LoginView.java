@@ -59,7 +59,7 @@ public class LoginView extends BasicWindow {
     }
 
     private void logAsGuest() {
-        showError(String.valueOf(new Error("In Progress : Le Guest ne peut rien faire appart login et signup, du coup que dois faire ce boutton ?")));
+        controller.login(Configuration.get("default.user.mail.guest"), "");
     }
 
     private void logAsXavierPigeolet() {
