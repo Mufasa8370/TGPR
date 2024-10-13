@@ -2,8 +2,10 @@ package tgpr.forms.view;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.AnalyzeController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Instance;
@@ -76,9 +78,12 @@ public class AnalyzeView extends DialogWindow {
                 .setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
                 .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-        new Button("Close", this::close).addTo(panel);
+        Button btnClose = new Button("Close", this::close).addTo(panel);
 
-        new Button("View Instances").addTo(panel);
+        Button viewInstances = new Button("View Instances").addTo(panel);
+
+        addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
+        addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
 
         return panel;
     }
