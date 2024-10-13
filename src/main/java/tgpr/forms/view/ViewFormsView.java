@@ -57,7 +57,7 @@ public class ViewFormsView extends BasicWindow{
         txtFilter.setTextChangeListener((txt, byUser) -> reloadData(currentPage));
         filter.addComponent(txtFilter);
         root.addComponent(filter);
-//Paginator
+        //Paginator
          paginator = new Paginator(
                 this,
                 9,
@@ -88,7 +88,8 @@ public class ViewFormsView extends BasicWindow{
         List<Form> forms = Form.getForUser(user,filter,start,cardPerPage);
         paginator.setCount(forms.size());
         //Nb form par ligne
-        cardPanel.setLayoutManager(new GridLayout(3));
+        cardPanel.setLayoutManager(new GridLayout(3).setVerticalSpacing(1).setHorizontalSpacing(1));
+
 
         for (Form form : forms){
             CardForFormsView card = new CardForFormsView(form,new CardForFormsController());
