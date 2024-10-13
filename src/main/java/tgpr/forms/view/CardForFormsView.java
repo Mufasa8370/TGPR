@@ -35,7 +35,7 @@ public class CardForFormsView extends Panel{
         descriptionLabel.center().addStyle(SGR.ITALIC).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
         pan.addComponent((descriptionLabel));
         pan.addComponent(new EmptySpace());
-        pan.addComponent(new Label(cutText("Creat by " +form.getOwner().getFullName(),32)).center());
+        pan.addComponent(new Label(cutText("Created by " +form.getOwner().getFullName(),32)).center());
         pan.addComponent(new Label(cutText(getLastInstance(getLoggedUser(),form)[0],32)).center());
         pan.addComponent(new Label(cutText(getLastInstance(getLoggedUser(),form)[1],32)).center());
         pan.addComponent(new EmptySpace());
