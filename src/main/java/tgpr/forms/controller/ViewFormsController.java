@@ -24,4 +24,10 @@ public class ViewFormsController extends Controller<ViewFormsView> {
 
     public void menuViewProfile() {
     }
+
+    public static void pageChanged(Integer integer) {
+    }
+
+    public void createNewForm() {
+    }
 }
