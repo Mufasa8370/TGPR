@@ -27,12 +27,13 @@ public class LoginController extends Controller<LoginView> {
                 errors.add(new Error("The email address does not exist"));
             }
         }
+
         if (errors.isEmpty()) {
             var member = User.checkCredentials(pseudo, password);
             if (member != null) {
                 Security.login(member);
-                //navigateTo(new TestController());
-                showMessage("Connexion réussie avec user : "+ member.getFullName() +" role -->"+member.getRole()+", le use case view_forms est en préparation :)","Info","Close");
+                navigateTo(new ViewFormsController());
+                //showMessage("Connexion réussie avec user : "+ member.getFullName() +" role -->"+member.getRole()+", le use case view_forms est en préparation :)","Info","Close");
             } else
                 showError(String.valueOf(new Error("invalid credentials")));
         } else
