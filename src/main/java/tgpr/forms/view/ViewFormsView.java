@@ -47,8 +47,11 @@ public class ViewFormsView extends BasicWindow{
         menuFile.add(menuLogout);
         MenuItem menuExit = new MenuItem("Exit", controller::exit);
         menuFile.add(menuExit);
-        Menu menuParameters = new Menu("Parameters");
-        menuBar.add(menuParameters);
+        if(!getLoggedUser().isGuest()){
+            Menu menuParameters = new Menu("Parameters");
+            menuBar.add(menuParameters);
+        }
+
 
        // new EmptySpace().addTo(root);
         
