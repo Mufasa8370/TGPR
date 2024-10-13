@@ -1,13 +1,14 @@
 package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.SignupController;
-import tgpr.framework.ViewManager;
-
+import tgpr.forms.model.User;
 import java.util.List;
+
 
 public class SignupView extends DialogWindow {
     private final SignupController controller;
@@ -15,7 +16,10 @@ public class SignupView extends DialogWindow {
     private final TextBox txtFullName = new TextBox();
     private final TextBox txtPassword = new TextBox();
     private final TextBox txtConfirmPassword = new TextBox();
-
+    private final Label errMail = new Label("");
+    private final Label errFullName = new Label("");
+    private final Label errPassword = new Label("");
+    private final Label errConfirmPassword = new Label("");
     private Button btnSignup;
 
     public SignupView(SignupController controller){
@@ -23,45 +27,57 @@ public class SignupView extends DialogWindow {
         this.controller = controller;
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
+        setCloseWindowWithEscape(true);
         setFixedSize(new TerminalSize(54, 11));
 
-        var root = Panel.verticalPanel(1);
+        var root = Panel.verticalPanel();
         setComponent(root);
 
-        createFieldsPanel().setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Beginning)).sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
-        createButtonsPanel().setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center)).addTo(root);
+        createFieldsPanel().addTo(root);
+        createButtonsPanel().addTo(root);
 
-        btnSignup.takeFocus();
+        txtMail.takeFocus();
     }
 
     private Panel createFieldsPanel() {
-        Panel panel = Panel.gridPanel(2, Margin.of(1, 1, 1, 0), Spacing.of(1)).center();
+        var panel = Panel.gridPanel(2, Margin.of(1));
 
         new Label("Mail:").addTo(panel);
-        txtMail.addTo(panel).takeFocus();
-        txtMail.setPreferredSize(new TerminalSize(23, 1));
+        txtMail.addTo(panel)
+                .sizeTo(23)
+                .setTextChangeListener((txt, byUser) -> validate());
+        panel.addEmpty();
+        errMail.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Full Name:").addTo(panel);
-        txtFullName.setMask('*').addTo(panel);
-        txtFullName.setPreferredSize(new TerminalSize(34, 1));
+        txtFullName.addTo(panel).takeFocus()
+                .sizeTo(34)
+                .setTextChangeListener((txt, byUser) -> validate());
+        panel.addEmpty();
+        errFullName.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Password:").addTo(panel);
-        txtPassword.setMask('*').addTo(panel);
-        txtPassword.setPreferredSize(new TerminalSize(23, 1));
+        txtPassword.setMask('*').addTo(panel)
+                .sizeTo(23)
+                .setTextChangeListener((txt, byUser) -> validate());
+        panel.addEmpty();
+        errPassword.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Confirm Password:").addTo(panel);
-        txtConfirmPassword.setMask('*').addTo(panel);
-        txtConfirmPassword.setPreferredSize(new TerminalSize(23, 1));
+        txtConfirmPassword.setMask('*').addTo(panel)
+                .sizeTo(23)
+                .setTextChangeListener((txt, byUser) -> validate());
+        panel.addEmpty();
+        errConfirmPassword.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
 
         return panel;
     }
 
     private Panel createButtonsPanel() {
         Panel panel = Panel.horizontalPanel(1).center();
-        btnSignup = new Button("Signup", this::signup).addTo(panel);
+        btnSignup = new Button("Signup", this::signup).addTo(panel).setEnabled(false);
 
         Button btnClose = new Button("Close", this::close).addTo(panel);
-
 
         addShortcut(btnSignup, KeyStroke.fromString("<A-s>"));
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
@@ -70,8 +86,27 @@ public class SignupView extends DialogWindow {
     }
 
     private void signup() {
-        //controller.signup(txtMail.getText(), txtFullName.getText(), txtPassword.getText(), txtConfirmPassword.getText());
+        controller.save(
+                txtMail.getText(),
+                txtFullName.getText(),
+                txtPassword.getText(),
+                txtConfirmPassword.getText()
+        );
     }
 
+    private void validate() {
+        var errors = controller.validate(
+                txtMail.getText(),
+                txtFullName.getText(),
+                txtPassword.getText(),
+                txtConfirmPassword.getText()
+        );
+        errMail.setText(errors.getFirstErrorMessage(User.Fields.Email));
+        errFullName.setText(errors.getFirstErrorMessage(User.Fields.FullName));
+        errPassword.setText(errors.getFirstErrorMessage(User.Fields.Password));
+        errConfirmPassword.setText(errors.getFirstErrorMessage(SignupController.Fields.PasswordConfirm)); // Assurez-vous d'utiliser le bon champ
+
+        btnSignup.setEnabled(errors.isEmpty());
+    }
 
 }
