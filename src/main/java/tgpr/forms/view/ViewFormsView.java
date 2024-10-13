@@ -1,6 +1,7 @@
 package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.menu.Menu;
 import com.googlecode.lanterna.gui2.menu.MenuBar;
@@ -12,6 +13,7 @@ import tgpr.forms.model.User;
 
 import java.util.List;
 
+import static tgpr.forms.model.Form.countForUser;
 import static tgpr.forms.model.Security.getLoggedUser;
 
 public class ViewFormsView extends BasicWindow{
@@ -48,7 +50,7 @@ public class ViewFormsView extends BasicWindow{
         Menu menuParameters = new Menu("Parameters");
         menuBar.add(menuParameters);
 
-        new EmptySpace().addTo(root);
+       // new EmptySpace().addTo(root);
         
         //filtre
         Panel filter = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -63,40 +65,52 @@ public class ViewFormsView extends BasicWindow{
                 9,
                 this::reloadData
         );
-         //Ajout du footer
+        paginator.setCount(countForUser(user,txtFilter.getText()));
 
-         root.addComponent(cardPanel).setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
-        Panel footer = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
-                .setLayoutData(Layouts.LINEAR_CENTER).addTo(root).setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.End,LinearLayout.GrowPolicy.CanGrow));
+        //Donner une taille max pour qu'il prenne la place :)
+        cardPanel.setPreferredSize(new TerminalSize(1000,1000));
+        root.addComponent(cardPanel).setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
-         Button buttonCreateForm = new Button("Creat a new form", controller::createNewForm).addTo(footer);
-         footer.addComponent(paginator);
+        //Ajout du footer
+        Panel footer = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
+        footer.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+         if(!getLoggedUser().isGuest()){
+             Button buttonCreateForm = new Button("Creat a new form", controller::createNewForm).addTo(footer);
+         }
+        footer.addComponent(new EmptySpace(new TerminalSize(1000, 1)));
+
+
+        footer.addComponent(paginator);
          //Start page 1
-         reloadData(1);
+         reloadData(0);
 
 
     }
 
     private void reloadData(Integer page) {
+        System.out.println("appel   " + page);
         String filter = txtFilter.getText();
         int cardPerPage = 9;
-        int start = (page - 1) * cardPerPage;
+        int start = page * cardPerPage;
         currentPage = page;
         //Vider les existante
         cardPanel.removeAllComponents();
-
         List<Form> forms = Form.getForUser(user,filter,start,cardPerPage);
-        paginator.setCount(forms.size());
+
         //Nb form par ligne
         cardPanel.setLayoutManager(new GridLayout(3).setVerticalSpacing(1).setHorizontalSpacing(1));
-
 
         for (Form form : forms){
             CardForFormsView card = new CardForFormsView(form,new CardForFormsController());
             cardPanel.addComponent(card);
         }
+        if(forms.isEmpty()){
+            cardPanel.addComponent(new EmptySpace());
+            cardPanel.addComponent(new Label("No form found").setForegroundColor(TextColor.ANSI.RED));
+        }
         root.addComponent(cardPanel);
         root.invalidate();
+
 
     }
 

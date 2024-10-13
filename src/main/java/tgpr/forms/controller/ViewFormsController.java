@@ -23,11 +23,10 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void menuViewProfile() {
-    }
-
-    public static void pageChanged(Integer integer) {
+        showMessage("Le use case view_profile est en préparation :)","Info","Close");
     }
 
     public void createNewForm() {
+        showMessage("Le use case add_edit_form est en préparation :)","Info","Close");
     }
 }
