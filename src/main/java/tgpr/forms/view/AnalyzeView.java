@@ -1,0 +1,95 @@
+package tgpr.forms.view;
+
+import com.googlecode.lanterna.SGR;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import tgpr.forms.controller.AnalyzeController;
+import tgpr.forms.model.Form;
+import tgpr.forms.model.Instance;
+import tgpr.framework.ViewManager;
+import java.util.List;
+
+public class AnalyzeView extends DialogWindow {
+    private final AnalyzeController controller;
+    private Form form;
+    private final Label lblTitle = new Label("");
+    private final Label lblDescription = new Label("");
+    private final Label lblNbInstances = new Label("");
+    private ObjectTable<Instance> statisticsTable;
+    private Panel pnlStatistics;
+
+
+    public AnalyzeView(AnalyzeController controller, Form form){
+        super("Statistical Analysis of Submitted Instances");
+        this.controller = controller;
+        this.form = form;
+
+        setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
+        setCloseWindowWithEscape(true);
+        setFixedSize(new TerminalSize(70, 20));
+
+        var root = Panel.verticalPanel();
+        setComponent(root);
+
+        createFields().addTo(root);
+        createStatisticsPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
+        createButtonsPanel().addTo(root);
+
+        refresh();
+    }
+
+    private Panel createFields(){
+        var panel = Panel.gridPanel(2, Margin.of(1));
+
+        new Label("Title:").addTo(panel);
+        lblTitle.addTo(panel).addStyle(SGR.BOLD);
+        new Label("Description:").addTo(panel);
+        lblDescription.addTo(panel).addStyle(SGR.BOLD);
+        new Label("Number of Submitted Instances:").addTo(panel);
+        lblNbInstances.addTo(panel).addStyle(SGR.BOLD);
+
+        return panel;
+    }
+
+    private Panel createStatisticsPanel() {
+        var panel = pnlStatistics = new Panel();
+
+//        statisticsTable = new ObjectTable<>(
+//                new ColumnSpec<Object>("Index", )
+//                        .setMinWidth(4).alignRight(),
+//                new ColumnSpec<Object>("Title", )
+//                        .setMinWidth(7).alignLeft(),
+//                new ColumnSpec<Object>("Value", )
+//                        .setMinWidth(7).alignLeft(),
+//                new ColumnSpec<Object>("Nb Occ.", )
+//                        .setMinWidth(3).alignRight(),
+//                new ColumnSpec<Object>("Ratio", )
+//                        .setMinWidth(3).alignRight()
+//        ).addTo(panel);
+
+        return panel;
+    }
+
+    private Panel createButtonsPanel() {
+        var panel = new Panel()
+                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
+                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+
+        new Button("Close", this::close).addTo(panel);
+
+        new Button("View Instances").addTo(panel);
+
+        return panel;
+    }
+
+    private void refresh() {
+        if (form != null) {
+            lblTitle.setText(form.getTitle());
+            lblDescription.setText(form.getDescription());
+            lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
+
+
+        }
+    }
+}
