@@ -48,7 +48,6 @@ public class SignupController extends Controller<SignupView> {
         if (emailExists(email))
             errors.add("already exists", User.Fields.Email);
 
-        // adresse mail valide
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"))
             errors.add("invalid email", User.Fields.Email);
 
@@ -58,15 +57,12 @@ public class SignupController extends Controller<SignupView> {
         if (password.length() < 8)
             errors.add("minimum 8 char", User.Fields.Password);
 
-        // password doit contenir au moins un chiffre
         if (!password.matches(".*\\d.*"))
             errors.add("must contain a digit", User.Fields.Password);
 
-        // password doit contenir au moins une lettre majuscule
         if (!password.matches(".*[A-Z].*"))
             errors.add("must contain an uppercase letter", User.Fields.Password);
 
-        // password doit contenir au moins un caractère non alphanumérique
         if (!password.matches(".*\\W.*"))
             errors.add("must contain a non-alphanumeric character", User.Fields.Password);
 
