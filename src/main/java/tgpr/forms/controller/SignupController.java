@@ -27,9 +27,9 @@ public class SignupController extends Controller<SignupView> {
         var errors = validate(email, fullName, password, confirmPassword);
         if (errors.isEmpty()) {
             var hashedPassword = password.isBlank() ? password : hash(password);
-            User user = new User(email, fullName, hashedPassword, User.Role.User);
+            User user = new User(fullName, email, hashedPassword, User.Role.User);
             user.save();
-            showMessage("Inscription réussie avec user : "+ user.getFullName() +" role -->"+user.getRole()+", le use case view_forms est en préparation :)","Info","Close");
+            Controller.navigateTo(new ViewFormsController());
         } else
             showErrors(errors);
 
