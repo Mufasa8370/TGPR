@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 
+import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
 import tgpr.forms.view.SignupView;
 import tgpr.framework.Controller;
@@ -29,7 +30,8 @@ public class SignupController extends Controller<SignupView> {
             var hashedPassword = password.isBlank() ? password : hash(password);
             User user = new User(fullName, email, hashedPassword, User.Role.User);
             user.save();
-            Controller.navigateTo(new ViewFormsController());
+            Security.login(user);
+            navigateTo(new ViewFormsController());
         } else
             showErrors(errors);
 
