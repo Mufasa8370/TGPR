@@ -7,6 +7,7 @@ import com.googlecode.lanterna.gui2.*;
 import tgpr.forms.controller.CardForFormsController;
 import tgpr.forms.controller.LoginController;
 import tgpr.forms.model.Form;
+import tgpr.forms.model.Instance;
 
 import static tgpr.forms.controller.CardForFormsController.*;
 import static tgpr.forms.model.Security.getLoggedUser;
@@ -42,14 +43,17 @@ public class CardForFormsView extends Panel{
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL)).center();
         //ICI POUR view_edit_instance!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if(questionInForm(form)){
-            Button open = new Button("Open", controller::open).addTo(buttons);
+            Button open = new Button("Open", () -> {
+                controller.open(form.getMostRecentInstance(getLoggedUser()));
+            }
+            ).addTo(buttons);
         }
         //ICI POUR view_form !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if(accesTypeEditor(form)){
             Button manage = new Button("Manage", () -> {
                 controller.manage(form);
             }
-                    ).addTo(buttons);
+            ).addTo(buttons);
         }
 
 
