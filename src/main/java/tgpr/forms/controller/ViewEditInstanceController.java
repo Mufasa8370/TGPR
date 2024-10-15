@@ -1,6 +1,9 @@
 package tgpr.forms.controller;
 
+import com.googlecode.lanterna.gui2.Panel;
+import tgpr.forms.model.Form;
 import tgpr.forms.model.Instance;
+import tgpr.forms.model.Question;
 import tgpr.forms.view.SignupView;
 import tgpr.forms.view.ViewEditInstanceView;
 import tgpr.framework.Controller;
@@ -15,29 +18,40 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         return view;
     }
 
-    public ViewEditInstanceController(Instance i) {
-        this.instance = i;
-        view = new ViewEditInstanceView(this, i);
+    public ViewEditInstanceController(Instance i, Form form) {
+        if(i != null){
+            this.instance = i;
+            if(i.getCompleted() != null){
+                view = new ViewEditInstanceView(this, i);
+            }else {
+                view = new ViewEditInstanceView(this,form);
+            }
+
+        }else {
+            //Change après
+            view = new ViewEditInstanceView(this,form);
+        }
+
     }
-    public ViewEditInstanceController() {
-        view = new ViewEditInstanceView(this);
+    public ViewEditInstanceController(Form form) {
+        view = new ViewEditInstanceView(this,form);
     }
 
-    public ViewEditInstanceController(Instance i, boolean viewSubmit) {
-        view = new ViewEditInstanceView(this, i, viewSubmit);
-    }
+    //public Question getNextQuestion()
 
     public void viewSubmission() {
-        navigateTo(new ViewEditInstanceController(instance,true));
-
     }
 
     public void submitAgain() {
-        navigateTo(new ViewEditInstanceController());
 
     }
 
     public void cancel() {
-        navigateTo(new ViewFormsController());
+        view.close();
+    }
+    //Fonction pour remove un panel
+    public void removePanelError(Panel pan){
+        pan.removeAllComponents();
+
     }
 }

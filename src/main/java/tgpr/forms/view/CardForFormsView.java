@@ -25,7 +25,7 @@ public class CardForFormsView extends Panel{
         );
         createCell().addTo(root);
         addComponent(root);
-        setPreferredSize(new TerminalSize(35, 10));
+        //setPreferredSize(new TerminalSize(35, 10));
     }
     private Border createCell() {
         Panel pan = new Panel();
@@ -44,7 +44,7 @@ public class CardForFormsView extends Panel{
         //ICI POUR view_edit_instance!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if(questionInForm(form)){
             Button open = new Button("Open", () -> {
-                controller.open(form.getMostRecentInstance(getLoggedUser()));
+                controller.open(form.getMostRecentInstance(getLoggedUser()),form);
             }
             ).addTo(buttons);
         }

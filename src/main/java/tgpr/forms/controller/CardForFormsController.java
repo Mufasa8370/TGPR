@@ -70,13 +70,8 @@ public class CardForFormsController {
     }
 
 
-    public void open(Instance i) {
-        if(i != null){
-            navigateTo(new ViewEditInstanceController(i));
-        }else {
-            navigateTo(new ViewEditInstanceController());
-        }
-
+    public void open(Instance i, Form form) {
+        navigateTo(new ViewEditInstanceController(i, form));
      }
 
     public void manage(Form form) {
