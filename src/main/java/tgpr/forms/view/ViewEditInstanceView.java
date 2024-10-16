@@ -24,9 +24,12 @@ public class ViewEditInstanceView extends DialogWindow {
 
     private List<Question> questions;
 
+    private  Question currentQuestion;
+
     // Attributs de classe pour les composants
     private Panel root;
     private Panel titlePanel;
+    private Panel questionPanel;
     private Panel labelPanel;
     private Panel valuesPanel;
     private Panel buttonsPanel;
@@ -36,6 +39,10 @@ public class ViewEditInstanceView extends DialogWindow {
     private Button close;
     private Button previous;
     private Button cancel;
+
+    private TextBox date;
+    private TextBox txtShort;
+    CheckBoxList<OptionValue> lstOptionsValues;
 
     // Si instance existe
     public ViewEditInstanceView(ViewEditInstanceController controller, Instance i) {
@@ -115,88 +122,59 @@ public class ViewEditInstanceView extends DialogWindow {
     }
 
     private Border createCell() {
-        Panel pan = new Panel();
-        pan.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-        pan.setPreferredSize(new TerminalSize(83, 20));
-        Question question = form.getQuestions().get(current - 1);
-        pan.addComponent(new EmptySpace());
+        questionPanel = new Panel();
+        questionPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        questionPanel.setPreferredSize(new TerminalSize(83, 20));
+        currentQuestion = form.getQuestions().get(current - 1);
+        questionPanel.addComponent(new EmptySpace());
 
         // ERROR
         panelError = new Panel();
 
+
         // QUESTION
-        Panel questionPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        if (question.getRequired()) {
-            questionPanel.addComponent(new Label("(*)").setForegroundColor(TextColor.ANSI.RED));
+        Panel questionTitlePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        if (currentQuestion.getRequired()) {
+            questionTitlePanel.addComponent(new Label("(*)").setForegroundColor(TextColor.ANSI.RED));
         }
-        questionPanel.addComponent(new Label(question.getTitle()).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
-        pan.addComponent(questionPanel);
+        questionTitlePanel.addComponent(new Label(currentQuestion.getTitle()).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        questionPanel.addComponent(questionTitlePanel);
 
         // REPONSE
-        pan.addComponent(new EmptySpace());
-
-        if (question.getType().toString().equals("Radio")) {
-            System.out.println("radio");
-            OptionList optionList = question.getOptionList();
-            List<OptionValue> optionValues = optionList.getOptionValues();
-            radioBoxList = new RadioBoxList<>();
-
-            for (OptionValue optionValue : optionValues) {
-                radioBoxList.addItem(optionValue);
-            }
-
-            radioBoxList.takeFocus();
-            radioBoxList.addListener(new RadioBoxList.Listener() {
-                @Override
-                public void onSelectionChanged(int selectedIndex, int previousSelection) {
-                    controller.removePanelError(panelError);
-                }
-            });
-
-            pan.addComponent(radioBoxList);
-        } else if (question.getType().toString().equals("Check")) {
-            System.out.println("Check");
-        } else if (question.getType().toString().equals("Short")) {
+        questionPanel.addComponent(new EmptySpace());
+        if (currentQuestion.getType().toString().equals("Radio")) {
+            this.questionPanel.addComponent(getViewRadio());
+        } else if (currentQuestion.getType().toString().equals("Check")) {
+            this.questionPanel.addComponent(getViewCheckBox());
+        } else if (currentQuestion.getType().toString().equals("Short")) {
             System.out.println("Short");
-            TextBox txtShort = new TextBox().addTo(pan);
+            txtShort = new TextBox().addTo(this.questionPanel);
             txtShort.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
             txtShort.takeFocus();
-
-        } else if (question.getType().toString().equals("Combo")) {
-            cbo1 = new ComboBox<>();
-            OptionList optionList = question.getOptionList();
-            List<OptionValue> optionValues = optionList.getOptionValues();
-            OptionValue optionValueTemp = new OptionValue();
-            optionValueTemp.setLabel("-- Please choose an option --");
-            cbo1.addItem(optionValueTemp);
-            for (OptionValue optionValue : optionValues) {
-                cbo1.addItem(optionValue);
-            }
+        } else if (currentQuestion.getType().toString().equals("Combo")) {
+            this.questionPanel.addComponent(getViewCombo());
             cbo1.takeFocus();
+            System.out.println("combo");
+        } else if (currentQuestion.getType().toString().equals("Email")) {
 
-            cbo1.addListener((newIndex, oldIndex, byUser) -> {
-                controller.removePanelError(panelError);
-            });
-            cbo1.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
-            pan.addComponent(cbo1);
-
-            System.out.println("Combo");
-        } else if (question.getType().toString().equals("Email")) {
             System.out.println("email");
-        } else if (question.getType().toString().equals("Date")) {
-            System.out.println("date");
-        } else if (question.getType().toString().equals("Long")) {
+        } else if (currentQuestion.getType().toString().equals("Date")) {
+            this.date = new TextBox().setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+            this.questionPanel.addComponent(date);
+            date.setTextChangeListener((txt, byUser) -> validateDate());
+
+        } else if (currentQuestion.getType().toString().equals("Long")) {
             System.out.println("long");
         }
 
-        if (question.getRequired()) {
-            pan.addComponent(new EmptySpace());
+        if (currentQuestion.getRequired()) {
+            this.questionPanel.addComponent(new EmptySpace());
             panelError.addComponent(new Label("This question is required.").setForegroundColor(TextColor.ANSI.RED));
-            pan.addComponent(panelError);
+            this.questionPanel.addComponent(panelError);
         }
 
-        return pan.withBorder(Borders.singleLine("Question " + current + " of " + total));
+        return this.questionPanel.withBorder(Borders.singleLine("Question " + current + " of " + total));
     }
 
     public Panel createdButtons() {
@@ -204,29 +182,142 @@ public class ViewEditInstanceView extends DialogWindow {
         controller.removePanelError(buttonsPanel);
         buttonsPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         close = new Button("Close").addTo(buttonsPanel).center();
-        if (current > 1) {
-            previous = new Button("Previous", this::previous).addTo(buttonsPanel);
-        }
-        if (current < total) {
-            next = new Button("Next", this::next).addTo(buttonsPanel);
-        }
-
+        previous = new Button("Previous", this::previous).addTo(buttonsPanel);
+        previous.setVisible(false);
+        next = new Button("Next", this::next).addTo(buttonsPanel);
         cancel = new Button("Cancel").addTo(buttonsPanel);
         return buttonsPanel;
     }
 
     private void previous() {
         current--;
+        if (current > 1) {
+            previous.setVisible(true);
+        }else {
+            next.setVisible(false);
+        }
+        if (current < total) {
+            next.setVisible(true);
+        }else {
+            next.setVisible(false);
+        }
         panelForQuestion.removeAllComponents();
         panelForQuestion.addComponent(createCell());
-        panelForQuestion.invalidate();
+        getFocus();
     }
 
     private void next() {
         System.out.println("next");
         current++;
+
+        if (current > 1) {
+            previous.setVisible(true);
+        }else {
+            next.setVisible(false);
+        }
+        if (current < total) {
+           next.setVisible(true);
+        }else {
+            next.setVisible(false);
+        }
         panelForQuestion.removeAllComponents();
         panelForQuestion.addComponent(createCell());
-        panelForQuestion.invalidate();
+        getFocus();
+
+
     }
+
+
+    //View pour type de réponse
+
+    public RadioBoxList<Object> getViewRadio(){
+
+        OptionList optionList = currentQuestion.getOptionList();
+        List<OptionValue> optionValues = optionList.getOptionValues();
+        radioBoxList = new RadioBoxList<>();
+
+        for (OptionValue optionValue : optionValues) {
+            radioBoxList.addItem(optionValue);
+        }
+
+        radioBoxList.takeFocus();
+        radioBoxList.addListener(new RadioBoxList.Listener() {
+            @Override
+            public void onSelectionChanged(int selectedIndex, int previousSelection) {
+                controller.removePanelError(panelError);
+                currentQuestion.save();
+            }
+        });
+
+        return radioBoxList;
+
+    }
+
+    public CheckBoxList<OptionValue> getViewCheckBox(){
+        lstOptionsValues = new CheckBoxList<>();
+        OptionList optionList = currentQuestion.getOptionList();
+        List<OptionValue> optionValues = optionList.getOptionValues();
+
+        for (OptionValue optionValue : optionValues) {
+            lstOptionsValues.addItem(optionValue);
+        }
+        return lstOptionsValues;
+    }
+
+    public ComboBox<OptionValue> getViewCombo(){
+        cbo1 = new ComboBox<>();
+        OptionList optionList = currentQuestion.getOptionList();
+        List<OptionValue> optionValues = optionList.getOptionValues();
+        OptionValue optionValueTemp = new OptionValue();
+        optionValueTemp.setLabel("-- Please choose an option --");
+        cbo1.addItem(optionValueTemp);
+        for (OptionValue optionValue : optionValues) {
+            cbo1.addItem(optionValue);
+        }
+
+        cbo1.addListener((newIndex, oldIndex, byUser) -> {
+            controller.removePanelError(panelError);
+        });
+        cbo1.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+
+        return cbo1;
+    }
+
+
+
+
+    public void validateDate(){
+        panelError.removeAllComponents();
+        String dateCurrent = date.getText();
+        String regex = "^([0-2][0-9]|3[01])/(0[1-9]|1[0-2])/\\d{4}$";
+        if(!dateCurrent.matches(regex)){
+             panelError.addComponent(new Label("Date invalid format.").setForegroundColor(TextColor.ANSI.RED));
+        }
+        panelError.addComponent(new Label("")) ;
+    }
+
+    public void getFocus(){
+        if (currentQuestion.getType().toString().equals("Radio")) {
+            radioBoxList.takeFocus();
+        } else if (currentQuestion.getType().toString().equals("Check")) {
+            lstOptionsValues.takeFocus();
+        } else if (currentQuestion.getType().toString().equals("Short")) {
+            txtShort.takeFocus();
+        } else if (currentQuestion.getType().toString().equals("Combo")) {
+            cbo1.takeFocus();
+        } else if (currentQuestion.getType().toString().equals("Email")) {
+
+
+
+
+            System.out.println("email");
+        } else if (currentQuestion.getType().toString().equals("Date")) {
+            date.takeFocus();
+        } else if (currentQuestion.getType().toString().equals("Long")) {
+            System.out.println("long");
+        }
+
+    }
+
+
 }

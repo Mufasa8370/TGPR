@@ -54,4 +54,7 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         pan.removeAllComponents();
 
     }
+
+
+
 }
