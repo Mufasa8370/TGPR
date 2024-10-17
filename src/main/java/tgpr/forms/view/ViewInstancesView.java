@@ -38,7 +38,7 @@ public class ViewInstancesView extends DialogWindow {
         setComponent(root);
 
         createFields().addTo(root);
-        createSubmittedInstancesPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root); // j'aimerais pouvoir décaler ce panel un peu vers la droite pour qu'il soit alligner avec le reste
+        createSubmittedInstancesPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
         createButtonsPanel().addTo(root);
 
         refresh();
