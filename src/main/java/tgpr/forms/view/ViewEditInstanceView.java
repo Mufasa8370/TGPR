@@ -239,13 +239,19 @@ public class ViewEditInstanceView extends DialogWindow {
         for (OptionValue optionValue : optionValues) {
             radioBoxList.addItem(optionValue);
         }
-
+        if (currentQuestion.getAnswerValue(instance) != null){
+            System.out.println("existe pas");
+        }else {
+            System.out.println("existe pas");
+        }
         radioBoxList.takeFocus();
         radioBoxList.addListener(new RadioBoxList.Listener() {
             @Override
             public void onSelectionChanged(int selectedIndex, int previousSelection) {
                 controller.removePanelError(panelError);
-                currentQuestion.save();
+                Answer answer = new Answer(instance,currentQuestion, String.valueOf(radioBoxList.getCheckedItemIndex()));
+                answer.save();
+
             }
         });
 
