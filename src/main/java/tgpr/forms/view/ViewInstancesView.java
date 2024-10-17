@@ -56,7 +56,7 @@ public class ViewInstancesView extends DialogWindow {
     }
 
     private Panel createSubmittedInstancesPanel() {
-        var panel = pnlInstances = new Panel();
+        var panel = pnlInstances = Panel.gridPanel(1, Margin.of(1));
 
         instancesTable = new ObjectTable<>(
                 new ColumnSpec<>("Id", Instance::getId)
