@@ -80,8 +80,8 @@ public class ViewEditInstanceView extends DialogWindow {
         super("Answer the Form");
         this.controller = controller;
         this.form = form;
-        instance = new Instance(form, getLoggedUser());
-        this.instance = instance;
+        this.instance =  new Instance(form, getLoggedUser());;
+        this.instance.save();
         questions = form.getQuestions();
         total = questions.size();
         instance.setStarted(LocalDateTime.now());
@@ -147,10 +147,8 @@ public class ViewEditInstanceView extends DialogWindow {
         } else if (currentQuestion.getType().toString().equals("Check")) {
             this.questionPanel.addComponent(getViewCheckBox());
         } else if (currentQuestion.getType().toString().equals("Short")) {
-            System.out.println("Short");
-            txtShort = new TextBox().addTo(this.questionPanel);
-            txtShort.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
-            txtShort.takeFocus();
+
+           questionPanel.addComponent(getViewShort());
         } else if (currentQuestion.getType().toString().equals("Combo")) {
             this.questionPanel.addComponent(getViewCombo());
             cbo1.takeFocus();
@@ -235,14 +233,15 @@ public class ViewEditInstanceView extends DialogWindow {
         OptionList optionList = currentQuestion.getOptionList();
         List<OptionValue> optionValues = optionList.getOptionValues();
         radioBoxList = new RadioBoxList<>();
+        //radioBoxList.setCheckedItemIndex(1);
 
         for (OptionValue optionValue : optionValues) {
             radioBoxList.addItem(optionValue);
         }
         if (currentQuestion.getAnswerValue(instance) != null){
-            System.out.println("existe pas");
+            radioBoxList.setCheckedItemIndex(Integer.parseInt(currentQuestion.getAnswerValue(instance)));
         }else {
-            System.out.println("existe pas");
+            System.out.println("existe pas ");
         }
         radioBoxList.takeFocus();
         radioBoxList.addListener(new RadioBoxList.Listener() {
@@ -263,7 +262,31 @@ public class ViewEditInstanceView extends DialogWindow {
         lstOptionsValues = new CheckBoxList<>();
         OptionList optionList = currentQuestion.getOptionList();
         List<OptionValue> optionValues = optionList.getOptionValues();
+        System.out.println(optionValues.get(2));
+        lstOptionsValues.setChecked(optionValues.get(2),false);
+        if (currentQuestion.getAnswerValue(instance) != null){
 
+            String answers = currentQuestion.getAnswerValue(instance);
+            List<String> answersSep = List.of(answers.split(","));
+            for (String sep : answersSep){
+                sep = sep.replace("[","").trim();
+                sep = sep.replace("]","");
+
+            }
+
+            System.out.println("exit");
+        }else {
+            System.out.println("existe pas ");
+        }
+
+
+        lstOptionsValues.addListener(new CheckBoxList.Listener() {
+            @Override
+            public void onStatusChanged(int itemIndex, boolean checked) {
+                Answer answer = new Answer(instance, currentQuestion,String.valueOf(lstOptionsValues.getCheckedItems()));
+                answer.save();
+            }
+        });
         for (OptionValue optionValue : optionValues) {
             lstOptionsValues.addItem(optionValue);
         }
@@ -280,13 +303,46 @@ public class ViewEditInstanceView extends DialogWindow {
         for (OptionValue optionValue : optionValues) {
             cbo1.addItem(optionValue);
         }
+        if (currentQuestion.getAnswerValue(instance) != null){
+            System.out.println(Integer.parseInt(currentQuestion.getAnswerValue(instance)));
+            cbo1.setSelectedIndex(Integer.parseInt(currentQuestion.getAnswerValue(instance)));
+            controller.removePanelError(panelError);
+            System.out.println("exit");
+        }else {
+            System.out.println("existe pas ");
+        }
+
 
         cbo1.addListener((newIndex, oldIndex, byUser) -> {
             controller.removePanelError(panelError);
+            Answer answer = new Answer(instance,currentQuestion, String.valueOf(newIndex));
+            answer.save();
         });
         cbo1.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
         return cbo1;
+    }
+
+    public TextBox getViewShort(){
+        txtShort = new TextBox();
+        txtShort.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+        if (currentQuestion.getAnswerValue(instance) != null){
+
+            txtShort.setText(currentQuestion.getAnswerValue(instance));
+            controller.removePanelError(panelError);
+        }else {
+            System.out.println("existe pas ");
+        }
+        txtShort.setTextChangeListener(new TextBox.TextChangeListener() {
+            @Override
+            public void onTextChanged(String newText, boolean changedByUserInteraction) {
+                controller.removePanelError(panelError);
+                Answer answer = new Answer(instance,currentQuestion,txtShort.getText());
+                answer.save();
+
+            }
+        });
+        return txtShort;
     }
 
 
