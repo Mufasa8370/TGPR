@@ -16,7 +16,7 @@ public class AnalyzeView extends DialogWindow {
     private final Label lblTitle = new Label("");
     private final Label lblDescription = new Label("");
     private final Label lblNbInstances = new Label("");
-    private ObjectTable<Object> questionsTable;
+    private ObjectTable<Question> questionsTable;
     private ObjectTable<Object> answersTable;
     private Panel pnlQuestions;
     private Panel pnlAnswers;
@@ -60,13 +60,19 @@ public class AnalyzeView extends DialogWindow {
         var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
 
         questionsTable = new ObjectTable<>(
-                new ColumnSpec<Object>("Index", question -> ((Question) question).getId() )
+                new ColumnSpec<Question>("Index", Question::getIdx)
                         .setMinWidth(4).alignRight(),
-                new ColumnSpec<Object>("Title", question -> ((Question) question).getDescription())
+                new ColumnSpec<Question>("Title", Question::getTitle)
                         .setMinWidth(7).alignLeft()
         ).addTo(panel);
 
+        questionsTable.addSelectionChangeListener(this::test);
         return panel;
+    }
+
+    public void test(int oldValue, int newValue, boolean byUser) { //renommer cette méthode, la laisser ici
+        System.out.println(questionsTable.getSelected()); // cette ligne est juste pour tester
+        // appeler le refresh ici
     }
 
 //    private Panel createAnswersPanel() {

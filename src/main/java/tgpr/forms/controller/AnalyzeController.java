@@ -24,12 +24,9 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         return form.getInstances().stream().filter(Instance::isCompleted).count();
     }
 
-    public void questionsPanel(ObjectTable<Object> statisticsTable) {
-        List<Question> questions = form.getQuestions();
-        for (int i = 0; i < questions.size(); i++) {
-            Question question = questions.get(i);
-            statisticsTable.getTableModel().addRow(String.valueOf(question.getIdx()), question.getTitle());
-        }
+    public void questionsPanel(ObjectTable<Question> statisticsTable) {
+        statisticsTable.add(form.getQuestions());
     }
+
 
 }
