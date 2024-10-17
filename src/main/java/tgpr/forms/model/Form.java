@@ -194,7 +194,7 @@ public class Form extends Model {
             Assert.isTrue(c == 1, "Something went wrong");
 
             if (isPublic && !obj.isPublic)
-                deleteAllAccesses();
+                deleteAllUserAccesses();
         }
         reload();   // reload to get default values
         return this;
@@ -322,10 +322,9 @@ public class Form extends Model {
             throw new IllegalArgumentException("Wrong model type");
     }
 
-    // gestion des permissions accessible uniquement si owner ou admin et que le form n'est pas public
-
+    // gestion des permissions accessible uniquement si owner ou admin
     public boolean mayChangePermissions(User user) {
-        return !isPublic && (user.isAdmin() || user.getId() == ownerId);
+        return user.isAdmin() || user.getId() == ownerId;
     }
 
     public List<Model> getPotentialBeneficiaries() {
@@ -387,10 +386,10 @@ public class Form extends Model {
         return getAccessType(user) == AccessType.Editor;
     }
 
-    private void deleteAllAccesses() {
-        execute("delete from user_form_accesses where form=:form",
+    private void deleteAllUserAccesses() {
+        execute("delete from user_form_accesses where form=:form and access_type='user'",
                 new Params("form", id));
-        execute("delete from distlist_form_accesses where form=:form",
+        execute("delete from distlist_form_accesses where form=:form and access_type='user'",
                 new Params("form", id));
     }
 
