@@ -6,8 +6,11 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.AnalyzeController;
+import tgpr.forms.model.Answer;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
+import tgpr.framework.ViewManager;
+
 import java.util.List;
 
 public class AnalyzeView extends DialogWindow {
@@ -17,7 +20,7 @@ public class AnalyzeView extends DialogWindow {
     private final Label lblDescription = new Label("");
     private final Label lblNbInstances = new Label("");
     private ObjectTable<Question> questionsTable;
-    private ObjectTable<Object> answersTable;
+    private ObjectTable<Answer> answersTable;
     private Panel pnlQuestions;
     private Panel pnlAnswers;
 
@@ -30,14 +33,13 @@ public class AnalyzeView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(70, 20));
+        setFixedSize(new TerminalSize(90, 20));
 
         var root = Panel.verticalPanel();
         setComponent(root);
 
         createFields().addTo(root);
-        createQuestionsPanel().addTo(root);
-//        createAnswersPanel().addTo(root);
+        createQuestionsAndAnswersPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
         createButtonsPanel().addTo(root);
 
         refresh();
@@ -56,6 +58,15 @@ public class AnalyzeView extends DialogWindow {
         return panel;
     }
 
+    private Panel createQuestionsAndAnswersPanel() {
+        var panel = Panel.gridPanel(2, Margin.of(1));
+
+        createQuestionsPanel().addTo(panel);
+        createAnswersPanel().addTo(panel);
+
+        return panel;
+    }
+
     private Panel createQuestionsPanel() {
         var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
 
@@ -66,27 +77,32 @@ public class AnalyzeView extends DialogWindow {
                         .setMinWidth(7).alignLeft()
         ).addTo(panel);
 
-        questionsTable.addSelectionChangeListener(this::test);
+        questionsTable.addSelectionChangeListener(this::onQuestionSelectionChanged);
+
         return panel;
     }
 
-    public void test(int oldValue, int newValue, boolean byUser) { //renommer cette méthode, la laisser ici
-        System.out.println(questionsTable.getSelected()); // cette ligne est juste pour tester
-        // appeler le refresh ici
+    private void onQuestionSelectionChanged(int oldValue, int newValue, boolean byUser) {
+        Question selectedQuestion = questionsTable.getSelected();
+        if (selectedQuestion != null) {
+            controller.answersPanel(answersTable, selectedQuestion);
+        }
     }
 
-//    private Panel createAnswersPanel() {
-//        var panel = pnlAnswers = new Panel();
-//
-//        answersTable = new ObjectTable<>(
-//                new ColumnSpec<Object>("Value",  )
-//                        .setMinWidth(7).alignLeft(),
-//                new ColumnSpec<Object>("Nb Occ.", )
+    private Panel createAnswersPanel() {
+        var panel = pnlAnswers = Panel.gridPanel(1, Margin.of(1));
+
+        answersTable = new ObjectTable<>(
+                new ColumnSpec<Answer>("Value", Answer::getValue )
+                        .setMinWidth(7).alignLeft()
+//                new ColumnSpec<Answer>("Nb Occ.", )
 //                        .setMinWidth(3).alignRight(),
-//                new ColumnSpec<Object>("Ratio", )
+//                new ColumnSpec<Answer>("Ratio", )
 //                        .setMinWidth(3).alignRight()
-//        ).addTo(panel);
-//    }
+        ).addTo(panel);
+
+        return panel;
+    }
 
 
     private Panel createButtonsPanel() {
@@ -110,6 +126,7 @@ public class AnalyzeView extends DialogWindow {
             lblDescription.setText(form.getDescription());
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
             controller.questionsPanel(questionsTable);
+            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), false);
 
         }
     }
