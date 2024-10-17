@@ -57,7 +57,7 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createQuestionsPanel() {
-        var panel = pnlQuestions = new Panel();
+        var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
 
         questionsTable = new ObjectTable<>(
                 new ColumnSpec<Object>("Index", question -> ((Question) question).getId() )

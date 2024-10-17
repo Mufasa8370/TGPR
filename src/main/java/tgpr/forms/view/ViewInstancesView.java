@@ -31,6 +31,7 @@ public class ViewInstancesView extends DialogWindow {
         this.form = form;
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
+        setCloseWindowWithEscape(true);
         setFixedSize(new TerminalSize(70, 20));
 
         var root = Panel.verticalPanel();
@@ -38,8 +39,6 @@ public class ViewInstancesView extends DialogWindow {
 
         createFields().addTo(root);
         createSubmittedInstancesPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root); // j'aimerais pouvoir décaler ce panel un peu vers la droite pour qu'il soit alligner avec le reste
-        // sizeTo(ViewManager.getTerminalColumns(),15) permet de spécifier une taille (columns, rows)
-        // rows 15 permet de pousser tout en bas les buttons
         createButtonsPanel().addTo(root);
 
         refresh();
@@ -57,7 +56,7 @@ public class ViewInstancesView extends DialogWindow {
     }
 
     private Panel createSubmittedInstancesPanel() {
-        var panel = pnlInstances = new Panel();
+        var panel = pnlInstances = Panel.gridPanel(1, Margin.of(1));
 
         instancesTable = new ObjectTable<>(
                 new ColumnSpec<>("Id", Instance::getId)
@@ -104,8 +103,9 @@ public class ViewInstancesView extends DialogWindow {
             Button btnDeleteAll = new Button("Delete All", this::deleteAll).addTo(panel);
         }
 
-        new Button("Close", this::close).addTo(panel);
+        Button btnClose = new Button("Close", this::close).addTo(panel);
 
+        addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
 
         return panel;
     }

@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 
+import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
 import tgpr.forms.view.SignupView;
 import tgpr.framework.Controller;
@@ -27,9 +28,10 @@ public class SignupController extends Controller<SignupView> {
         var errors = validate(email, fullName, password, confirmPassword);
         if (errors.isEmpty()) {
             var hashedPassword = password.isBlank() ? password : hash(password);
-            User user = new User(email, fullName, hashedPassword, User.Role.User);
+            User user = new User(fullName, email, hashedPassword, User.Role.User);
             user.save();
-            showMessage("Inscription réussie avec user : "+ user.getFullName() +" role -->"+user.getRole()+", le use case view_forms est en préparation :)","Info","Close");
+            Security.login(user);
+            navigateTo(new ViewFormsController());
         } else
             showErrors(errors);
 
@@ -48,7 +50,6 @@ public class SignupController extends Controller<SignupView> {
         if (emailExists(email))
             errors.add("already exists", User.Fields.Email);
 
-        // adresse mail valide
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"))
             errors.add("invalid email", User.Fields.Email);
 
@@ -58,15 +59,12 @@ public class SignupController extends Controller<SignupView> {
         if (password.length() < 8)
             errors.add("minimum 8 char", User.Fields.Password);
 
-        // password doit contenir au moins un chiffre
         if (!password.matches(".*\\d.*"))
             errors.add("must contain a digit", User.Fields.Password);
 
-        // password doit contenir au moins une lettre majuscule
         if (!password.matches(".*[A-Z].*"))
             errors.add("must contain an uppercase letter", User.Fields.Password);
 
-        // password doit contenir au moins un caractère non alphanumérique
         if (!password.matches(".*\\W.*"))
             errors.add("must contain a non-alphanumeric character", User.Fields.Password);
 
