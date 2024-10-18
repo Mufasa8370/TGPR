@@ -5,8 +5,7 @@ import tgpr.forms.model.*;
 import tgpr.forms.view.AnalyzeView;
 import tgpr.framework.Controller;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class AnalyzeController extends Controller<AnalyzeView> {
@@ -29,27 +28,25 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         questionsTable.add(form.getQuestions());
     }
 
-    public void answersPanel(ObjectTable<Answer> answersTable, Question question) {
-//        List<ValueStat> listAnswersValueStat = question.getStats();
-//        System.out.println(listAnswersValueStat);
-
+    public void answersPanel(ObjectTable<Stat> answersTable, Question question) {
         answersTable.clear();
-        List<Answer> listAnswersWithoutDoublons = getAnswersWithoutDoublons(question);
-        answersTable.add(listAnswersWithoutDoublons);
-    }
 
-    public List<Answer> getAnswersWithoutDoublons(Question question) {
-        List<Answer> listAnswersWithDoublons = question.getAnswers();
-        List<Answer> listAnswersWithoutDoublons = new ArrayList<>();
-        HashSet<String> seenValues = new HashSet<>();
+        List<ValueStat> listAnswersValueStat = question.getStats();
+        DecimalFormat df = new DecimalFormat("0.0%");
 
-        for (Answer answer : listAnswersWithDoublons) {
-            if (seenValues.add(answer.getValue())) {
-                listAnswersWithoutDoublons.add(answer);
-            }
+        int nbAnswers = 0;
+        for (ValueStat valueStat : listAnswersValueStat) {
+            nbAnswers += valueStat.getCount();
         }
 
-        return listAnswersWithoutDoublons;
+        for (ValueStat valueStat : listAnswersValueStat) {
+            Stat stat = new Stat();
+            stat.setValue(valueStat.getValue());
+            stat.setCount(valueStat.getCount());
+            double ratio = (double) valueStat.getCount() / nbAnswers;
+            stat.setRatio(df.format(ratio));
+            answersTable.add(stat);
+        }
     }
 
 }

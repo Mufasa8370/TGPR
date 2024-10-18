@@ -6,7 +6,7 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.AnalyzeController;
-import tgpr.forms.model.Answer;
+import tgpr.forms.model.Stat;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
 import tgpr.framework.ViewManager;
@@ -20,11 +20,9 @@ public class AnalyzeView extends DialogWindow {
     private final Label lblDescription = new Label("");
     private final Label lblNbInstances = new Label("");
     private ObjectTable<Question> questionsTable;
-    private ObjectTable<Answer> answersTable;
+    private ObjectTable<Stat> answersTable;
     private Panel pnlQuestions;
     private Panel pnlAnswers;
-
-
 
     public AnalyzeView(AnalyzeController controller, Form form){
         super("Statistical Analysis of Submitted Instances");
@@ -72,9 +70,9 @@ public class AnalyzeView extends DialogWindow {
 
         questionsTable = new ObjectTable<>(
                 new ColumnSpec<Question>("Index", Question::getIdx)
-                        .setMinWidth(4).alignRight(),
+                        .setMinWidth(5).alignRight(),
                 new ColumnSpec<Question>("Title", Question::getTitle)
-                        .setMinWidth(7).alignLeft()
+                        .setMinWidth(27).alignLeft()
         ).addTo(panel);
 
         questionsTable.addSelectionChangeListener(this::onQuestionSelectionChanged);
@@ -93,12 +91,12 @@ public class AnalyzeView extends DialogWindow {
         var panel = pnlAnswers = Panel.gridPanel(1, Margin.of(1));
 
         answersTable = new ObjectTable<>(
-                new ColumnSpec<Answer>("Value", Answer::getValue )
-                        .setMinWidth(7).alignLeft()
-//                new ColumnSpec<Answer>("Nb Occ.", ) )
-//                        .setMinWidth(3).alignRight()
-//                new ColumnSpec<Answer>("Ratio", )
-//                        .setMinWidth(3).alignRight()
+                new ColumnSpec<Stat>("Value", Stat::getValue )
+                        .setMinWidth(24).alignLeft(),
+                new ColumnSpec<Stat>("Nb Occ.", Stat::getCount)
+                        .setMinWidth(3).alignRight(),
+                new ColumnSpec<Stat>("Ratio", Stat::getRatio)
+                        .setMinWidth(8).alignRight()
         ).addTo(panel);
 
         return panel;
