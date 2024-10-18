@@ -95,8 +95,8 @@ public class AnalyzeView extends DialogWindow {
         answersTable = new ObjectTable<>(
                 new ColumnSpec<Answer>("Value", Answer::getValue )
                         .setMinWidth(7).alignLeft()
-//                new ColumnSpec<Answer>("Nb Occ.", )
-//                        .setMinWidth(3).alignRight(),
+//                new ColumnSpec<Answer>("Nb Occ.", ) )
+//                        .setMinWidth(3).alignRight()
 //                new ColumnSpec<Answer>("Ratio", )
 //                        .setMinWidth(3).alignRight()
         ).addTo(panel);
