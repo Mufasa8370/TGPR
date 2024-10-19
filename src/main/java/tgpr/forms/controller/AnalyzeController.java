@@ -4,7 +4,6 @@ import com.googlecode.lanterna.gui2.ObjectTable;
 import tgpr.forms.model.*;
 import tgpr.forms.view.AnalyzeView;
 import tgpr.framework.Controller;
-
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -33,11 +32,7 @@ public class AnalyzeController extends Controller<AnalyzeView> {
 
         List<ValueStat> listAnswersValueStat = question.getStats();
         DecimalFormat df = new DecimalFormat("0.0%");
-
-        int nbAnswers = 0;
-        for (ValueStat valueStat : listAnswersValueStat) {
-            nbAnswers += valueStat.getCount();
-        }
+        int nbAnswers = getNbAnswers(listAnswersValueStat);
 
         for (ValueStat valueStat : listAnswersValueStat) {
             Stat stat = new Stat();
@@ -47,6 +42,14 @@ public class AnalyzeController extends Controller<AnalyzeView> {
             stat.setRatio(df.format(ratio));
             answersTable.add(stat);
         }
+    }
+
+    public int getNbAnswers(List<ValueStat> listAnswersValueStat) {
+        int nbAnswers = 0;
+        for (ValueStat valueStat : listAnswersValueStat) {
+            nbAnswers += valueStat.getCount();
+        }
+        return nbAnswers;
     }
 
 }

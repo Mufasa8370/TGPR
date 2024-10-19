@@ -10,7 +10,6 @@ import tgpr.forms.model.Stat;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
 import tgpr.framework.ViewManager;
-
 import java.util.List;
 
 public class AnalyzeView extends DialogWindow {
@@ -102,7 +101,6 @@ public class AnalyzeView extends DialogWindow {
         return panel;
     }
 
-
     private Panel createButtonsPanel() {
         var panel = new Panel()
                 .setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
@@ -125,7 +123,6 @@ public class AnalyzeView extends DialogWindow {
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
             controller.questionsPanel(questionsTable);
             onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), false);
-
         }
     }
 }
