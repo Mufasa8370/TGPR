@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class ViewInstancesController extends Controller<ViewInstancesView> {
     private final ViewInstancesView view;
     private final Form form;
+    private Instance selectedInstance;
 
     @Override
     public ViewInstancesView getView() { return view; }
@@ -43,6 +44,15 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
         }
     }
 
+    public void setSelectedInstance(Instance instance){
+        selectedInstance = instance;
+    }
 
+    public void testDelete() {
+        if (selectedInstance != null) {
+            deleteInstance(selectedInstance);
+            view.refresh();
+        }
+    }
 
 }

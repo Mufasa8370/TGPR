@@ -6,8 +6,10 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.AnalyzeController;
+import tgpr.forms.model.Stat;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
+import tgpr.framework.ViewManager;
 import java.util.List;
 
 public class AnalyzeView extends DialogWindow {
@@ -16,12 +18,10 @@ public class AnalyzeView extends DialogWindow {
     private final Label lblTitle = new Label("");
     private final Label lblDescription = new Label("");
     private final Label lblNbInstances = new Label("");
-    private ObjectTable<Object> questionsTable;
-    private ObjectTable<Object> answersTable;
+    private ObjectTable<Question> questionsTable;
+    private ObjectTable<Stat> answersTable;
     private Panel pnlQuestions;
     private Panel pnlAnswers;
-
-
 
     public AnalyzeView(AnalyzeController controller, Form form){
         super("Statistical Analysis of Submitted Instances");
@@ -30,14 +30,13 @@ public class AnalyzeView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(70, 20));
+        setFixedSize(new TerminalSize(90, 20));
 
         var root = Panel.verticalPanel();
         setComponent(root);
 
         createFields().addTo(root);
-        createQuestionsPanel().addTo(root);
-//        createAnswersPanel().addTo(root);
+        createQuestionsAndAnswersPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
         createButtonsPanel().addTo(root);
 
         refresh();
@@ -56,32 +55,51 @@ public class AnalyzeView extends DialogWindow {
         return panel;
     }
 
-    private Panel createQuestionsPanel() {
-        var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
+    private Panel createQuestionsAndAnswersPanel() {
+        var panel = Panel.gridPanel(2, Margin.of(1));
 
-        questionsTable = new ObjectTable<>(
-                new ColumnSpec<Object>("Index", question -> ((Question) question).getId() )
-                        .setMinWidth(4).alignRight(),
-                new ColumnSpec<Object>("Title", question -> ((Question) question).getDescription())
-                        .setMinWidth(7).alignLeft()
-        ).addTo(panel);
+        createQuestionsPanel().addTo(panel);
+        createAnswersPanel().addTo(panel);
 
         return panel;
     }
 
-//    private Panel createAnswersPanel() {
-//        var panel = pnlAnswers = new Panel();
-//
-//        answersTable = new ObjectTable<>(
-//                new ColumnSpec<Object>("Value",  )
-//                        .setMinWidth(7).alignLeft(),
-//                new ColumnSpec<Object>("Nb Occ.", )
-//                        .setMinWidth(3).alignRight(),
-//                new ColumnSpec<Object>("Ratio", )
-//                        .setMinWidth(3).alignRight()
-//        ).addTo(panel);
-//    }
+    private Panel createQuestionsPanel() {
+        var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
 
+        questionsTable = new ObjectTable<>(
+                new ColumnSpec<Question>("Index", Question::getIdx)
+                        .setMinWidth(5).alignRight(),
+                new ColumnSpec<Question>("Title", Question::getTitle)
+                        .setMinWidth(27).alignLeft()
+        ).addTo(panel);
+
+        questionsTable.addSelectionChangeListener(this::onQuestionSelectionChanged);
+
+        return panel;
+    }
+
+    private void onQuestionSelectionChanged(int oldValue, int newValue, boolean byUser) {
+        Question selectedQuestion = questionsTable.getSelected();
+        if (selectedQuestion != null) {
+            controller.answersPanel(answersTable, selectedQuestion);
+        }
+    }
+
+    private Panel createAnswersPanel() {
+        var panel = pnlAnswers = Panel.gridPanel(1, Margin.of(1));
+
+        answersTable = new ObjectTable<>(
+                new ColumnSpec<Stat>("Value", Stat::getValue )
+                        .setMinWidth(24).alignLeft(),
+                new ColumnSpec<Stat>("Nb Occ.", Stat::getCount)
+                        .setMinWidth(3).alignRight(),
+                new ColumnSpec<Stat>("Ratio", Stat::getRatio)
+                        .setMinWidth(8).alignRight()
+        ).addTo(panel);
+
+        return panel;
+    }
 
     private Panel createButtonsPanel() {
         var panel = new Panel()
@@ -104,7 +122,7 @@ public class AnalyzeView extends DialogWindow {
             lblDescription.setText(form.getDescription());
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
             controller.questionsPanel(questionsTable);
-
+            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), false);
         }
     }
 }

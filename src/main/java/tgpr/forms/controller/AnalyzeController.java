@@ -1,11 +1,10 @@
 package tgpr.forms.controller;
 
 import com.googlecode.lanterna.gui2.ObjectTable;
-import tgpr.forms.model.Form;
-import tgpr.forms.model.Question;
+import tgpr.forms.model.*;
 import tgpr.forms.view.AnalyzeView;
 import tgpr.framework.Controller;
-import tgpr.forms.model.Instance;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class AnalyzeController extends Controller<AnalyzeView> {
@@ -24,12 +23,33 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         return form.getInstances().stream().filter(Instance::isCompleted).count();
     }
 
-    public void questionsPanel(ObjectTable<Object> statisticsTable) {
-        List<Question> questions = form.getQuestions();
-        for (int i = 0; i < questions.size(); i++) {
-            Question question = questions.get(i);
-            statisticsTable.getTableModel().addRow(String.valueOf(question.getIdx()), question.getTitle());
+    public void questionsPanel(ObjectTable<Question> questionsTable) {
+        questionsTable.add(form.getQuestions());
+    }
+
+    public void answersPanel(ObjectTable<Stat> answersTable, Question question) {
+        answersTable.clear();
+
+        List<ValueStat> listAnswersValueStat = question.getStats();
+        DecimalFormat df = new DecimalFormat("0.0%");
+        int nbAnswers = getNbAnswers(listAnswersValueStat);
+
+        for (ValueStat valueStat : listAnswersValueStat) {
+            Stat stat = new Stat();
+            stat.setValue(valueStat.getValue());
+            stat.setCount(valueStat.getCount());
+            double ratio = (double) valueStat.getCount() / nbAnswers;
+            stat.setRatio(df.format(ratio));
+            answersTable.add(stat);
         }
+    }
+
+    public int getNbAnswers(List<ValueStat> listAnswersValueStat) {
+        int nbAnswers = 0;
+        for (ValueStat valueStat : listAnswersValueStat) {
+            nbAnswers += valueStat.getCount();
+        }
+        return nbAnswers;
     }
 
 }
