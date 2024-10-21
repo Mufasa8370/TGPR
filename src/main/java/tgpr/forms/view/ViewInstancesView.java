@@ -38,7 +38,7 @@ public class ViewInstancesView extends DialogWindow {
         setComponent(root);
 
         createFields().addTo(root);
-        createSubmittedInstancesPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root); // j'aimerais pouvoir décaler ce panel un peu vers la droite pour qu'il soit alligner avec le reste
+        createSubmittedInstancesPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
         createButtonsPanel().addTo(root);
 
         refresh();
@@ -72,13 +72,11 @@ public class ViewInstancesView extends DialogWindow {
 //            controller.viewEditInstance(instance);
 //        });
 
-
-        // Suppression d'une instance en détectant la touche clavier delete
         this.addWindowListener(new WindowListenerAdapter() {
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                var instance = instancesTable.getSelected();
                 if (keyStroke.getKeyType() == KeyType.Backspace) {
-                    var instance = instancesTable.getSelected();
                     if (instance != null) {
                         controller.deleteInstance(instance);
                         refresh();
@@ -88,8 +86,16 @@ public class ViewInstancesView extends DialogWindow {
             }
         });
 
+        instancesTable.addSelectionChangeListener(this::onInstanceSelectionChanged);
 
         return panel;
+    }
+
+    private void onInstanceSelectionChanged(int oldValue, int newValue, boolean byUser) {
+        Instance selectedInstance = instancesTable.getSelected();
+        if (selectedInstance != null) {
+            controller.setSelectedInstance(selectedInstance);
+        }
     }
 
     private Panel createButtonsPanel() {
@@ -98,7 +104,7 @@ public class ViewInstancesView extends DialogWindow {
                 .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
         if (!controller.getSubmittedInstances().isEmpty()){
-            Button btnDeleteSelected = new Button("Delete Selected").addTo(panel);
+            Button btnDeleteSelected = new Button("Delete Selected", this.controller::testDelete).addTo(panel);
 
             Button btnDeleteAll = new Button("Delete All", this::deleteAll).addTo(panel);
         }
@@ -110,7 +116,7 @@ public class ViewInstancesView extends DialogWindow {
         return panel;
     }
 
-    private void refresh() {
+    public void refresh() {
         if (form != null) {
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
@@ -124,6 +130,7 @@ public class ViewInstancesView extends DialogWindow {
                 instancesTable.clear();
                 instancesTable.add(instances);
             }
+            onInstanceSelectionChanged(-1, instancesTable.getSelectedRow(), false);
         }
     }
 
