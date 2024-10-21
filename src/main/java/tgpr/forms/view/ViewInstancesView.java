@@ -77,13 +77,19 @@ public class ViewInstancesView extends DialogWindow {
         this.addWindowListener(new WindowListenerAdapter() {
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
+                var instance = instancesTable.getSelected();
                 if (keyStroke.getKeyType() == KeyType.Backspace) {
-                    var instance = instancesTable.getSelected();
                     if (instance != null) {
                         controller.deleteInstance(instance);
                         refresh();
                         hasBeenHandled.set(true);
                     }
+                }
+                if (keyStroke.getKeyType() == KeyType.Tab) {
+                    System.out.println("Tab pressed");
+                    controller.test(instance);
+                    refresh();
+                    hasBeenHandled.set(true);
                 }
             }
         });
@@ -98,7 +104,7 @@ public class ViewInstancesView extends DialogWindow {
                 .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
         if (!controller.getSubmittedInstances().isEmpty()){
-            Button btnDeleteSelected = new Button("Delete Selected").addTo(panel);
+            Button btnDeleteSelected = new Button("Delete Selected", this.controller::testDelete).addTo(panel);
 
             Button btnDeleteAll = new Button("Delete All", this::deleteAll).addTo(panel);
         }
