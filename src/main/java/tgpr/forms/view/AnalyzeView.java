@@ -108,7 +108,7 @@ public class AnalyzeView extends DialogWindow {
 
         Button btnClose = new Button("Close", this::close).addTo(panel);
 
-        Button viewInstances = new Button("View Instances").addTo(panel);
+        Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
 
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
         addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));

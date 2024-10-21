@@ -52,4 +52,8 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         return nbAnswers;
     }
 
+    public void viewInstances() {
+        navigateTo(new ViewInstancesController(form));
+    }
+
 }
