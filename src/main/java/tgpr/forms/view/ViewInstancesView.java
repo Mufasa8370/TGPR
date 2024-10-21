@@ -72,8 +72,6 @@ public class ViewInstancesView extends DialogWindow {
 //            controller.viewEditInstance(instance);
 //        });
 
-
-        // Suppression d'une instance en détectant la touche clavier delete
         this.addWindowListener(new WindowListenerAdapter() {
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
@@ -85,17 +83,19 @@ public class ViewInstancesView extends DialogWindow {
                         hasBeenHandled.set(true);
                     }
                 }
-                if (keyStroke.getKeyType() == KeyType.Tab) {
-                    System.out.println("Tab pressed");
-                    controller.test(instance);
-                    refresh();
-                    hasBeenHandled.set(true);
-                }
             }
         });
 
+        instancesTable.addSelectionChangeListener(this::onInstanceSelectionChanged);
 
         return panel;
+    }
+
+    private void onInstanceSelectionChanged(int oldValue, int newValue, boolean byUser) {
+        Instance selectedInstance = instancesTable.getSelected();
+        if (selectedInstance != null) {
+            controller.setSelectedInstance(selectedInstance);
+        }
     }
 
     private Panel createButtonsPanel() {
@@ -116,7 +116,7 @@ public class ViewInstancesView extends DialogWindow {
         return panel;
     }
 
-    private void refresh() {
+    public void refresh() {
         if (form != null) {
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
@@ -130,6 +130,7 @@ public class ViewInstancesView extends DialogWindow {
                 instancesTable.clear();
                 instancesTable.add(instances);
             }
+            onInstanceSelectionChanged(-1, instancesTable.getSelectedRow(), false);
         }
     }
 
