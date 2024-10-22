@@ -4,7 +4,10 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.controller.ViewEditInstanceController;
+import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.*;
 
 import java.time.LocalDateTime;
@@ -12,9 +15,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static tgpr.forms.model.Security.getLoggedUser;
+import static tgpr.framework.Controller.navigateTo;
 
 public class ViewEditInstanceView extends DialogWindow {
     private final ViewEditInstanceController controller;
@@ -55,7 +60,7 @@ public class ViewEditInstanceView extends DialogWindow {
 
 
     // Si instance existe
-    public ViewEditInstanceView(ViewEditInstanceController controller, Instance i) {
+    public ViewEditInstanceView(ViewEditInstanceController controller, Instance i,Form form) {
         super("Open a form");
         this.controller = controller;
         this.instance = i;
@@ -86,21 +91,31 @@ public class ViewEditInstanceView extends DialogWindow {
     }
 
     // Si instance existe pas
-    public ViewEditInstanceView(ViewEditInstanceController controller, Form form) {
+    public ViewEditInstanceView(ViewEditInstanceController controller, Form form, Instance instance) {
         super("Answer the Form");
         this.controller = controller;
         this.form = form;
-        this.instance =  new Instance(form, getLoggedUser());;
+        System.out.println(instance.getId());
+        this.instance =  instance;
         this.instance.save();
         questions = form.getQuestions();
         total = questions.size();
         instance.setStarted(LocalDateTime.now());
         setHints(List.of(Window.Hint.CENTERED, Window.Hint.FIXED_SIZE));
-        setCloseWindowWithEscape(true);
+        setCloseWindowWithEscape(false);
         setFixedSize(new TerminalSize(85, 28));
 
         root = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
         setComponent(root);
+        addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
+                if (keyStroke.getKeyType() == KeyType.Escape) {
+                    // Redirection vers une autre page
+                    navigateTo(new ViewFormsController());
+                }
+            }
+        });
 
         // Panel pour les infos dessus
         titlePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -179,13 +194,13 @@ public class ViewEditInstanceView extends DialogWindow {
         buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         controller.removePanelError(buttonsPanel);
         buttonsPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
-        close = new Button("Close").addTo(buttonsPanel).center();
+        close = new Button("Close", controller::close).addTo(buttonsPanel).center();
         previous = new Button("Previous", this::previous).addTo(buttonsPanel);
         previous.setVisible(false);
         next = new Button("Next", this::next).addTo(buttonsPanel);
-        submission = new Button("Submit").addTo(buttonsPanel);
+        submission = new Button("Submit", controller::submit).addTo(buttonsPanel);
         submission.setVisible(false);
-        cancel = new Button("Cancel").addTo(buttonsPanel);
+        cancel = new Button("Cancel", controller::cancel).addTo(buttonsPanel);
 
         return buttonsPanel;
     }
@@ -265,18 +280,20 @@ public class ViewEditInstanceView extends DialogWindow {
         lstOptionsValues = new CheckBoxList<>();
         OptionList optionList = currentQuestion.getOptionList();
         List<OptionValue> optionValues = optionList.getOptionValues();
-        lstOptionsValues.setChecked(optionValues.get(2),false);
 
 
 
         lstOptionsValues.addListener(new CheckBoxList.Listener() {
             @Override
             public void onStatusChanged(int itemIndex, boolean checked) {
-                if( lstOptionsValues.getCheckedItems() != null){
+                System.out.println("checked");
+                if( !lstOptionsValues.getCheckedItems().isEmpty()){
+                    System.out.println(String.valueOf(lstOptionsValues.getCheckedItems()));
                     removeError();
                     Answer answer = new Answer(instance, currentQuestion,String.valueOf(lstOptionsValues.getCheckedItems()));
                     answer.save();
                 }else {
+                    System.out.println("no Chacked");
                     if (currentQuestion.getRequired()){
                         getRequired();
                     }
