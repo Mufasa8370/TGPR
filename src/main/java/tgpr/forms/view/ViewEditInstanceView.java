@@ -12,20 +12,17 @@ import tgpr.forms.model.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
-import static tgpr.forms.model.Security.getLoggedUser;
 import static tgpr.framework.Controller.navigateTo;
 
 public class ViewEditInstanceView extends DialogWindow {
     private final ViewEditInstanceController controller;
-    private Instance instance;
+    private final Instance instance;
     private Form form;
-    private Panel panelForQuestion = new Panel();
+    private final Panel panelForQuestion = new Panel();
     private int current = 1;
     private int total;
     private Button next;
@@ -35,7 +32,7 @@ public class ViewEditInstanceView extends DialogWindow {
     private  Question currentQuestion;
 
     // Attributs de classe pour les composants
-    private Panel root;
+    private final Panel root;
     private Panel titlePanel;
     private Panel questionPanel;
     private Panel labelPanel;
@@ -48,9 +45,6 @@ public class ViewEditInstanceView extends DialogWindow {
     private Button previous;
     private Button cancel;
     private Button submission;
-
-    private final Label labelRequired = new Label("This question is required.");
-    private final Label labelErrorsFormatDate = new Label("Date invalid format.");
 
     private TextBox date;
     private TextBox txtShort;
@@ -83,24 +77,91 @@ public class ViewEditInstanceView extends DialogWindow {
         buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         Button viewSubmission = new Button("View Submission", controller::viewSubmission).addTo(buttonsPanel);
         Button submitAgain = new Button("Submit again", controller::submitAgain).addTo(buttonsPanel);
-        Button cancel = new Button("Cancel", controller::cancel).addTo(buttonsPanel);
+        Button cancel = new Button("Cancel", controller::close).addTo(buttonsPanel);
         buttonsPanel.addComponent(viewSubmission);
         buttonsPanel.addComponent(submitAgain);
         buttonsPanel.addComponent(cancel);
         root.addComponent(buttonsPanel);
+        viewSubmission.takeFocus();
     }
 
+
+    //Voir instance
+    public ViewEditInstanceView(ViewEditInstanceController controller, Form form, Instance instance){
+        super("View Answers");
+        this.controller = controller;
+        this.form = form;
+        this.instance =  instance;
+        this.instance.save();
+        questions = form.getQuestions();
+        total = questions.size();
+        if (instance.getStarted() == null){
+            instance.setStarted(LocalDateTime.now());
+        }
+        setHints(List.of(Window.Hint.CENTERED, Window.Hint.FIXED_SIZE));
+        setCloseWindowWithEscape(false);
+        setFixedSize(new TerminalSize(85, 28));
+
+        root = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        setComponent(root);
+        addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
+                if (keyStroke.getKeyType() == KeyType.Escape) {
+                    // Redirection vers une autre page
+                    navigateTo(new ViewFormsController());
+                }
+            }
+        });
+
+        // Panel pour les infos dessus
+        titlePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        root.addComponent(titlePanel);
+
+        labelPanel = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        labelPanel.addComponent(new Label("Title:"));
+        labelPanel.addComponent(new Label("Description:"));
+        labelPanel.addComponent(new Label("Started on:"));
+        labelPanel.addComponent(new Label("Submitted on:"));
+        titlePanel.addComponent(labelPanel);
+        titlePanel.addComponent(new EmptySpace());
+
+        valuesPanel = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        valuesPanel.addComponent(new Label(form.getTitle()).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        valuesPanel.addComponent(new Label(form.getDescription()).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        valuesPanel.addComponent(new Label(instance.getStarted().format(formatter)).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        valuesPanel.addComponent(new Label(instance.getCompleted().format(formatter)).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        titlePanel.addComponent(valuesPanel);
+
+        root.addComponent(titlePanel);
+        root.addComponent(new EmptySpace());
+        root.addComponent(panelForQuestion);
+
+
+        // Création réponses
+        panelForQuestion.addComponent(createCellForCompleted());
+
+
+        // Boutons
+        root.addComponent(createdButtonsForCompleted());
+
+
+    }
     // Si instance existe pas
-    public ViewEditInstanceView(ViewEditInstanceController controller, Form form, Instance instance) {
+    public ViewEditInstanceView(ViewEditInstanceController controller, Form form, Instance instance, int current) {
         super("Answer the Form");
         this.controller = controller;
         this.form = form;
+        this.current = current;
         System.out.println(instance.getId());
         this.instance =  instance;
         this.instance.save();
         questions = form.getQuestions();
         total = questions.size();
-        instance.setStarted(LocalDateTime.now());
+        if (instance.getStarted() == null){
+            instance.setStarted(LocalDateTime.now());
+        }
         setHints(List.of(Window.Hint.CENTERED, Window.Hint.FIXED_SIZE));
         setCloseWindowWithEscape(false);
         setFixedSize(new TerminalSize(85, 28));
@@ -190,6 +251,46 @@ public class ViewEditInstanceView extends DialogWindow {
         return this.questionPanel.withBorder(Borders.singleLine("Question " + current + " of " + total));
     }
 
+    private Border createCellForCompleted() {
+        questionPanel = new Panel();
+        questionPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        questionPanel.setPreferredSize(new TerminalSize(83, 20));
+        currentQuestion = form.getQuestions().get(current - 1);
+        questionPanel.addComponent(new EmptySpace());
+
+        // QUESTION
+        Panel questionTitlePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        if (currentQuestion.getRequired()) {
+            questionTitlePanel.addComponent(new Label("(*)").setForegroundColor(TextColor.ANSI.RED));
+        }
+        questionTitlePanel.addComponent(new Label(currentQuestion.getTitle()).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        questionPanel.addComponent(questionTitlePanel);
+
+        // REPONSE
+        questionPanel.addComponent(new EmptySpace());
+
+        //Reponse String
+        String reponse = currentQuestion.getAnswerValue(instance);
+        if (reponse != null){
+            if (currentQuestion.getType().toString().equals("Check")){
+                reponse = reponse.replace("[","").replace("]","");
+                List<String> reponses = List.of(reponse.split(","));
+                for (String rep : reponses){
+                    questionPanel.addComponent(new Label(rep.trim()));
+                }
+            }else{
+                questionPanel.addComponent(new Label(reponse));
+            }
+
+        }
+
+
+
+
+        questionPanel.addComponent(new EmptySpace());
+        return this.questionPanel.withBorder(Borders.singleLine("Question " + current + " of " + total));
+    }
+
     public Panel createdButtons() {
         buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         controller.removePanelError(buttonsPanel);
@@ -198,9 +299,20 @@ public class ViewEditInstanceView extends DialogWindow {
         previous = new Button("Previous", this::previous).addTo(buttonsPanel);
         previous.setVisible(false);
         next = new Button("Next", this::next).addTo(buttonsPanel);
-        submission = new Button("Submit", controller::submit).addTo(buttonsPanel);
+        submission = new Button("Submit", () -> controller.submit(instance)).addTo(buttonsPanel);
         submission.setVisible(false);
-        cancel = new Button("Cancel", controller::cancel).addTo(buttonsPanel);
+        cancel = new Button("Cancel", () -> controller.cancel(instance)).addTo(buttonsPanel);
+
+        return buttonsPanel;
+    }
+    public Panel createdButtonsForCompleted() {
+        buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        controller.removePanelError(buttonsPanel);
+        buttonsPanel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+        close = new Button("Close", controller::close).addTo(buttonsPanel).center();
+        previous = new Button("Previous", this::previous).addTo(buttonsPanel);
+        previous.setVisible(false);
+        next = new Button("Next", this::next).addTo(buttonsPanel);
 
         return buttonsPanel;
     }
@@ -221,14 +333,25 @@ public class ViewEditInstanceView extends DialogWindow {
     private void visibleOfHiddenButton() {
         previous.setVisible(current > 1);
         next.setVisible(current < total);
-        if(current == total){
-            submission.setVisible(true);
+        if(submission != null){
+            submission.setVisible(current == total);
+            panelForQuestion.removeAllComponents();
+            removeError();
+            panelForQuestion.addComponent(createCell());
+            getFocus();
+        }else {
+            panelForQuestion.removeAllComponents();
+            panelForQuestion.addComponent(createCellForCompleted());
+            if (next.isVisible()){
+                next.takeFocus();
+            }else{
+                previous.takeFocus();
+            }
         }
-        panelForQuestion.removeAllComponents();
-        removeError();
-        panelForQuestion.addComponent(createCell());
 
-        getFocus();
+
+
+
     }
 
 
@@ -245,22 +368,21 @@ public class ViewEditInstanceView extends DialogWindow {
         }
 
         radioBoxList.takeFocus();
-        radioBoxList.addListener(new RadioBoxList.Listener() {
-            @Override
-            public void onSelectionChanged(int selectedIndex, int previousSelection) {
-                if(radioBoxList.getCheckedItem() != null){
-                    Answer answer = new Answer(instance,currentQuestion, String.valueOf(radioBoxList.getCheckedItemIndex()));
-                    answer.save();
-                    removeError();
+        radioBoxList.addListener((selectedIndex, previousSelection) -> {
+            if(radioBoxList.getCheckedItem() != null){
+                Answer answer = new Answer(instance,currentQuestion, String.valueOf(radioBoxList.getCheckedItemIndex()));
+                answer.save();
+                removeError();
 
-                }else {
-                    if (currentQuestion.getRequired()){
-                        getRequired();
-                    }
+            }else {
+                if (currentQuestion.getRequired()){
+                    getRequired();
                 }
-
-
+                Answer answer = instance.getAnswer(currentQuestion);
+                answer.delete();
             }
+
+
         });
         panelRadio.addComponent(radioBoxList);
         if (currentQuestion.getAnswerValue(instance) != null){
@@ -283,23 +405,19 @@ public class ViewEditInstanceView extends DialogWindow {
 
 
 
-        lstOptionsValues.addListener(new CheckBoxList.Listener() {
-            @Override
-            public void onStatusChanged(int itemIndex, boolean checked) {
-                System.out.println("checked");
-                if( !lstOptionsValues.getCheckedItems().isEmpty()){
-                    System.out.println(String.valueOf(lstOptionsValues.getCheckedItems()));
-                    removeError();
-                    Answer answer = new Answer(instance, currentQuestion,String.valueOf(lstOptionsValues.getCheckedItems()));
-                    answer.save();
-                }else {
-                    System.out.println("no Chacked");
-                    if (currentQuestion.getRequired()){
-                        getRequired();
-                    }
+        lstOptionsValues.addListener((itemIndex, checked) -> {
+            if( !lstOptionsValues.getCheckedItems().isEmpty()){
+                removeError();
+                Answer answer = new Answer(instance, currentQuestion,String.valueOf(lstOptionsValues.getCheckedItems()));
+                answer.save();
+            }else {
+                Answer answer = instance.getAnswer(currentQuestion);
+                answer.delete();
+                if (currentQuestion.getRequired()){
+                    getRequired();
                 }
-
             }
+
         });
         for (OptionValue optionValue : optionValues) {
             lstOptionsValues.addItem(optionValue);
@@ -347,6 +465,8 @@ public class ViewEditInstanceView extends DialogWindow {
                 Answer answer = new Answer(instance,currentQuestion, String.valueOf(newIndex));
                 answer.save();
             }else {
+                Answer answer = instance.getAnswer(currentQuestion);
+                answer.delete();
                 if (currentQuestion.getRequired()){
                     getRequired();
                 }
@@ -377,6 +497,8 @@ public class ViewEditInstanceView extends DialogWindow {
                     Answer answer = new Answer(instance,currentQuestion,txtShort.getText());
                     answer.save();
                 }else {
+                    Answer answer = instance.getAnswer(currentQuestion);
+                    answer.delete();
                     if (currentQuestion.getRequired())
                         getRequired();
                 }
@@ -392,7 +514,9 @@ public class ViewEditInstanceView extends DialogWindow {
         if (currentQuestion.getAnswerValue(instance) != null){
             date.setText(currentQuestion.getAnswerValue(instance));
             removeError();
-            validateDate();
+            if(!controller.validateDate(date.getText())){
+                getErrorValidateDate();
+            }
         }else {
             if (currentQuestion.getRequired()){
                 getRequired();
@@ -403,9 +527,13 @@ public class ViewEditInstanceView extends DialogWindow {
                 Answer answer = new Answer(instance,currentQuestion,date.getText());
                 answer.save();
                 removeError();
-                validateDate();
+                if(!controller.validateDate(date.getText())){
+                    getErrorValidateDate();
+                }
             }else {
                 removeError();
+                Answer answer = instance.getAnswer(currentQuestion);
+                answer.delete();
                 if (currentQuestion.getRequired()){
 
                     getRequired();
@@ -421,7 +549,9 @@ public class ViewEditInstanceView extends DialogWindow {
         email  = new TextBox().setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
         if (currentQuestion.getAnswerValue(instance) != null){
             email.setText(currentQuestion.getAnswerValue(instance));
-            validateEmail();
+            if(!controller.validateEmail(email.getText())){
+                getErrorValidateEmail();
+            }
         }else {
            if(currentQuestion.getRequired()){
                getRequired();
@@ -432,8 +562,12 @@ public class ViewEditInstanceView extends DialogWindow {
                 Answer answer = new Answer(instance,currentQuestion,email.getText());
                 answer.save();
                 removeError();
-                validateEmail();
+                if(!controller.validateEmail(email.getText())){
+                    getErrorValidateEmail();
+                }
             }else {
+                Answer answer = instance.getAnswer(currentQuestion);
+                answer.delete();
                 removeError();
                 if (currentQuestion.getRequired()){
 
@@ -448,12 +582,10 @@ public class ViewEditInstanceView extends DialogWindow {
     }
 
     public TextBox getViewLong(){
-        longTextBox  = new TextBox().setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
+        longTextBox  = new TextBox(new TerminalSize(40, 10)).setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
         if (currentQuestion.getAnswerValue(instance) != null){
             longTextBox.setText(currentQuestion.getAnswerValue(instance));
-            removeError();
-            validateLong();
         }else {
             if (currentQuestion.getRequired()){
                 getRequired();
@@ -465,9 +597,11 @@ public class ViewEditInstanceView extends DialogWindow {
                 Answer answer = new Answer(instance,currentQuestion,longTextBox.getText());
                 answer.save();
                 removeError();
-                validateLong();
+
             }else {
                 removeError();
+                Answer answer = instance.getAnswer(currentQuestion);
+                answer.delete();
                 if (currentQuestion.getRequired()){
 
                     getRequired();
@@ -480,46 +614,9 @@ public class ViewEditInstanceView extends DialogWindow {
 
 
 
-    public void validateDate(){
-        String dateCurrent = date.getText();
-        String regex = "^([0-2][0-9]|3[01])/(0[1-9]|1[0-2])/\\d{3,}$";
-        if(!dateCurrent.matches(regex)){
-           getErrorValidateDate();
-        }else{
-           removeError();
-        }
-        if (dateCurrent.isEmpty() && currentQuestion.getRequired()){
-            getRequired();
-        }
-    }
 
-    public void validateLong(){
-        String longTxt = longTextBox.getText();
-        String regex = "^[0-9]+$";
-        if(!longTxt.matches(regex)){
-            getErrorValidateLong();
-        }else{
-            removeError();
-        }
-        if (longTxt.isEmpty() && currentQuestion.getRequired()){
-            getRequired();
-        }
-    }
 
-    public void validateEmail(){
-        System.out.println("email11");
-        String emailCurrent = email.getText();
-        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        if(!emailCurrent.matches(regex)){
-            getErrorValidateEmail();
-            System.out.println("emailErrorr");
-        }else{
-            removeError();
-        }
-        if (emailCurrent.isEmpty() && currentQuestion.getRequired()){
-            getRequired();
-        }
-    }
+
 
     public void getFocus(){
         if (currentQuestion.getType().toString().equals("Radio")) {
@@ -532,14 +629,11 @@ public class ViewEditInstanceView extends DialogWindow {
             cbo1.takeFocus();
         } else if (currentQuestion.getType().toString().equals("Email")) {
 
-
-
-
-            System.out.println("email");
+            email.takeFocus();
         } else if (currentQuestion.getType().toString().equals("Date")) {
             date.takeFocus();
         } else if (currentQuestion.getType().toString().equals("Long")) {
-            System.out.println("long");
+            longTextBox.takeFocus();
         }
 
     }
