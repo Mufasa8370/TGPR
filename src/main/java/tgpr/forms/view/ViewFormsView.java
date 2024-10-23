@@ -80,7 +80,7 @@ public class ViewFormsView extends BasicWindow{
          if(!getLoggedUser().isGuest()){
              Button buttonCreateForm = new Button("Creat a new form", controller::createNewForm).addTo(footer);
          }
-        footer.addComponent(new EmptySpace(new TerminalSize(1000, 1)));
+        footer.addComponent(new EmptySpace(new TerminalSize(45, 1)));
 
 
         footer.addComponent(paginator);
