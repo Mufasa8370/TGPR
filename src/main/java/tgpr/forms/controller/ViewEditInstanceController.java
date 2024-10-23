@@ -11,7 +11,7 @@ import tgpr.framework.Controller;
 
 import java.util.List;
 
-import static tgpr.forms.model.Security.getLoggedUser;
+import static tgpr.forms.model.Security.*;
 
 public class ViewEditInstanceController extends Controller<ViewEditInstanceView> {
     private final ViewEditInstanceView view;
@@ -103,24 +103,34 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
 
 
     public void close() {
-        navigateTo(new ViewFormsController());
+        if(isGuest()){
+            cancel(instance);
+        }else{
+            navigateTo(new ViewFormsController());
+        }
     }
 
     public void submit(Instance instance) {
         List<Question> questions = form.getQuestions();
         for(int i = 0; i < questions.size(); i++){
             if(!verifyQuestionRequired(questions.get(i),instance)){
+                showMessage("You must correct all errors before submitting the form.","Error","OK");
                 navigateTo(new ViewEditInstanceController(instance,form,i+1));
             }
             if(!verifyQuestionFormat(questions.get(i),instance)){
-                System.out.println("ok3");
+                showMessage("You must correct all errors before submitting the form.","Error","OK");
                 navigateTo(new ViewEditInstanceController(instance,form,i+1));
             }
 
         }
-        instance.submit();
-        showMessage("The form has been successyfully submitted", "Information", "OK");
-        navigateTo(new ViewFormsController());
+        boolean confirmed = askConfirmation("Are you sure you want to submit this form?", "Submit Form");
+        if (confirmed) {
+            instance.submit();
+            showMessage("The form has been successyfully submitted", "Information", "OK");
+            navigateTo(new ViewFormsController());
+
+        }
+
 
 
     }

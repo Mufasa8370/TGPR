@@ -104,15 +104,7 @@ public class ViewEditInstanceView extends DialogWindow {
 
         root = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
         setComponent(root);
-        addWindowListener(new WindowListenerAdapter() {
-            @Override
-            public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
-                if (keyStroke.getKeyType() == KeyType.Escape) {
-                    // Redirection vers une autre page
-                    navigateTo(new ViewFormsController());
-                }
-            }
-        });
+
 
         // Panel pour les infos dessus
         titlePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -172,8 +164,12 @@ public class ViewEditInstanceView extends DialogWindow {
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
                 if (keyStroke.getKeyType() == KeyType.Escape) {
-                    // Redirection vers une autre page
-                    navigateTo(new ViewFormsController());
+                    if(Security.isGuest()){
+                        controller.cancel(instance);
+                    }else{
+                        navigateTo(new ViewFormsController());
+                    }
+
                 }
             }
         });
