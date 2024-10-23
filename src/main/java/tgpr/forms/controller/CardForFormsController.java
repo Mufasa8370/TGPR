@@ -8,6 +8,7 @@ import java.util.List;
 import static tgpr.forms.model.Question.getAll;
 import static tgpr.forms.model.Security.getLoggedUser;
 import static tgpr.forms.model.Security.isLogged;
+import static tgpr.framework.Controller.navigateTo;
 import static tgpr.framework.Controller.showMessage;
 
 
@@ -69,9 +70,9 @@ public class CardForFormsController {
     }
 
 
-    public void open() {
-        showMessage("Le use case  view_edit_instance est en préparation :)","Info","Close");
-    }
+    public void open(Instance i, Form form) {
+        navigateTo(new ViewEditInstanceController(i, form));
+     }
 
     public void manage(Form form) {
         showMessage("Ouverture du form "+form.getTitle()+".Le use case view_form est en préparation :)","Info","Close");
