@@ -25,28 +25,25 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
     }
 
     public ViewEditInstanceController(Instance i, Form form) {
-        System.out.println("ok2" + getLoggedUser().getFullName());
         this.form = form;
         if(i != null){
             this.instance = i;
-            System.out.println(i.getCompleted());
             if(i.getCompleted() != null){
-                System.out.println("ok");
 
                 view = new ViewEditInstanceView(this, i, form);
             }else {
                 //Instance non completée
                 view = new ViewEditInstanceView(this,form,instance,1);
-                System.out.println("ok1");
+
 
             }
 
         }else {
 
-            System.out.println("acune instance");
-
+            Instance instanceNew = new Instance(form, getLoggedUser());
+            this.instance = instanceNew;
             //Aucune instance
-            view = new ViewEditInstanceView(this,form, new Instance(form, getLoggedUser()),1);
+            view = new ViewEditInstanceView(this,form,instanceNew ,1);
         }
 
     }
@@ -106,7 +103,7 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         if(isGuest()){
             cancel(instance);
         }else{
-            navigateTo(new ViewFormsController());
+           view.close();
         }
     }
 
