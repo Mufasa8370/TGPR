@@ -27,7 +27,7 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
     }
 
     public void viewEditInstance(Instance instance){
-        navigateTo(new ViewEditInstanceController(instance, form));
+        navigateTo(new ViewEditInstanceController(form, instance));
     }
 
     public void deleteAll(){
