@@ -35,11 +35,11 @@ public class CardForFormsView extends Panel{
         Label descriptionLabel = new Label(cutText(description, 32));
         descriptionLabel.center().addStyle(SGR.ITALIC).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT);
         pan.addComponent((descriptionLabel));
-        pan.addComponent(new EmptySpace());
+        //pan.addComponent(new EmptySpace());
         pan.addComponent(new Label(cutText("Created by " +form.getOwner().getFullName(),32)).center());
         pan.addComponent(new Label(cutText(getLastInstance(getLoggedUser(),form)[0],32)).center());
         pan.addComponent(new Label(cutText(getLastInstance(getLoggedUser(),form)[1],32)).center());
-        pan.addComponent(new EmptySpace());
+        //pan.addComponent(new EmptySpace());
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL)).center();
         //ICI POUR view_edit_instance!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if(questionInForm(form)){
@@ -61,7 +61,7 @@ public class CardForFormsView extends Panel{
         pan.addComponent(buttons);
         //Bouton open
         // bouton Manage
-        pan.setPreferredSize(new TerminalSize(35,10));
+        pan.setPreferredSize(new TerminalSize(35,6));
 
         return pan
                 .withBorder(Borders.singleLine());

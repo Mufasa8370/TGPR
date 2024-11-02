@@ -50,6 +50,10 @@ public class ViewFormsView extends BasicWindow{
         if(!getLoggedUser().isGuest()){
             Menu menuParameters = new Menu("Parameters");
             menuBar.add(menuParameters);
+            MenuItem menuManageOptionList = new MenuItem("Manage your Option Lists", controller::manageYourOptionList);
+            menuParameters.add(menuManageOptionList);
+            MenuItem menuManageDistributionList = new MenuItem("Manage your Distribution Lists", controller::manageYourDistributionList);
+            menuParameters.add(menuManageDistributionList);
         }
 
 
@@ -91,7 +95,6 @@ public class ViewFormsView extends BasicWindow{
     }
 
     private void reloadData(Integer page) {
-        System.out.println("appel   " + page);
         String filter = txtFilter.getText();
         int cardPerPage = 9;
         int start = page * cardPerPage;
@@ -101,7 +104,7 @@ public class ViewFormsView extends BasicWindow{
         List<Form> forms = Form.getForUser(user,filter,start,cardPerPage);
 
         //Nb form par ligne
-        cardPanel.setLayoutManager(new GridLayout(3).setVerticalSpacing(1).setHorizontalSpacing(1));
+        cardPanel.setLayoutManager(new GridLayout(3));
 
         for (Form form : forms){
             CardForFormsView card = new CardForFormsView(form,new CardForFormsController());
