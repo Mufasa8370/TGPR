@@ -35,15 +35,14 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
                 //Instance non completée
                 view = new ViewEditInstanceView(this,form,instance,1);
 
-
             }
 
         }else {
-
             Instance instanceNew = new Instance(form, getLoggedUser());
             this.instance = instanceNew;
+
             //Aucune instance
-            view = new ViewEditInstanceView(this,form,instanceNew ,1);
+            view = new ViewEditInstanceView(this,form, instanceNew,1);
         }
 
     }
@@ -103,7 +102,7 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         if(isGuest()){
             cancel(instance);
         }else{
-           view.close();
+            view.close();
         }
     }
 
