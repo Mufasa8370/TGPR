@@ -67,10 +67,10 @@ public class ViewInstancesView extends DialogWindow {
                         //.setMinWidth(20) --> produit une erreur si j'insère cette ligne de code
         ).addTo(panel);
 
-//        instancesTable.setSelectAction(() -> {
-//            var instance = instancesTable.getSelected();
-//            controller.viewEditInstance(instance);
-//        });
+        instancesTable.setSelectAction(() -> {
+            var instance = instancesTable.getSelected();
+            controller.viewEditInstance(instance);
+        });
 
         this.addWindowListener(new WindowListenerAdapter() {
             @Override
