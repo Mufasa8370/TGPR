@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class LoginController extends Controller<LoginView> {
+
+
     public void exit() {
         System.exit(0);
     }

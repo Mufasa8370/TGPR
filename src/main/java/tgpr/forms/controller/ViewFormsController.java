@@ -29,4 +29,11 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     public void createNewForm() {
         showMessage("Le use case add_edit_form est en préparation :)","Info","Close");
     }
+
+    public void manageYourOptionList() {
+        //navigateTo(AddEditOptionListController());
+    }
+
+    public void manageYourDistributionList() {
+    }
 }
