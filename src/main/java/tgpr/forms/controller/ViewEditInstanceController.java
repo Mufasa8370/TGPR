@@ -68,11 +68,13 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
     //public Question getNextQuestion()
 
     public void viewSubmission() {
+        close();
         navigateTo(new ViewEditInstanceController(form,instance));
 
     }
 
     public void submitAgain() {
+        close();
         navigateTo(new ViewEditInstanceController(null,form));
     }
 
@@ -111,10 +113,12 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         for(int i = 0; i < questions.size(); i++){
             if(!verifyQuestionRequired(questions.get(i),instance)){
                 showMessage("You must correct all errors before submitting the form.","Error","OK");
+                close();
                 navigateTo(new ViewEditInstanceController(instance,form,i+1));
             }
             if(!verifyQuestionFormat(questions.get(i),instance)){
                 showMessage("You must correct all errors before submitting the form.","Error","OK");
+                close();
                 navigateTo(new ViewEditInstanceController(instance,form,i+1));
             }
 
@@ -123,6 +127,7 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         if (confirmed) {
             instance.submit();
             showMessage("The form has been successyfully submitted", "Information", "OK");
+            close();
             navigateTo(new ViewFormsController());
 
         }
