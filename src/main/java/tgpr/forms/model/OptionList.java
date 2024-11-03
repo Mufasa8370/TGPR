@@ -36,6 +36,11 @@ public class OptionList extends Model {
                 new Params("id", id));
     }
 
+    public List<OptionValue> getOptionValuesIndexAndLabelByName() { //à modifier pour utiliser le nom
+        return queryList(OptionValue.class, "select idx,label from option_values where option_list=:id order by idx",
+                new Params("id", id));
+    }
+
     public List<Question> getQuestions() {
         return queryList(Question.class, "select * from questions where option_list=:id",
                 new Params("id", id));

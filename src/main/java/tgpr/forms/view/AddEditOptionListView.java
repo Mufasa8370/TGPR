@@ -5,7 +5,9 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.AddEditOptionListController;
 import tgpr.forms.model.OptionList;
+import tgpr.forms.model.OptionValue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -14,19 +16,20 @@ public class AddEditOptionListView extends DialogWindow {
     private final Panel panelForOptionListUpdate = new Panel();
     private OptionList optionList;
 
-    private Button reorder;
-    private Button delete;
-    private Button save;
-    private Button close;
-    private Button add;
+    private final Button reorder;
+    private final Button delete;
+    private final Button save;
+    private final Button close;
+    private final Button add;
 
 
     // Attributs de classe pour les composants
     private final Panel root;
     private Panel titlePanel;
 
-    private final TextBox txtName;
-    private final TextBox txtNewValue;
+    private TextBox txtName;
+    private TextBox txtNewValue;
+    //private Panel optionValuePanel;
 
     private Panel buttonsPanel;
 
@@ -45,6 +48,8 @@ public class AddEditOptionListView extends DialogWindow {
 
         root = new Panel();
 
+        // Name + TextBox
+
         //new Label("Name:").addTo(root);
         Label nameLabel = new Label("Name:");
         root.addComponent(nameLabel);
@@ -57,8 +62,10 @@ public class AddEditOptionListView extends DialogWindow {
         }
         root.addComponent(new EmptySpace());
 
-        // tableau de values
+        // Tableau de values
+        tableOfValues(optionList);
 
+        // TextBos + bouton add
         txtNewValue = new TextBox();
         add = new Button("Add", controller::add).addTo(buttonsPanel);
 
@@ -78,9 +85,15 @@ public class AddEditOptionListView extends DialogWindow {
         buttonsPanel.addComponent(close);
 
 
+    }
 
-
-
+    private void tableOfValues(OptionList optionList){
+        ObjectTable<OptionValue> tbl = new ObjectTable<>(
+                new ColumnSpec<>("Index", OptionValue::getOptionListId),
+                new ColumnSpec<>("Label", OptionValue::getLabel)
+        );
+        List<OptionValue> optionValueList = optionList.getOptionValuesIndexAndLabelByName(); // à modifier: ajouter méthode dans la classe OptionList ou dans le controlleur?
+        tbl.add(optionValueList);
 
     }
 
