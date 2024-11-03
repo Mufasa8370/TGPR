@@ -54,7 +54,7 @@ public class EditFormView  extends DialogWindow {
         new EmptySpace().addTo(root);
 
         var buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        new EmptySpace(new TerminalSize(50,1)).addTo(buttons);
+        new EmptySpace(new TerminalSize(37,1)).addTo(buttons);
         btnCreate = new Button(form != null ? "Update" : "Create").addTo(buttons);
         btnCancel = new Button("Cancel").addTo(buttons);
 
