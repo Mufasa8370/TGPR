@@ -1,4 +1,5 @@
 package tgpr.forms.view;
+
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
@@ -10,9 +11,13 @@ import tgpr.framework.Controller;
 
 import java.util.List;
 import java.util.regex.Pattern;
-public class EditFormView  extends DialogWindow {
+
+import static tgpr.framework.Tools.asString;
+import static tgpr.framework.Tools.ifNull;
+
+public class EditFormView extends DialogWindow {
     private final Form form;
-    private final Controller controller;
+    private final EditFormController controller;
     private final TextBox txtTitle;
     private final Label errTitle;
     private final TextBox txtDescription;
@@ -20,9 +25,10 @@ public class EditFormView  extends DialogWindow {
 
     private final Button btnCreate;
     private final Button btnCancel;
+
     public EditFormView(EditFormController controller, Form form) {
 
-        super(form == null ? "Add a form": "Edit a form");
+        super(form == null ? "Add a form" : "Edit a form");
 
         this.form = form;
         this.controller = controller;
@@ -37,7 +43,7 @@ public class EditFormView  extends DialogWindow {
         new Label("Title:").addTo(root);
 
         txtTitle = new TextBox(new TerminalSize(11, 1)).addTo(root).takeFocus()
-                .setTextChangeListener((txt, byUser) -> validate());
+                .setTextChangeListener((txt, byUser) -> isValid());
         new EmptySpace().addTo(root);
         errTitle = new Label("").addTo(root)
                 .setForegroundColor(TextColor.ANSI.RED);
@@ -54,20 +60,41 @@ public class EditFormView  extends DialogWindow {
         new EmptySpace().addTo(root);
 
         var buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        new EmptySpace(new TerminalSize(37,1)).addTo(buttons);
-        btnCreate = new Button(form != null ? "Update" : "Create").addTo(buttons);
-        btnCancel = new Button("Cancel").addTo(buttons);
+        new EmptySpace(new TerminalSize(37, 1)).addTo(buttons);
+        btnCreate = new Button(form != null ? "Update" : "Create", this::save).addTo(buttons);
+        btnCancel = new Button("Cancel", this::close).addTo(buttons);
 
         root.addComponent(buttons, LinearLayout.createLayoutData(LinearLayout.Alignment.End));
-
         setComponent(root);
+
+
+        if (form != null) {
+            txtTitle.setText(form.getTitle());
+            txtDescription.setText(ifNull(form.getDescription(), ""));
+            isPublicBox.setChecked(form.getIsPublic());
+        }
     }
 
 
-
-
-
-    public void validate() {
-
+    public void save(){
+        if (isValid()) {
+            if (this.controller.save(txtTitle.getText(), txtDescription.getText(), isPublicBox.isChecked())) {
+                this.close();
+            }
+        }
     }
+
+    public boolean isValid() {
+
+        if (!controller.isValidTitle(
+                txtTitle.getText()
+        )) {
+            errTitle.setText("title required");
+            return false;
+        } else {
+            errTitle.setText("");
+            return true;
+        }
+    }
+
 }
