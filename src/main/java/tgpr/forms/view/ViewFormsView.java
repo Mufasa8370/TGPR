@@ -82,8 +82,9 @@ public class ViewFormsView extends BasicWindow{
         Panel footer = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
         footer.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
          if(!getLoggedUser().isGuest()){
-             Button buttonCreateForm = new Button("Creat a new form", controller::createNewForm).addTo(footer);
+             Button buttonCreateForm = new Button("Create a new form", controller::createNewForm).addTo(footer);
          }
+
         footer.addComponent(new EmptySpace(new TerminalSize(45, 1)));
 
 
