@@ -78,7 +78,7 @@ public class ViewFormsView extends BasicWindow{
         cardPanel.setPreferredSize(new TerminalSize(1000,1000));
         root.addComponent(cardPanel).setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
-        //Ajout du footer
+        //Ajout du footer (d'un contenant footer)
         Panel footer = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL)).addTo(root);
         footer.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
          if(!getLoggedUser().isGuest()){
@@ -88,7 +88,21 @@ public class ViewFormsView extends BasicWindow{
              }).addTo(footer);
          }
 
+
+        //TODO: bouton Share pour View Form Detail
+        // A déplacer par après une fois que View Form Detail sera fait XD.
+        // et supprimer la méthode SharesForm() mit dans ViewFormsController
+
+        Button buttonMAnageShares = new Button("Shares", ()->{
+            controller.SharesForm();
+        }) .addTo(footer);
+
+
         footer.addComponent(new EmptySpace(new TerminalSize(45, 1)));
+
+
+
+
 
 
         footer.addComponent(paginator);
@@ -96,6 +110,9 @@ public class ViewFormsView extends BasicWindow{
          reloadData(0);
 
 
+    }
+
+    private void nagivetTo() {
     }
 
     private void reloadData(Integer page) {
