@@ -8,7 +8,10 @@ import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.QuestionController;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
+import tgpr.framework.Controller;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class QuestionView extends DialogWindow {
@@ -56,7 +59,10 @@ public class QuestionView extends DialogWindow {
         txtDescription.setTextChangeListener((newText, changedText) -> validate());
 
         new Label("Type:").addTo(fields);
-        cboType = new ComboBox<>(Question.Type.values()).addTo(fields);
+        List<Question.Type> sortedTypes = new ArrayList<>(List.of(Question.Type.values()));
+        sortedTypes.sort(Comparator.comparing(Enum::name));
+        cboType = new ComboBox<>(sortedTypes).addTo(fields);
+
 
         new EmptySpace().addTo(fields);
         new EmptySpace().addTo(fields);
@@ -104,7 +110,7 @@ public class QuestionView extends DialogWindow {
     }
 
     private void add() {
-
+        Controller.showMessage("use case en cours de dev", "message", "ok");
     }
 
 

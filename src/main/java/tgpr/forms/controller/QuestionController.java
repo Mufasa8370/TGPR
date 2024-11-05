@@ -6,6 +6,8 @@ import tgpr.forms.view.QuestionView;
 import tgpr.framework.Controller;
 import tgpr.framework.ErrorList;
 
+import javax.naming.ldap.Control;
+
 public class QuestionController extends Controller<QuestionView> {
 
     private final QuestionView view;
@@ -42,7 +44,7 @@ public class QuestionController extends Controller<QuestionView> {
 
         if (errors.isEmpty()) {
             // Crée une nouvelle instance de Question
-            question = new Question(); // Assure-toi d'utiliser le bon constructeur
+            question = new Question();
             question.setTitle(title);
             question.setDescription(description);
             question.setType(type);
@@ -55,14 +57,11 @@ public class QuestionController extends Controller<QuestionView> {
             // Ferme la vue
             view.close();
         } else {
-            // Montre les erreurs
             showError(String.valueOf(errors));
         }
     }
 
-    //button add
     public void add(){
-        //optionList
     }
 
 
