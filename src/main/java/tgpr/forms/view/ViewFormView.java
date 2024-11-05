@@ -7,15 +7,21 @@ import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
+import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.AnalyzeController;
+import tgpr.forms.controller.QuestionController;
 import tgpr.forms.controller.ViewFormController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
 import tgpr.framework.Controller;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
+
+import static com.googlecode.lanterna.input.KeyType.*;
 
 public class ViewFormView extends DialogWindow {
 
@@ -80,7 +86,7 @@ public class ViewFormView extends DialogWindow {
         List<Question> questions = form.getQuestions();
         questionTable.add(questions);
         questionTable.setSelectAction(this::displayQuestion);
-        lblNoQuestions = new Label("No question yet").setForegroundColor(TextColor.ANSI.BLUE)
+        lblNoQuestions = new Label("No question yet").setForegroundColor(TextColor.ANSI.RED)
                 .addTo(pnlQuestions);
 
         pnlQuestions.setPreferredSize(new TerminalSize(500,500));
@@ -148,7 +154,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void newQuestion() {
-        Controller.showMessage("use case en cours de dev","Message", "ok");
+        controller.newQuestion();
     }
 
     private void displayQuestion() {

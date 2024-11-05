@@ -15,7 +15,7 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Form form = Form.getByKey(3);
+            Form form = Form.getByKey(2);
             Controller.navigateTo(new ViewFormController(form));
             //Controller.navigateTo(new LoginController());
         }
