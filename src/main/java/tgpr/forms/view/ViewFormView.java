@@ -33,7 +33,6 @@ public class ViewFormView extends DialogWindow {
     private final Label lblIsPublic;
     private final Panel pnlQuestions;
     private final ObjectTable<Question> questionTable;
-    private final Label lblNoQuestions;
     private boolean existInstance;
 
 
@@ -84,10 +83,18 @@ public class ViewFormView extends DialogWindow {
         ).addTo(pnlQuestions);
 
         List<Question> questions = form.getQuestions();
-        questionTable.add(questions);
         questionTable.setSelectAction(this::displayQuestion);
-        lblNoQuestions = new Label("No question yet").setForegroundColor(TextColor.ANSI.RED)
-                .addTo(pnlQuestions);
+
+        Label lblNoQuestions = new Label("No question yet").setForegroundColor(TextColor.ANSI.RED);
+        lblNoQuestions.setVisible(false);
+        lblNoQuestions.addTo(pnlQuestions);
+
+        if (questions == null || questions.isEmpty()) {
+            lblNoQuestions.setVisible(true);
+        } else {
+            lblNoQuestions.setVisible(false);
+            questionTable.add(questions);
+        }
 
         pnlQuestions.setPreferredSize(new TerminalSize(500,500));
         root.addComponent(pnlQuestions);
