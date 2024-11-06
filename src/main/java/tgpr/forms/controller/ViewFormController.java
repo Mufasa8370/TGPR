@@ -18,7 +18,6 @@ public class ViewFormController extends Controller<ViewFormView> {
     public void delete(){
         if (askConfirmation("You are about to delete this form. Please confirm.","Delete form")){
             form.deleteAllInstances();
-            //delete access
             form.delete();
             view.close();
         }

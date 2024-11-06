@@ -7,21 +7,12 @@ import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
-import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import com.googlecode.lanterna.input.KeyStroke;
-import tgpr.forms.controller.AnalyzeController;
-import tgpr.forms.controller.QuestionController;
-import tgpr.forms.controller.ViewFormController;
+import tgpr.forms.controller.*;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
 import tgpr.framework.Controller;
-
-import java.awt.*;
-import java.util.Collections;
 import java.util.List;
-
-import static com.googlecode.lanterna.input.KeyType.*;
 
 public class ViewFormView extends DialogWindow {
 
@@ -121,7 +112,10 @@ public class ViewFormView extends DialogWindow {
         if(!existInstance){
             Button btnReorder = new Button("Reorder", this::reorder).addTo(buttons);
         }
-        Button btnAnalyse = new Button("Analyse", this::analyse).addTo(buttons);
+
+        if (existInstance) {
+            Button btnAnalyse = new Button("Analyse", this::analyse).addTo(buttons);
+        }
         new Button("Close", this::close).addTo(buttons);
 
         root.addComponent(buttons);
@@ -129,7 +123,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void clearInstances() {
-        Controller.showMessage("use case en cours de dev", "message", "ok");
+        Controller.navigateTo(new ViewInstancesController(form));
     }
 
     private void makePublic() {
@@ -141,7 +135,6 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void analyse() {
-        //ppas dinstance ? pas danalyse?
         Controller.navigateTo(new AnalyzeController(form));
     }
 
@@ -150,7 +143,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void share() {
-        Controller.showMessage("use case en cours de dev","Message", "ok");
+        Controller.navigateTo(new ManageSharesController());
     }
 
     private void deleteForm() {
@@ -158,7 +151,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void editForm() {
-        Controller.showMessage("use case en cours de dev","Message", "ok");
+        Controller.navigateTo(new EditFormController());
     }
 
     private void newQuestion() {
@@ -166,6 +159,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void displayQuestion() {
+
     }
 
 }
