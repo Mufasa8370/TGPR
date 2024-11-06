@@ -39,8 +39,5 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void manageYourDistributionList() {
-
-        Form form = Form.getByKey(17);
-        Controller.navigateTo(new EditFormController(form));
     }
 }
