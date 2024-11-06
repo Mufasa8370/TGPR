@@ -25,7 +25,7 @@ public class QuestionView extends DialogWindow {
     private Label errOptionList;
     private final Question question;
     public QuestionView(QuestionController controller, Question question) {
-        super("Add a Question");
+        super(question == null ? "Add a question" : "Edit a question");
         this.controller = controller;
         this.question = question;
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
