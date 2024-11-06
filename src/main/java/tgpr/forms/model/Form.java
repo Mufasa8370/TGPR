@@ -424,4 +424,22 @@ public class Form extends Model {
         setIsPublic(!getIsPublic());
         save();
     }
+
+    public void deleteAccesses() {
+        var dx = DistListFormAccess.getAll();
+        for( DistListFormAccess d:  dx ){
+            if(d.getFormId() == id){
+                d.delete();
+            }
+        }
+
+        var ux = UserFormAccess.getAll();
+        for(UserFormAccess u: ux){
+            if(u.getFormId() == id && u.getUserId() != ownerId){
+                u.delete();
+            }
+        }
+    }
+
 }
+
