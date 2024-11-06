@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 
+import tgpr.forms.model.Form;
 import tgpr.forms.model.Security;
 import tgpr.forms.view.ViewFormsView;
 import tgpr.framework.Controller;
@@ -38,5 +39,8 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void manageYourDistributionList() {
+
+        Form form = Form.getByKey(17);
+        Controller.navigateTo(new EditFormController(form));
     }
 }

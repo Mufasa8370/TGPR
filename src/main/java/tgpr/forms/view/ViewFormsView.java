@@ -9,6 +9,7 @@ import com.googlecode.lanterna.gui2.menu.MenuItem;
 import tgpr.forms.controller.CardForFormsController;
 import tgpr.forms.controller.ViewFormsController;
 import tgpr.forms.model.Form;
+import tgpr.forms.model.Security;
 import tgpr.forms.model.User;
 
 import java.util.List;
@@ -95,6 +96,10 @@ public class ViewFormsView extends BasicWindow{
 
         Button buttonMAnageShares = new Button("Shares", ()->{
             controller.SharesForm();
+        }) .addTo(footer);
+
+        Button buttonEditFormTest = new Button("Edit a form", ()->{
+            controller.manageYourDistributionList();
         }) .addTo(footer);
 
 

@@ -45,7 +45,9 @@ public class EditFormController  extends Controller<EditFormView> {
             // un formulaire est rendu public alors qu'au départ il est privé.
             // Rendre public un formulaire supprime tous les partages précédents.
             if (Security.getLoggedUser() != null) {
-                this.form = new Form(title, description, Security.getLoggedUser(), isPublic);
+                this.form. setTitle(title);
+                this.form.setDescription(description);
+                this.form.setIsPublic(isPublic);
                 this.form.save();
                 return true;
             } else {

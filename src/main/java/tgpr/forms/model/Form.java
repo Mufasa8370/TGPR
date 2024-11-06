@@ -270,6 +270,7 @@ public class Form extends Model {
         );
     }
 
+
     public static int countForUser(User user, String filter) {
         var count = queryScalar(Integer.class, "select count(*) " + GET_FOR_USER_SQL,
                 new Params("userid", user.getId())
