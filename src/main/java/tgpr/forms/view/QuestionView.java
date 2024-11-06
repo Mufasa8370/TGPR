@@ -27,7 +27,7 @@ public class QuestionView extends DialogWindow {
     private final Question question;
 
     public QuestionView(QuestionController controller, Question question) {
-        super("Add a Question");
+        super(question != null ? "Edit a Question" : "Add a Question");
 
         this.controller = controller;
         this.question = question;

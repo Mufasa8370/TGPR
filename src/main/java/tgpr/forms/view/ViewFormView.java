@@ -129,6 +129,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void clearInstances() {
+        Controller.showMessage("use case en cours de dev", "message", "ok");
     }
 
     private void makePublic() {
