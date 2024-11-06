@@ -47,7 +47,19 @@ public class EditFormController  extends Controller<EditFormView> {
             if (Security.getLoggedUser() != null) {
                 this.form. setTitle(title);
                 this.form.setDescription(description);
-                this.form.setIsPublic(isPublic);
+                if(!this.form.getIsPublic() &&  isPublic){
+
+                    if(askForConfirmation()){
+                        this.form.setIsPublic(isPublic);
+                        this.form.deleteAccesses();
+                    }
+                    else
+                        return false;
+
+                }
+                else{
+                    this.form.setIsPublic(isPublic);
+                }
                 this.form.save();
                 return true;
             } else {
@@ -56,4 +68,9 @@ public class EditFormController  extends Controller<EditFormView> {
         }
     }
 
+    public boolean askForConfirmation(){
+        var confirmation = new FormEditConfirmationController();
+        navigateTo(confirmation);
+        return confirmation.answer;
+    }
 }
