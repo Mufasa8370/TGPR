@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 
+import tgpr.forms.model.Form;
 import tgpr.forms.model.Security;
 import tgpr.forms.view.ViewFormsView;
 import tgpr.framework.Controller;
@@ -30,6 +31,9 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         navigateTo(new EditFormController());
     }
 
+    public void SharesForm(){
+        navigateTo(new ManageSharesController());
+    }
     public void manageYourOptionList() {
         //navigateTo(AddEditOptionListController());
     }
