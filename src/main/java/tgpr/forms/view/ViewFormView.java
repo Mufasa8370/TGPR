@@ -74,7 +74,19 @@ public class ViewFormView extends DialogWindow {
         ).addTo(pnlQuestions);
 
         List<Question> questions = form.getQuestions();
-        questionTable.setSelectAction(this::displayQuestion);
+
+//        questionTable.setSelectAction(()->{
+//            var selectedQuestion = questionTable.getSelected();
+//            controller.newQuestion();
+//        });
+
+        questionTable.setSelectAction(() -> {
+            var selectedQuestion = questionTable.getSelected();
+            if (selectedQuestion != null) {
+                Controller.navigateTo(new QuestionController(selectedQuestion)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
+            }
+        });
+
 
         Label lblNoQuestions = new Label("No question yet").setForegroundColor(TextColor.ANSI.RED);
         lblNoQuestions.setVisible(false);
@@ -158,8 +170,5 @@ public class ViewFormView extends DialogWindow {
         controller.newQuestion();
     }
 
-    private void displayQuestion() {
-
-    }
 
 }
