@@ -1,17 +1,16 @@
 package tgpr.forms.view;
 
-import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.EditFormController;
+import tgpr.forms.controller.FormEditConfirmationController;
 import tgpr.forms.model.Form;
-import tgpr.framework.Controller;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
+import static tgpr.framework.Controller.navigateTo;
 import static tgpr.framework.Tools.asString;
 import static tgpr.framework.Tools.ifNull;
 
@@ -96,5 +95,6 @@ public class EditFormView extends DialogWindow {
             return true;
         }
     }
+
 
 }

@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 import tgpr.forms.model.User;
+import tgpr.forms.model.UserFormAccess;
 import tgpr.framework.Controller;
 import static tgpr.framework.Tools.*;
 import tgpr.forms.view.ManageSharesView;
