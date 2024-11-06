@@ -91,6 +91,13 @@ public class ViewFormsView extends BasicWindow {
             }).addTo(footer);
         }
 
+        //TODO: bouton Share pour View Form Detail
+        // A déplacer par après une fois que View Form Detail sera fait XD.
+        // et supprimer la méthode SharesForm() mit dans ViewFormsController
+        Button buttonMAnageShares = new Button("Shares", ()->{
+            controller.SharesForm();
+        }) .addTo(footer);
+
         footer.addComponent(new EmptySpace(new TerminalSize(45, 1)));
         footer.addComponent(paginator);
         //Start page 1

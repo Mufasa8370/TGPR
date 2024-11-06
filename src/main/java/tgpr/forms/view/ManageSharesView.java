@@ -8,7 +8,6 @@ import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.ManageSharesController;
 import tgpr.forms.model.Form;
-import tgpr.forms.model.User;
 import tgpr.forms.model.UserFormAccess;
 import tgpr.framework.Controller;
 import tgpr.framework.ViewManager;
@@ -20,12 +19,10 @@ import static tgpr.framework.Tools.ifNull;
 
 public class ManageSharesView  extends DialogWindow {
     private final ManageSharesController controller;
-    private final ObjectTable<User> table;
-    private final User user;
-    public ManageSharesView(ManageSharesController controller, User user) {
+    private final ObjectTable<Object> table;
+    public ManageSharesView(ManageSharesController controller) {
         super("Manage Shares");
         this.controller = controller;
-        this.user = user;
 
         setHints(List.of(Hint.CENTERED));
         setFixedSize(new TerminalSize(66, 13));
@@ -34,10 +31,19 @@ public class ManageSharesView  extends DialogWindow {
         setComponent(root);
         new EmptySpace().addTo(root);
         Panel content = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.VERTICAL));
+
+        var bColumn = new ColumnSpec<>("Beneficiary",null);
+        bColumn.setWidth(22);
+
+        var tColumn = new ColumnSpec<>("Type",null);
+        tColumn.setWidth(22);
+
+        var aColumn = new ColumnSpec<>("Access right",null);
+
         table = new ObjectTable<>(
-                new ColumnSpec<>("Beneficiary",null),
-                new ColumnSpec<>("Type",null),
-                new ColumnSpec<User>("Acces right",null)
+                bColumn,
+                tColumn,
+                aColumn
         );
 
         content.addComponent(table);
