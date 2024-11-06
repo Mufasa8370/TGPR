@@ -26,6 +26,7 @@ public class QuestionView extends DialogWindow {
     private final Button btnCreate;
     private final Label errTitle;
     private final Label errDescription;
+    private Label errOptionList;
 
     private final Question question;
 
@@ -37,7 +38,7 @@ public class QuestionView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(70, 14));
+        setFixedSize(new TerminalSize(80, 16));
 
         Panel root = new Panel();
         setComponent(root);
@@ -74,16 +75,36 @@ public class QuestionView extends DialogWindow {
         new EmptySpace().addTo(fields);
 
         new Label("Options List:").addTo(fields);
-        cboOptionList = new ComboBox<OptionList>().addTo(fields);
 
-        btnAdd = new Button("Add", this::add).addTo(fields);
+        Panel optionListPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+
+        cboOptionList = new ComboBox<OptionList>().addTo(optionListPanel);
+
+        btnAdd = new Button("Add", this::add).addTo(optionListPanel);
+
+        optionListPanel.addTo(fields);
+
+        new EmptySpace().addTo(fields);
+
+        errOptionList = new Label("").setForegroundColor(TextColor.ANSI.RED).addTo(fields);
+
+
+        new EmptySpace().addTo(fields);
+
+        errOptionList = new Label("").setForegroundColor(TextColor.ANSI.RED).addTo(fields);
+
+        Panel fiels = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        root.addComponent(new EmptySpace(), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
 
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         btnCreate = new Button("Create", this::create);
         btnCreate.setEnabled(false);
         btnCreate.addTo(buttons);
+
         new Button("Cancel", this::close).addTo(buttons);
+
         root.addComponent(buttons, LinearLayout.createLayoutData(LinearLayout.Alignment.End));
+
     }
 
     private void validate(){
@@ -95,8 +116,29 @@ public class QuestionView extends DialogWindow {
         errTitle.setText(errors.getFirstErrorMessage(Question.Fields.Title));
         errDescription.setText(errors.getFirstErrorMessage(Question.Fields.Description));
 
-        btnCreate.setEnabled(errors.isEmpty());
-        //ajout option list
+        Question.Type selectedType = cboType.getSelectedItem();
+        String optionListError = "";
+
+        if (selectedType != null && selectedType.requiresOptionList() && cboOptionList.getSelectedItem() == null) {
+            optionListError = "required for this type";
+        }
+
+        if (!optionListError.isEmpty()) {
+            errOptionList.setText(optionListError);
+        } else {
+            errOptionList.setText("");
+        }
+        txtTitle.setTextChangeListener((newText, changedText) -> validate());
+        txtDescription.setTextChangeListener((newText, changedText) -> validate());
+
+        cboType.addListener((comboBox, previousItem, newItem) -> validate());
+
+        cboOptionList.addListener((comboBox, previousItem, newItem) -> validate());
+
+        errOptionList.setText(optionListError);
+
+        boolean isFormValid = errors.isEmpty() && optionListError.isEmpty();
+        btnCreate.setEnabled(isFormValid);
     }
 
     private void create() {
@@ -112,8 +154,6 @@ public class QuestionView extends DialogWindow {
     private void add() {
         Controller.showMessage("use case en cours de dev", "message", "ok");
     }
-
-
 }
 
 
