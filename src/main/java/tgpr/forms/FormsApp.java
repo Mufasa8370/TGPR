@@ -1,10 +1,13 @@
 package tgpr.forms;
 
-import tgpr.forms.controller.*;
+import tgpr.forms.controller.LoginController;
+import tgpr.forms.controller.TestController;
+import tgpr.forms.controller.ViewInstancesController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
 import tgpr.framework.Controller;
 import tgpr.framework.Model;
+import tgpr.forms.controller.QuestionController;
 
 import javax.swing.text.View;
 
@@ -15,9 +18,10 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Form form = Form.getByKey(15);
-            Controller.navigateTo(new ViewFormController(form));
-            //Controller.navigateTo(new LoginController());
+            Question question = new Question();
+
+            // Passe l'objet Question au contrôleur
+            Controller.navigateTo(new QuestionController(question));
         }
     }
 }
