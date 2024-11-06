@@ -26,9 +26,9 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
         return form.getInstances().stream().filter(Instance::isCompleted).sorted(Comparator.comparing(Instance::getCompleted).reversed()).collect(Collectors.toList());
     }
 
-//    public void viewEditInstance(Instance instance){
-//        navigateTo(new ViewEditInstanceController(instance));
-//    }
+    public void viewEditInstance(Instance instance){
+        navigateTo(new ViewEditInstanceController(form, instance));
+    }
 
     public void deleteAll(){
         if (askConfirmation("Are you sure you want to delete all the submitted instances?\n" +

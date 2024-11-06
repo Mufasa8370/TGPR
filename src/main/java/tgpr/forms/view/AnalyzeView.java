@@ -30,20 +30,20 @@ public class AnalyzeView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(90, 20));
+        setFixedSize(new TerminalSize(90, 23));
 
         var root = Panel.verticalPanel();
         setComponent(root);
 
         createFields().addTo(root);
-        createQuestionsAndAnswersPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
+        createQuestionsAndAnswersPanel().sizeTo(ViewManager.getTerminalColumns(),17).addTo(root);
         createButtonsPanel().addTo(root);
 
         refresh();
     }
 
     private Panel createFields(){
-        var panel = Panel.gridPanel(2, Margin.of(1));
+        var panel = Panel.gridPanel(2, Margin.of(1,1,1,0));
 
         new Label("Title:").addTo(panel);
         lblTitle.addTo(panel).addStyle(SGR.BOLD);
@@ -56,7 +56,7 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createQuestionsAndAnswersPanel() {
-        var panel = Panel.gridPanel(2, Margin.of(1));
+        var panel = Panel.gridPanel(2, Margin.of(0));
 
         createQuestionsPanel().addTo(panel);
         createAnswersPanel().addTo(panel);
@@ -108,7 +108,7 @@ public class AnalyzeView extends DialogWindow {
 
         Button btnClose = new Button("Close", this::close).addTo(panel);
 
-        Button viewInstances = new Button("View Instances").addTo(panel);
+        Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
 
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
         addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));

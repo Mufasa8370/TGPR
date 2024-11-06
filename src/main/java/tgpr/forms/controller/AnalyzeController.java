@@ -32,7 +32,7 @@ public class AnalyzeController extends Controller<AnalyzeView> {
 
         List<ValueStat> listAnswersValueStat = question.getStats();
         DecimalFormat df = new DecimalFormat("0.0%");
-        int nbAnswers = getNbAnswers(listAnswersValueStat);
+        long nbAnswers = getNbSubmittedInstances();
 
         for (ValueStat valueStat : listAnswersValueStat) {
             Stat stat = new Stat();
@@ -44,12 +44,8 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         }
     }
 
-    public int getNbAnswers(List<ValueStat> listAnswersValueStat) {
-        int nbAnswers = 0;
-        for (ValueStat valueStat : listAnswersValueStat) {
-            nbAnswers += valueStat.getCount();
-        }
-        return nbAnswers;
+    public void viewInstances() {
+        navigateTo(new ViewInstancesController(form));
     }
 
 }

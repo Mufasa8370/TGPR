@@ -13,13 +13,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class LoginController extends Controller<LoginView> {
+
+
     public void exit() {
         System.exit(0);
     }
 
     public boolean login(String pseudo, String password) {
         var errors = new ErrorList();
-        //Vérifier si email existe !!!!!PEUT ETRE METTRE DANS MODEL
+        // TODO; si email existe !!!!!PEUT ETRE METTRE DANS MODEL
         if (!Objects.equals(pseudo, "guest@epfc.eu")) {
             List<User> users = User.getAll();
             boolean emailExists = users.stream().anyMatch(user -> user.getEmail().equals(pseudo));
