@@ -270,6 +270,7 @@ public class Form extends Model {
         );
     }
 
+
     public static int countForUser(User user, String filter) {
         var count = queryScalar(Integer.class, "select count(*) " + GET_FOR_USER_SQL,
                 new Params("userid", user.getId())
@@ -423,4 +424,22 @@ public class Form extends Model {
         setIsPublic(!getIsPublic());
         save();
     }
+
+    public void deleteAccesses() {
+        var dx = DistListFormAccess.getAll();
+        for( DistListFormAccess d:  dx ){
+            if(d.getFormId() == id){
+                d.delete();
+            }
+        }
+
+        var ux = UserFormAccess.getAll();
+        for(UserFormAccess u: ux){
+            if(u.getFormId() == id && u.getUserId() != ownerId){
+                u.delete();
+            }
+        }
+    }
+
 }
+
