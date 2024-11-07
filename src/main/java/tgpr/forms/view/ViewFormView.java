@@ -25,6 +25,7 @@ public class ViewFormView extends DialogWindow {
     private final Panel pnlQuestions;
     private final ObjectTable<Question> questionTable;
     private boolean existInstance;
+    private Question question;
 
 
     public ViewFormView(ViewFormController controller, Form form) {
@@ -41,7 +42,7 @@ public class ViewFormView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(100, 18));
+        setFixedSize(new TerminalSize(80, 18));
 
         Panel root = new Panel();
         setComponent(root);
@@ -84,6 +85,7 @@ public class ViewFormView extends DialogWindow {
             var selectedQuestion = questionTable.getSelected();
             if (selectedQuestion != null) {
                 Controller.navigateTo(new QuestionController(selectedQuestion)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
+                //refresh
             }
         });
 
