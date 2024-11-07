@@ -104,7 +104,7 @@ public class SignupView extends DialogWindow {
         errMail.setText(errors.getFirstErrorMessage(User.Fields.Email));
         errFullName.setText(errors.getFirstErrorMessage(User.Fields.FullName));
         errPassword.setText(errors.getFirstErrorMessage(User.Fields.Password));
-        errConfirmPassword.setText(errors.getFirstErrorMessage(SignupController.Fields.PasswordConfirm)); // Assurez-vous d'utiliser le bon champ
+        errConfirmPassword.setText(errors.getFirstErrorMessage(SignupController.Fields.PasswordConfirm));
 
         btnSignup.setEnabled(errors.isEmpty());
     }
