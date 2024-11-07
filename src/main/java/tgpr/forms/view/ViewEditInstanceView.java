@@ -115,6 +115,7 @@ public class ViewEditInstanceView extends DialogWindow {
         labelPanel.addComponent(new Label("Description:"));
         labelPanel.addComponent(new Label("Started on:"));
         labelPanel.addComponent(new Label("Submitted on:"));
+        labelPanel.addComponent(new Label("Submitted by:"));
         titlePanel.addComponent(labelPanel);
         titlePanel.addComponent(new EmptySpace());
 
@@ -124,6 +125,7 @@ public class ViewEditInstanceView extends DialogWindow {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         valuesPanel.addComponent(new Label(instance.getStarted().format(formatter)).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
         valuesPanel.addComponent(new Label(instance.getCompleted().format(formatter)).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        valuesPanel.addComponent(new Label(instance.getUser().getName()).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
         titlePanel.addComponent(valuesPanel);
 
         root.addComponent(titlePanel);

@@ -91,7 +91,7 @@ public class ViewFormsView extends BasicWindow {
             }).addTo(footer);
         }
 
-        footer.addComponent(new EmptySpace(new TerminalSize(45, 1)));
+        footer.addComponent(new EmptySpace(new TerminalSize(42, 1)));
         footer.addComponent(paginator);
         //Start page 1
         reloadData(0);
