@@ -36,6 +36,10 @@ public class OptionList extends Model {
                 new Params("id", id));
     }
 
+    public int getNumberOfValues() {
+        return getOptionValues().size();
+    }
+
     public List<Question> getQuestions() {
         return queryList(Question.class, "select * from questions where option_list=:id",
                 new Params("id", id));
