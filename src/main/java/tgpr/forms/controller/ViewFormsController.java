@@ -31,7 +31,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void manageYourOptionList() {
-        //navigateTo(AddEditOptionListController());
+        navigateTo(new ManageOptionListsController());
     }
 
     public void manageYourDistributionList() {
