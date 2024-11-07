@@ -52,7 +52,7 @@ public class ManageSharesController extends Controller<ManageSharesView> {
                         filteredUsers.add(ux);
                     }
                 }
-            }
+    }
         }
         // HERE: Récupération des distlists
         List<DistList> notAddedLists = new ArrayList<>();

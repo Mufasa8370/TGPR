@@ -20,6 +20,7 @@ import static tgpr.framework.Tools.ifNull;
 public class ManageSharesView  extends DialogWindow {
     private final ManageSharesController controller;
     private final ObjectTable<Object> table;
+    private final Button btnAddFilter;
     public ManageSharesView(ManageSharesController controller) {
         super("Manage Shares");
         this.controller = controller;
@@ -47,9 +48,16 @@ public class ManageSharesView  extends DialogWindow {
         );
 
         content.addComponent(table);
-        // table.setMinWidth(11);
-
         new EmptySpace().addTo(root);
+        new EmptySpace().addTo(root);
+
+        Panel filter = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        AutoCompleteComboBox<String> addFilter = new AutoCompleteComboBox();
+        addFilter.addTo(filter);
+        addFilter.setPreferredSize(new TerminalSize(15, 1)).addTo(filter);
+        var cboRelationship = new ComboBox<String>("Editor","User").addTo(filter);
+        btnAddFilter = new Button("Add").addTo(filter);
+
     }
 
 }
