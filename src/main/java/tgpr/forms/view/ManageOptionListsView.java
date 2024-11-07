@@ -11,14 +11,14 @@ import java.util.List;
 
 public class ManageOptionListsView extends DialogWindow {
     private final ManageOptionListsController controller;
-    private final Panel panelForOptionListManagement = new Panel();
+    private final Panel root;
     private List<OptionList> listOfOptionLists;
 
     private final Panel buttonsPanel;
+    private ObjectTable<OptionList> tbl;
     private Button close;
     private Button newList;
 
-    private final Panel root;
 
 
     public ManageOptionListsView(ManageOptionListsController controller) {
@@ -26,11 +26,9 @@ public class ManageOptionListsView extends DialogWindow {
         super("Option Lists Management");
         this.controller = controller;
         this.listOfOptionLists = OptionList.getAll();
-        setHints(List.of(Window.Hint.CENTERED, Window.Hint.FIXED_SIZE));
+        setHints(List.of(Window.Hint.CENTERED));
         // permet de fermer la fenêtre en pressant la touche Esc
         setCloseWindowWithEscape(true);
-        // définit une taille fixe pour la fenêtre de 20 lignes et 70 colonnes
-        setFixedSize(new TerminalSize(70, 20));
 
         root = new Panel();
 
@@ -38,8 +36,9 @@ public class ManageOptionListsView extends DialogWindow {
         root.addComponent(tableOfOptionLists());
         root.addComponent(new EmptySpace());
         setComponent(root);
+
         // Boutons
-        buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL)).center();
 
         newList = new Button("New List", controller::newList).addTo(buttonsPanel);
         close = new Button("Close", controller::close).addTo(buttonsPanel);
@@ -48,28 +47,23 @@ public class ManageOptionListsView extends DialogWindow {
         buttonsPanel.addComponent(close);
         root.addComponent(buttonsPanel);
 
-
     }
 
-    private ObjectTable<OptionList> tableOfOptionLists(){
-        ObjectTable<OptionList> tbl = new ObjectTable<>(
+    private Panel tableOfOptionLists(){
+        tbl = new ObjectTable<>(
                 new ColumnSpec<>("Name", OptionList::getName),
                 new ColumnSpec<>("Values", OptionList::getNumberOfValues),
                 new ColumnSpec<>("Owner", OptionList::getOwner)
         );
-        tbl.addSelectionChangeListener(new ObjectTable.SelectionChangeListener() {
-            @Override
-            public void onSelectionChanged(int oldRow, int newRow, boolean byUser) {
-                System.out.println("okk");
-            }
-            //addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
+        tbl.setSelectAction(this::editList);
 
-        });
-        //this.listOfOptionLists = OptionList.getAll();
         tbl.add(listOfOptionLists);
-        System.out.println(listOfOptionLists.size());
-        root.addComponent(tbl);
-        return tbl;
-
+        return Panel.gridPanel(1, Margin.of(1)).addComponent(tbl);
     }
+
+    private void editList() {
+        //System.out.println(tbl.getSelected()); // imprime pour vérifier
+        controller.editList(tbl.getSelected());
+    }
+
 }
