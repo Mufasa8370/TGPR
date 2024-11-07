@@ -11,6 +11,9 @@ import static tgpr.framework.Tools.hash;
 public class SignupController extends Controller<SignupView> {
     private final SignupView view;
 
+    // meme si il y n'y a qu'un élément je dois le mettre en enum fields
+    // car les fields sont utilisé dans la méthode validate qui utilise
+    // la méthode add (qui doit prendre un field dans son deuxième paramètre)
     public enum Fields {
         PasswordConfirm
     }
@@ -34,7 +37,6 @@ public class SignupController extends Controller<SignupView> {
             navigateTo(new ViewFormsController());
         } else
             showErrors(errors);
-
     }
 
     public static boolean emailExists(String email) {
@@ -59,7 +61,7 @@ public class SignupController extends Controller<SignupView> {
         if (password.length() < 8)
             errors.add("minimum 8 char", User.Fields.Password);
 
-        if (!password.matches(".*\\d.*"))
+        if (!password.matches(".*\\d.*"))  // \\d siginifie un chiffre. equivalent à [0-9]
             errors.add("must contain a digit", User.Fields.Password);
 
         if (!password.matches(".*[A-Z].*"))
