@@ -15,11 +15,12 @@ public class FormsApp {
         if (!Model.checkDb(DATABASE_SCRIPT_FILE))
             Controller.abort("Database is not available!");
         else {
-            Question question = new Question();
+            //Question question = new Question();
             Form form = Form.getByKey(2);
 
             // Passe l'objet Question au contrôleur
-            Controller.navigateTo(new ViewFormController(form));
+            //Controller.navigateTo(new ViewFormController(form));
+            Controller.navigateTo(new LoginController());
         }
     }
 }

@@ -11,6 +11,9 @@ import tgpr.framework.Controller;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static tgpr.framework.Controller.askConfirmation;
+
 public class QuestionView extends DialogWindow {
     private final QuestionController controller;
     private final TextBox txtTitle;
@@ -19,7 +22,7 @@ public class QuestionView extends DialogWindow {
     private final CheckBox chkRequired;
     private final ComboBox<OptionList> cboOptionList;
     private final Button btnAdd;
-    private final Button btnCreate;
+    private Button btnCreate;
     private final Label errTitle;
     private final Label errDescription;
     private Label errOptionList;
@@ -37,11 +40,17 @@ public class QuestionView extends DialogWindow {
         new Label("Title:").addTo(fields);
         txtTitle = new TextBox(new TerminalSize(40,1))
                 .addTo(fields).takeFocus();
+        if (question != null) {
+            txtTitle.setText(question.getTitle());  // Pré-remplir le champ titre
+        }
         new EmptySpace().addTo(fields);
         errTitle = new Label("").setForegroundColor(TextColor.ANSI.RED).addTo(fields);
         txtTitle.setTextChangeListener((newText, changedText) -> validate());
         new Label("Description:").addTo(fields);
         txtDescription = new TextBox(new TerminalSize(50, 3), "", TextBox.Style.MULTI_LINE).addTo(fields);
+        if (question != null) {
+            txtDescription.setText(question.getDescription());  // Pré-remplir le champ titre
+        }
         new EmptySpace().addTo(fields);
         errDescription = new Label("").setForegroundColor(TextColor.ANSI.RED).addTo(fields);
         txtDescription.setTextChangeListener((newText, changedText) -> validate());
@@ -49,15 +58,24 @@ public class QuestionView extends DialogWindow {
         List<Question.Type> sortedTypes = new ArrayList<>(List.of(Question.Type.values()));
         sortedTypes.sort(Comparator.comparing(Enum::name));
         cboType = new ComboBox<>(sortedTypes).addTo(fields);
+        if (question != null) {
+            cboType.setSelectedItem(question.getType());  // Pré-remplir le champ titre
+        }
         new EmptySpace().addTo(fields);
         new EmptySpace().addTo(fields);
         new Label("Required:").addTo(fields);
         chkRequired = new CheckBox().addTo(fields);
+        if (question != null) {
+            chkRequired.setChecked(question.getRequired());  // Pré-remplir le champ titre
+        }
         new EmptySpace().addTo(fields);
         new EmptySpace().addTo(fields);
         new Label("Options List:").addTo(fields);
         Panel optionListPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         cboOptionList = new ComboBox<OptionList>().addTo(optionListPanel);
+        if (question != null) {
+            cboOptionList.setSelectedItem(question.getOptionList());  // Pré-remplir le champ titre
+        }
         btnAdd = new Button("Add", this::add).addTo(optionListPanel);
         optionListPanel.addTo(fields);
         new EmptySpace().addTo(fields);
@@ -67,12 +85,37 @@ public class QuestionView extends DialogWindow {
         Panel fiels = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
         root.addComponent(new EmptySpace(), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        btnCreate = new Button("Create", this::create);
-        btnCreate.setEnabled(false);
-        btnCreate.addTo(buttons);
+        if(question != null) {
+            Button btnDeleteQuestion = new Button("Delete", this::deleteQuestion).addTo(buttons);
+        }
+        if(question != null) {
+            Button btnUpdate = new Button("Update",this::updateQuestion).addTo(buttons);
+        }else{
+            btnCreate = new Button("Create", this::create);
+            btnCreate.setEnabled(false);
+            btnCreate.addTo(buttons);
+        }
         new Button("Cancel", this::close).addTo(buttons);
         root.addComponent(buttons, LinearLayout.createLayoutData(LinearLayout.Alignment.End));
     }
+
+    private void updateQuestion() {
+        controller.create(
+                txtTitle.getText(),
+                txtDescription.getText(),
+                cboType.getSelectedItem(),
+                chkRequired.isChecked(),
+                cboOptionList.getSelectedItem()
+        );
+    }
+
+    private void deleteQuestion() {
+        if (askConfirmation("You are about to delete this question. Please confirm.","Delete question")){
+            question.delete();
+            close();
+        }
+    }
+
     private void validate(){
         var errors = controller.validate(
                 txtTitle.getText(),
@@ -95,8 +138,8 @@ public class QuestionView extends DialogWindow {
         cboType.addListener((comboBox, previousItem, newItem) -> validate());
         cboOptionList.addListener((comboBox, previousItem, newItem) -> validate());
         errOptionList.setText(optionListError);
-        boolean isFormValid = errors.isEmpty() && optionListError.isEmpty();
-        btnCreate.setEnabled(isFormValid);
+//        boolean isFormValid = errors.isEmpty() && optionListError.isEmpty();
+//        btnCreate.setEnabled(isFormValid);
     }
     private void create() {
         controller.create(
