@@ -33,38 +33,34 @@ public class ViewProfileView extends DialogWindow {
     }
 
     private Panel createTxtPanel() {
-        // Création du panel principal
-        var panel = new Panel();
-        panel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        var panel = Panel.verticalPanel();
 
         // nom d'utilisateur
-        panel.addComponent(new Label("")); // ajout d'un espace
-
-        var welcomePanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        new Label("").addTo(panel); // ajout d'un espace vertical
+        var welcomePanel = Panel.horizontalPanel();
         ((LinearLayout) welcomePanel.getLayoutManager()).setSpacing(0);
-        welcomePanel.addComponent(new Label(" Hey "));
-        welcomePanel.addComponent(new Label(Security.getLoggedUser().getFullName())
-                .setForegroundColor(TextColor.ANSI.BLUE_BRIGHT));
-        welcomePanel.addComponent(new Label("!"));
-        panel.addComponent(welcomePanel);
 
-        panel.addComponent(new Label("")); // ajout d'un espace
+        new Label(" Hey ").addTo(welcomePanel);
+        new Label(Security.getLoggedUser().getFullName()).setForegroundColor(TextColor.ANSI.BLUE_BRIGHT).addTo(welcomePanel);
+        new Label("!").addTo(welcomePanel);
+
+        welcomePanel.addTo(panel);
 
         // mail
-        var emailPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        new Label("").addTo(panel);
+        var emailPanel = Panel.horizontalPanel();
         ((LinearLayout) emailPanel.getLayoutManager()).setSpacing(0);
-        emailPanel.addComponent(new Label(" I know your email address is "));
-        emailPanel.addComponent(new Label(Security.getLoggedUser().getEmail())
-                .setForegroundColor(TextColor.ANSI.BLUE_BRIGHT));
-        emailPanel.addComponent(new Label("."));
-        panel.addComponent(emailPanel);
 
-        panel.addComponent(new Label("")); // ajout d'un espace
+        new Label(" I know your email address is ").addTo(emailPanel);
+        new Label(Security.getLoggedUser().getEmail()).setForegroundColor(TextColor.ANSI.BLUE_BRIGHT).addTo(emailPanel);
+        new Label(".").addTo(emailPanel);
 
+        emailPanel.addTo(panel);
 
         // "What can I do for you?"
-        var questionLabel = new Label(" What can I do for you?");
-        panel.addComponent(questionLabel);
+        new Label("").addTo(panel);
+        new Label(" What can I do for you?").addTo(panel);
+
 
         return panel;
     }
