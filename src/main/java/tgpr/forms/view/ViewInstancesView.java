@@ -63,8 +63,8 @@ public class ViewInstancesView extends DialogWindow {
                         .setMinWidth(4).alignRight(),
                 new ColumnSpec<>("User", Instance::getUser)
                         .setMinWidth(30),
-                new ColumnSpec<>("Submitted", i -> asString(i.getCompleted()))
-                        //.setMinWidth(20) --> produit une erreur si j'insère cette ligne de code
+                new ColumnSpec<Instance>("Submitted", i -> asString(i.getCompleted()))
+                        .setMinWidth(20) //--> produit une erreur si j'insère cette ligne de code
         ).addTo(panel);
 
         instancesTable.setSelectAction(() -> {
