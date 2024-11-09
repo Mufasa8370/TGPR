@@ -39,5 +39,6 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void manageYourDistributionList() {
+        navigateTo(new ManageDistListsController());
     }
 }

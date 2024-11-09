@@ -216,6 +216,13 @@ public class DistList extends Model {
                 new Params("distlist", id));
     }
 
+    public void deleteAllFormAccesses() {
+        execute("delete from distlist_form_accesses where distlist=:distlist",
+                new Params("distlist", id));
+    }
+
+
+
     public static DistList getByNameAndUser(String name, User user) {
         return queryOne(DistList.class, """
                         select *
