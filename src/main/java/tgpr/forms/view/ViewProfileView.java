@@ -28,7 +28,7 @@ public class ViewProfileView extends DialogWindow {
         var root = Panel.verticalPanel();
         setComponent(root);
 
-        createTxtPanel().addTo(root).sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
+        createTxtPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
         createButtonsPanel().addTo(root);
     }
 
@@ -66,9 +66,7 @@ public class ViewProfileView extends DialogWindow {
     }
 
     private Panel createButtonsPanel() {
-        var panel = new Panel()
-                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+        var panel = Panel.horizontalPanel().center();
 
         Button btnEditProfile = new Button("Edit Profile").addTo(panel);
         Button btnChangePassword = new Button("Change Password").addTo(panel);
