@@ -76,7 +76,7 @@ public class ViewInstancesView extends DialogWindow {
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
                 var instance = instancesTable.getSelected();
-                if (keyStroke.getKeyType() == KeyType.Backspace) {
+                if (keyStroke.getKeyType() == KeyType.Backspace || keyStroke.getKeyType() == KeyType.Delete) {
                     if (instance != null) {
                         controller.deleteInstance(instance);
                         refresh();
