@@ -82,7 +82,7 @@ public class AnalyzeView extends DialogWindow {
     private void onQuestionSelectionChanged(int oldValue, int newValue, boolean byUser) {
         Question selectedQuestion = questionsTable.getSelected();
         if (selectedQuestion != null) {
-            controller.answersPanel(answersTable, selectedQuestion);
+            controller.answersPanel(answersTable, selectedQuestion); // va remplir la table de réponses
         }
     }
 
@@ -102,11 +102,10 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createButtonsPanel() {
-        var panel = new Panel()
-                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
+        var panel = Panel.horizontalPanel()
                 .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
-        Button btnClose = new Button("Close", this::close).addTo(panel);
+        Button btnClose = new Button("Close", this::close).addTo(panel); // this fait référence à la vue AnalyzeView
 
         Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
 
@@ -118,11 +117,17 @@ public class AnalyzeView extends DialogWindow {
 
     private void refresh() {
         if (form != null) {
+            // Met à jour Fields
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
-            controller.questionsPanel(questionsTable);
-            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), false);
+            // Met à jour Questions
+            controller.questionsPanel(questionsTable); // va remplir la table de questions
+            // Met à jour Answers
+            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), true);
+                    // -1 signifie que la sélection précédente est inexistante
+                    // questionsTable.getSelectedRow() pour obtenir la ligne sélectionnée
+                    // true pour spécifier que la sélection est faite par l'utilisateur
         }
     }
 }
