@@ -70,7 +70,7 @@ public class AnalyzeView extends DialogWindow {
         questionsTable = new ObjectTable<>(
                 new ColumnSpec<Question>("Index", Question::getIdx)
                         .setMinWidth(5).alignRight(),
-                new ColumnSpec<Question>("Title", Question::getTitle)
+                new ColumnSpec<Question>("Title", Question::getTitleForAnalyze)
                         .setMinWidth(27).alignLeft()
         ).addTo(pnlQuestions);
 
@@ -106,10 +106,12 @@ public class AnalyzeView extends DialogWindow {
 
         Button btnClose = new Button("Close", this::close).addTo(panel); // this fait référence à la vue AnalyzeView
 
-        Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
+        if (!form.getInstances().isEmpty()) {
+            Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
+            addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
+        }
 
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
-        addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
 
         return panel;
     }

@@ -19,6 +19,13 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         view = new AnalyzeView(this, form);
     }
 
+    public static String cutText(String text, int maxLength) {
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength - 3) + "...";
+    }
+
     public long getNbSubmittedInstances() {
         return form.getInstances().stream().filter(Instance::isCompleted).count();
     }
