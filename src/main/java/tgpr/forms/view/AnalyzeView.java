@@ -65,18 +65,18 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createQuestionsPanel() {
-        var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
+        var pnlQuestions = Panel.gridPanel(1, Margin.of(1));
 
         questionsTable = new ObjectTable<>(
                 new ColumnSpec<Question>("Index", Question::getIdx)
                         .setMinWidth(5).alignRight(),
                 new ColumnSpec<Question>("Title", Question::getTitle)
                         .setMinWidth(27).alignLeft()
-        ).addTo(panel);
+        ).addTo(pnlQuestions);
 
         questionsTable.addSelectionChangeListener(this::onQuestionSelectionChanged);
 
-        return panel;
+        return pnlQuestions;
     }
 
     private void onQuestionSelectionChanged(int oldValue, int newValue, boolean byUser) {
@@ -87,7 +87,7 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createAnswersPanel() {
-        var panel = pnlAnswers = Panel.gridPanel(1, Margin.of(1));
+        var pnlAnswers = Panel.gridPanel(1, Margin.of(1));
 
         answersTable = new ObjectTable<>(
                 new ColumnSpec<Stat>("Value", Stat::getValue )
@@ -96,14 +96,13 @@ public class AnalyzeView extends DialogWindow {
                         .setMinWidth(3).alignRight(),
                 new ColumnSpec<Stat>("Ratio", Stat::getRatio)
                         .setMinWidth(8).alignRight()
-        ).addTo(panel);
+        ).addTo(pnlAnswers);
 
-        return panel;
+        return pnlAnswers;
     }
 
     private Panel createButtonsPanel() {
-        var panel = Panel.horizontalPanel()
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+        var panel = Panel.horizontalPanel().center();
 
         Button btnClose = new Button("Close", this::close).addTo(panel); // this fait référence à la vue AnalyzeView
 
