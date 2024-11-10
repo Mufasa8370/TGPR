@@ -5,6 +5,8 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.QuestionController;
+import tgpr.forms.controller.ViewFormController;
+import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
 import tgpr.framework.Controller;
@@ -29,12 +31,14 @@ public class QuestionView extends DialogWindow {
     private final Label errDescription;
     private Label errOptionList;
     private final Question question;
+    private Form form;
 
-    public QuestionView(QuestionController controller, Question question) {
+    public QuestionView(QuestionController controller, Question question, Form form) {
         super(question == null ? "Add a question" : "Edit a question");
 
         this.controller = controller;
         this.question = question;
+        this.form = form;
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
@@ -87,7 +91,6 @@ public class QuestionView extends DialogWindow {
         new EmptySpace().addTo(fields);
         errOptionList = new Label("").setForegroundColor(TextColor.ANSI.RED).addTo(fields);
         new EmptySpace().addTo(fields);
-        errOptionList = new Label("").setForegroundColor(TextColor.ANSI.RED).addTo(fields);
         Panel fiels = new Panel().setLayoutManager(new LinearLayout(Direction.VERTICAL));
         root.addComponent(new EmptySpace(), LinearLayout.createLayoutData(LinearLayout.Alignment.Fill));
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
@@ -95,6 +98,9 @@ public class QuestionView extends DialogWindow {
             Button btnDeleteQuestion = new Button("Delete", this::deleteQuestion).addTo(buttons);
         }
         btnCreate = new Button("Create", this::create);
+        if(question == null) {
+            question = new Question();
+        }
         if(question != null) {
             Button btnUpdate = new Button("Update",this::updateQuestion).addTo(buttons);
         }else{
@@ -106,7 +112,9 @@ public class QuestionView extends DialogWindow {
     }
 
     private void updateQuestion() {
-        controller.save(
+        controller.update(
+                form.getId(),
+                question.getIdx(),
                 txtTitle.getText(),
                 txtDescription.getText(),
                 cboType.getSelectedItem(),
@@ -125,7 +133,7 @@ public class QuestionView extends DialogWindow {
     private void deleteQuestion() {
         if (askConfirmation("You are about to delete this question. Please confirm.","Delete question")){
             question.delete();
-            close();
+            reloadAfterDelete();
         }
     }
 
@@ -157,6 +165,8 @@ public class QuestionView extends DialogWindow {
 
     private void create() {
         controller.create(
+                form.getId(),
+                question.getIdx(),
                 txtTitle.getText(),
                 txtDescription.getText(),
                 cboType.getSelectedItem(),
@@ -167,5 +177,10 @@ public class QuestionView extends DialogWindow {
 
     private void add() {
         Controller.showMessage("use case en cours de dev", "message", "ok");
+    }
+
+    private void reloadAfterDelete(){
+        close();
+        controller.navigateTo(new ViewFormController(form));
     }
 }

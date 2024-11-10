@@ -24,8 +24,8 @@ public class ViewFormController extends Controller<ViewFormView> {
 
     }
 
-        private Question updateQuestion(Question question) {
-        var controller = new QuestionController(question);
+    private Question updateQuestion(Question question) {
+        var controller = new QuestionController(question,form);
         navigateTo(controller);
         return controller.getQuestion();
     }
@@ -33,7 +33,7 @@ public class ViewFormController extends Controller<ViewFormView> {
 
     public void newQuestion(){
         Question question = null;
-        var controller = new QuestionController(question);
+        var controller = new QuestionController(question, form);
         navigateTo(controller);
     }
 

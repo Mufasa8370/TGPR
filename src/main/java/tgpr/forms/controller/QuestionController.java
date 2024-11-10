@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 
+import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
 import tgpr.forms.view.QuestionView;
@@ -16,9 +17,9 @@ public class QuestionController extends Controller<QuestionView> {
     private final QuestionView view;
     private Question question;
 
-    public QuestionController(Question question) {
+    public QuestionController(Question question, Form form) {
         this.question = question;
-        view = new QuestionView(this, question);
+        view = new QuestionView(this, question, form);
     }
 
     public Question getQuestion() {
@@ -42,7 +43,7 @@ public class QuestionController extends Controller<QuestionView> {
     }
 
     //pour create
-    public void create(String title, String description, Question.Type type, boolean required, OptionList optionList) {
+    public void create(int formId, int idx,String title, String description, Question.Type type, boolean required, OptionList optionList) {
         // Valide les entrées
         var errors = validate(title, description);
 
@@ -69,7 +70,7 @@ public class QuestionController extends Controller<QuestionView> {
     }
 
     //pour update
-    public void save(String title, String description, Question.Type type, boolean required, OptionList optionList) {
+    public void update(int idForm, int idx,String title, String description, Question.Type type, boolean required, OptionList optionList) {
         var errors = validate(title, description);
         if (errors.isEmpty()) {
             question.save();

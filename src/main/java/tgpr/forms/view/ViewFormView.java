@@ -80,7 +80,7 @@ public class ViewFormView extends DialogWindow {
             questionTable.setSelectAction(() -> {
                 var selectedQuestion = questionTable.getSelected();
                 if (selectedQuestion != null) {
-                    Controller.navigateTo(new QuestionController(selectedQuestion)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
+                    Controller.navigateTo(new QuestionController(selectedQuestion, form)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
                     refresh();
                 }
             });
@@ -170,7 +170,7 @@ public class ViewFormView extends DialogWindow {
         controller.newQuestion();
     }
 
-    private void refresh(){
+    private void refresh() {
         if(question != null){
 //            txtTitle.setText(question.getTitle());
 //            txtDescription.setText(question.getDescription());
@@ -189,4 +189,6 @@ public class ViewFormView extends DialogWindow {
             }
         }
     }
+
+
 }
