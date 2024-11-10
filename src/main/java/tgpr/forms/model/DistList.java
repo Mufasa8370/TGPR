@@ -131,12 +131,14 @@ public class DistList extends Model {
                 .add("description", description)
                 .add("owner", ownerId);
         if (obj == null) {
+            System.out.println("Insert");
             sql = "insert into distlists (name,description,owner) " +
                     "values (:name,:description,:owner)";
             int id = insert(sql, params);
             if (id > 0)
                 this.id = id;
         } else {
+            System.out.println("Update");
             sql = "update distlists set name=:name," +
                     "description=:description, " +
                     "owner=:owner " +

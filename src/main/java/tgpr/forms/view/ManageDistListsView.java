@@ -12,6 +12,7 @@ import tgpr.forms.model.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static tgpr.forms.model.Security.getLoggedUser;
 import static tgpr.framework.Controller.askConfirmation;
 import static tgpr.framework.Controller.navigateTo;
 
@@ -50,11 +51,21 @@ public class ManageDistListsView extends DialogWindow {
     private Button save = new Button("Save",this::save);
 
     private void save() {
-        if (current != null){
-            current.save();
+        if (current != null) {
+            current.deleteAllUsers();
+            for(User user : usersInList){
+                DistListUser distListUser = new DistListUser(current,user);
+                distListUser.save();
+            }
         }else {
+            System.out.println("null");
             DistList distList  = new DistList(nameCurrentDst);
+            distList.setOwnerId(getLoggedUser().getId());
             distList.save();
+            for(User user : usersInList){
+                DistListUser distListUser = new DistListUser(distList,user);
+                distListUser.save();
+            }
         }
         close();
         navigateTo(new ManageDistListsController());
@@ -66,6 +77,7 @@ public class ManageDistListsView extends DialogWindow {
     private ObjectTable<User> userInTable;
     List<DistList> distLists = DistList.getAll();
     DistList current = null;
+    private AutoCompleteComboBox autoCompleteComboBox;
     List<User> usersInList = new ArrayList<>();
     private Label noItemInList = new Label("at least one user required").setForegroundColor(TextColor.ANSI.RED).setVisible(false);
     private Label goodLabel =new Label("(*)").setVisible(false);
@@ -85,6 +97,7 @@ public class ManageDistListsView extends DialogWindow {
 
         root.addComponent(createViewComboBox());
         panelForTable.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        panelForTable.setPreferredSize(new TerminalSize(100,100));
 
         Panel userInPanel = createViewPanelUserInList();
         Panel userOtherPanel = createViewPanelUserOther();
@@ -98,6 +111,7 @@ public class ManageDistListsView extends DialogWindow {
         root.addComponent(panelForTable);
 
         root.addComponent(createPanelButton());
+        autoCompleteComboBox.takeFocus();
 
     }
 
@@ -107,7 +121,7 @@ public class ManageDistListsView extends DialogWindow {
         panelForCombo.addComponent(new Label("List: "));
         // Avec des éléments qui sont des strings
 
-        AutoCompleteComboBox autoCompleteComboBox = new AutoCompleteComboBox<>("",distLists);
+         autoCompleteComboBox = new AutoCompleteComboBox<>("",distLists);
         autoCompleteComboBox.setPreferredSize(new TerminalSize(40,1));
         autoCompleteComboBox.addListener(new AutoCompleteComboBox.Listener() {
             @Override
@@ -123,8 +137,8 @@ public class ManageDistListsView extends DialogWindow {
                     }
                 }
                 if(!listExist){
-                    System.out.println("TEST");
                     usersInList.clear();
+                    current = null;
                     noItemInList.setVisible(true);
                     delete.setVisible(false);
                 }else {
@@ -166,10 +180,12 @@ public class ManageDistListsView extends DialogWindow {
                     goodLabel.setVisible(false);
                     save.setVisible(false);
                     cancel.setVisible(false);
+                    autoCompleteComboBox.setReadOnly(false);
                 }else {
                     goodLabel.setVisible(true);
                     save.setVisible(true);
                     cancel.setVisible(true);
+                    autoCompleteComboBox.setReadOnly(true);
                 }
                 delete.setVisible(false);
 
@@ -203,6 +219,8 @@ public class ManageDistListsView extends DialogWindow {
                 save.setVisible(true);
                 cancel.setVisible(true);
                 goodLabel.setVisible(true);
+                autoCompleteComboBox.setReadOnly(true);
+
                 reload();
             }
         });
@@ -214,7 +232,7 @@ public class ManageDistListsView extends DialogWindow {
 
     public Panel createPanelButton(){
         var panel = Panel.horizontalPanel().center();
-        panel.setPreferredSize(new TerminalSize(100,2));
+        panel.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         panel.addComponent(save.setVisible(false));
         panel.addComponent(delete.setVisible(false));
         panel.addComponent(cancel.setVisible(false));
