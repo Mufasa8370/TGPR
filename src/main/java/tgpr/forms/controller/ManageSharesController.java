@@ -2,15 +2,11 @@ package tgpr.forms.controller;
 import tgpr.forms.model.*;
 import tgpr.framework.Controller;
 
-import static tgpr.framework.Tools.*;
 import tgpr.forms.view.ManageSharesView;
-import tgpr.framework.Controller;
 import tgpr.framework.Model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ManageSharesController extends Controller<ManageSharesView> {
 
@@ -19,20 +15,23 @@ public class ManageSharesController extends Controller<ManageSharesView> {
     private final Form form;
     private List<User> filteredUsers;
     private List<DistList> notAddedLists;
-    private ArrayList<Integer> listTestId = new ArrayList<Integer>();
-
+    private List<DistList> listAccessDisList;
+    private List<DistListFormAccess> distlistAccessesFiltered;
+    private List<UserFormAccess> userAccessFiltered;
+    private List<UserFormAccess> formsAccesses;
     public ManageSharesController(Form form){
         this.form = form;
         view = new ManageSharesView(this);
 
     }
 
-    public ArrayList<Model>getAll(){
+    public List<Model> getPotentialBeneficiaries(){
+/*
         ArrayList<Model> listFull = new ArrayList<>();
 
         // HERE: Récupération dans distlist_form_accesses
         //       des listes d'utilisateurs qui ont accès au formulaire.
-        List<DistListFormAccess> distlistAccessesFiltered = new ArrayList<>();
+        distlistAccessesFiltered = new ArrayList<>();
         for (DistListFormAccess listAccess : DistListFormAccess.getAll()) {
             if (listAccess.getFormId() == form.getId()) {
                 // récupérer tous les listes qui on accès à notre formulaire courant.
@@ -43,34 +42,36 @@ public class ManageSharesController extends Controller<ManageSharesView> {
         // HERE: Récupération de tous les utilisateurs des listes/Distlist_users
         //       qui ont accès à mon formualire courant.
         ArrayList<DistListUser> listDistUsers = new ArrayList<DistListUser>();
-        for(int a = 0; a<distlistAccessesFiltered.size();a++ ){
+        for(int a = 0; a < distlistAccessesFiltered.size(); a++){
             for(DistListUser userFromDistList: DistListUser.getAll()){
                 // si un user appartient à la dislist qui est dans la liste distlistAccessesFiltered
                 // et s'il est pas  le membre courrant alors on l'ajoute.
                 if(userFromDistList.getDistListId() == distlistAccessesFiltered.get(a).getDistListId() && userFromDistList.getUserId() != Security.getLoggedUserId()){
-                    listDistUsers.add( userFromDistList);
+                    listDistUsers.add(userFromDistList);
                 }
             }
         }
 
         // HERE: Récupération des user_form_access qui n'appartiennent pas
         //       à une liste qui a accès à l'utilisateur courant.
-        List<UserFormAccess> userAccessFiltered = new ArrayList<>();
-        for (UserFormAccess userAccess : UserFormAccess.getAll()) {
+        userAccessFiltered = new ArrayList<>();
+        formsAccesses = UserFormAccess.getAll();
+        for (UserFormAccess userAccess : formsAccesses) {
             boolean isPresent = false;
-            if  (userAccess.getFormId() == form.getId() && userAccess. getUserId() != Security.getLoggedUserId()) {
+            if  (userAccess.getFormId() == form.getId()) {
                 // récupére tous les utilisateurs de la table user_from_access
                 // ont accès au formulaire courant.
 
-                // Si un utilisateur dans la table  user_from_access
+                // Si un utilisateur dans la table user_from_access
                 // appartient déjà à une liste qui a accès au formulaire courant,
                 // je ne l'ajoute pas.
                 for(DistListUser elem: listDistUsers){
-                    if(userAccess.getUserId() == elem.getUserId() ){
+                    if(userAccess.getUserId() == elem.getUserId()){
                         isPresent = true;
                     }
                 }
-                if(!isPresent){
+                if(!isPresent) {
+                    System.out.println("taken0");
                     userAccessFiltered.add(userAccess);
                 }
             }
@@ -81,27 +82,33 @@ public class ManageSharesController extends Controller<ManageSharesView> {
         //       qui donnent accès au formualaire courant ni dans userAccessFiltered.
         var users = User.getAll();
         filteredUsers = new ArrayList<>();
-        for(User ux : users){
-            // si l'utilsateur est ni l'utilisateur courrant ni un admin.
-            if(ux.getId() != Security.getLoggedUserId() && ux.getRole() != User.Role.Admin  && ux.getId() != form.getOwnerId()){
-                boolean isPresentDistList = false;
-                boolean isPresentFromAccess = false;
+        for(User user : users){
+            System.out.print(user);
+            // si l'utilsateur est ni l'utilisateur courrant ni un admin et qui n'est pas le propriétaire du fomrulaire.
+            if(user.getId() != Security.getLoggedUserId() && user.getRole() != User.Role.Admin  && user.getId() != form.getOwnerId()){
+                boolean isPresentInDistList = false;
+                boolean isPresentInFormAccess = false;
                 for (DistListUser userListDist: listDistUsers){
-                    if(ux.getId() == userListDist.getUserId()){
-                        isPresentDistList = true;
+                    if(user.getId() == userListDist.getUserId()){
+                        isPresentInDistList = true;
                     }
                 }
-                if(!isPresentDistList){
-                    filteredUsers.add(ux);
+                if(!isPresentInDistList){
+                    filteredUsers.add(user);
+                    System.out.println("Taken 1");
+                    continue;
                 }
                 for (UserFormAccess userAccess: userAccessFiltered){
-                    if(ux.getId() == userAccess.getUserId()){
-                        isPresentFromAccess = true;
+                    if(user.getId() == userAccess.getUserId()){
+                        isPresentInFormAccess = true;
                     }
                 }
-                if(!isPresentFromAccess){
-                    filteredUsers.add(ux);
+                if(!isPresentInFormAccess){
+                    filteredUsers.add(user);
+                    System.out.println("Taken 2");
                 }
+            } else {
+                System.out.println("Not taken");
             }
         }
         // HERE: Récupération des distlists
@@ -113,20 +120,54 @@ public class ManageSharesController extends Controller<ManageSharesView> {
             }
         }
 
-        for(int elem: listTestId){
-            listFull.add(User.getByKey(elem));
-        }
-
         listFull.addAll(filteredUsers);
         listFull.addAll(notAddedLists);
 
-        return listFull;
+*/
+        return form.getPotentialBeneficiaries();
     }
 
+    public List<Model> getAccesses() {
+        var accesses = form.getAccesses();
+        ArrayList<Model> accessesToDisplay = new ArrayList<>();
+        for (Model access: accesses) {
+            if(access instanceof UserFormAccess){
+                var id = ((UserFormAccess)access).getUserId();
+                if(id != form.getOwnerId() && Security.getLoggedUserId() != id) {
+                    accessesToDisplay.add(access);
+                }
+            } else {
+                accessesToDisplay.add(access);
+            }
+        }
+        return accessesToDisplay;
+    }
+
+    public List<UserFormAccess> getUserAccess() {
+        List<UserFormAccess> usersToDisplay = new ArrayList<>();
+        for (UserFormAccess access: formsAccesses) {
+            if(access.getFormId() == form.getId() && Security.getLoggedUserId() != access.getUserId()){
+                usersToDisplay.add(access);
+            }
+        }
+        return usersToDisplay;
+    }
+
+    public List<DistListFormAccess> getDistListFormAccess(){
+        return distlistAccessesFiltered;
+    }
     public static void SharesForm(){
         navigateTo(new ManageSharesController(Form.getByKey(14)));
     }
 
+    public void addAccess(Model beneficiary, AccessType accessType) {
+        if (beneficiary instanceof User) {
+            form.addAccess(((User) beneficiary), accessType);
+        }
+        else if(beneficiary instanceof DistList){
+            form.addAccess(((DistList) beneficiary), accessType);
+        }
+    }
     @Override
     public ManageSharesView getView() {return view;}
 }
