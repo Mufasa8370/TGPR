@@ -3,18 +3,19 @@ package tgpr.forms.controller;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.Question;
-import tgpr.forms.view.QuestionView;
+import tgpr.forms.view.AddEditQuestionView;
+import tgpr.forms.view.ViewFormView;
 import tgpr.framework.Controller;
 import tgpr.framework.ErrorList;
 
-public class QuestionController extends Controller<QuestionView> {
+public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
-    private final QuestionView view;
+    private final AddEditQuestionView view;
     private Question question;
 
-    public QuestionController(Question question, Form form) {
+    public AddEditQuestionController(Question question, Form form, ViewFormView formView) {
         this.question = question;
-        view = new QuestionView(this, question, form);
+        view = new AddEditQuestionView(this, question, form, formView);
     }
 
     public Question getQuestion() {
@@ -78,7 +79,7 @@ public class QuestionController extends Controller<QuestionView> {
     }
 
     @Override
-    public QuestionView getView() {
+    public AddEditQuestionView getView() {
         return view;
     }
 }

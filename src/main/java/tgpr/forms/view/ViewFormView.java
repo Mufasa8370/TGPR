@@ -92,7 +92,7 @@ public class ViewFormView extends DialogWindow {
                 if (!reorderMode){
                     var selectedQuestion = questionTable.getSelected();
                     if (selectedQuestion != null) {
-                        Controller.navigateTo(new QuestionController(selectedQuestion, form)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
+                        Controller.navigateTo(new AddEditQuestionController(selectedQuestion, form, this)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
                         refresh();
                     }
 

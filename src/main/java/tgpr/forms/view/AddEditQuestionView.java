@@ -3,7 +3,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
-import tgpr.forms.controller.QuestionController;
+import tgpr.forms.controller.AddEditQuestionController;
 import tgpr.forms.controller.ViewFormController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.OptionList;
@@ -15,9 +15,9 @@ import java.util.List;
 
 import static tgpr.framework.Controller.askConfirmation;
 
-public class QuestionView extends DialogWindow {
+public class AddEditQuestionView extends DialogWindow {
 
-    private final QuestionController controller;
+    private final AddEditQuestionController controller;
     private final TextBox txtTitle;
     private final TextBox txtDescription;
     private final ComboBox<Question.Type> cboType;
@@ -30,10 +30,12 @@ public class QuestionView extends DialogWindow {
     private Label errOptionList;
     private final Question question;
     private Form form;
+    private ViewFormView formView;
 
-    public QuestionView(QuestionController controller, Question question, Form form) {
+    public AddEditQuestionView(AddEditQuestionController controller, Question question, Form form, ViewFormView formView) {
         super(question == null ? "Add a question" : "Edit a question");
 
+        this.formView = formView;
         this.controller = controller;
         this.question = question;
         this.form = form;
@@ -184,6 +186,7 @@ public class QuestionView extends DialogWindow {
     }
 
     private void reloadAfterDelete(){
+        formView.close();
         close();
         controller.navigateTo(new ViewFormController(form));
     }
