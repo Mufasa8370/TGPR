@@ -10,8 +10,10 @@ import tgpr.forms.controller.ManageSharesController;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.UserFormAccess;
 import tgpr.framework.Controller;
+import tgpr.framework.Model;
 import tgpr.framework.ViewManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static tgpr.framework.Tools.asString;
@@ -52,12 +54,22 @@ public class ManageSharesView  extends DialogWindow {
         new EmptySpace().addTo(root);
 
         Panel filter = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        AutoCompleteComboBox<String> addFilter = new AutoCompleteComboBox();
+        AutoCompleteComboBox<Model> addFilter = new AutoCompleteComboBox<>();
         addFilter.addTo(filter);
         addFilter.setPreferredSize(new TerminalSize(15, 1)).addTo(filter);
-        var cboRelationship = new ComboBox<String>("Editor","User").addTo(filter);
+        addFilter.addItems(controller.getAll());
+        var cboType = new ComboBox<String>("Editor","User").addTo(filter);
         btnAddFilter = new Button("Add").addTo(filter);
+        btnAddFilter.addListener(btn -> {
+            // btn: de type Button, contient une réf vers le bouton
+            System.out.println("Button Save has been pressed");
+            var b = addFilter.getSelectedItem();
+            System.out.println(b);
+            var c = cboType.getSelectedItem();
+            System.out.println(c);
+        });
+
+
 
     }
-
 }
