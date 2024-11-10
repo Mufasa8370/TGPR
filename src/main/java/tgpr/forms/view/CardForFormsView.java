@@ -16,10 +16,12 @@ public class CardForFormsView extends Panel{
     private final Form form;
     //private final Instance instance;
     private final CardForFormsController controller ;
+    private final Runnable refreshCallBack;
 
-    public CardForFormsView(Form form, CardForFormsController controller) {
+    public CardForFormsView(Form form, CardForFormsController controller, Runnable refreshCallback) {
         this.form = form;
         this.controller = controller;
+        this.refreshCallBack = refreshCallback;
         var root = new Panel().setLayoutManager(
                 new LinearLayout(Direction.VERTICAL)
         );
@@ -52,6 +54,7 @@ public class CardForFormsView extends Panel{
         if(accesTypeEditor(form)){
             Button manage = new Button("Manage", () -> {
                 controller.manage(form);
+                refreshCallBack.run();
             }
             ).addTo(buttons);
         }

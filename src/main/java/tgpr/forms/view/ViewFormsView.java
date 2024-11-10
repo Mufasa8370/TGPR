@@ -115,7 +115,7 @@ public class ViewFormsView extends BasicWindow {
         cardPanel.setLayoutManager(new GridLayout(3));
 
         for (Form form : forms) {
-            CardForFormsView card = new CardForFormsView(form, new CardForFormsController());
+            CardForFormsView card = new CardForFormsView(form, new CardForFormsController(), () -> {txtFilter.takeFocus();reloadData(page);});
             cardPanel.addComponent(card);
         }
         if (forms.isEmpty()) {
