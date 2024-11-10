@@ -29,6 +29,15 @@ public class ViewFormView extends DialogWindow {
     private boolean existInstance;
     private Question question;
     private Label lblNoQuestions;
+    private boolean auto = false;
+
+    List<Question> questions;
+
+    Question current;
+    private Button saveOrder,cancel,btnNewQuestion, btnEditForm, btnDeleteForm, btnMakePrivate, btnMakePublic,btnShare, btnClearInstances, btnReorder, btnAnalyse, close;
+
+
+    private boolean reorderMode = false,reoderSelect = false;
 
     public ViewFormView(ViewFormController controller, Form form) {
         super("View Form Details");
@@ -76,15 +85,21 @@ public class ViewFormView extends DialogWindow {
                 new ColumnSpec<>("Option List", Question::getOptionList).setOverflowHandling(ColumnSpec.OverflowHandling.Wrap)
         ).addTo(pnlQuestions);
 
-        List<Question> questions = form.getQuestions();
+        questions = form.getQuestions();
 
         if(!existInstance){
             questionTable.setSelectAction(() -> {
-                var selectedQuestion = questionTable.getSelected();
-                if (selectedQuestion != null) {
-                    Controller.navigateTo(new QuestionController(selectedQuestion, form)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
-                    refresh();
+                if (!reorderMode){
+                    var selectedQuestion = questionTable.getSelected();
+                    if (selectedQuestion != null) {
+                        Controller.navigateTo(new QuestionController(selectedQuestion, form)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
+                        refresh();
+                    }
+
+                }else {
+                    reorderSelect();
                 }
+
             });
         }
 
@@ -107,31 +122,38 @@ public class ViewFormView extends DialogWindow {
         Panel buttons = new Panel(new LinearLayout(Direction.HORIZONTAL));
         buttons.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         if(!existInstance){
-            Button btnNewQuestion = new Button("New Question", this::newQuestion).addTo(buttons);
-            Button btnEditForm = new Button("Edit Form", this::editForm).addTo(buttons);
+            btnNewQuestion = new Button("New Question", this::newQuestion).addTo(buttons);
+            btnEditForm = new Button("Edit Form", this::editForm).addTo(buttons);
         }
-        Button btnDeleteForm = new Button("Delete Form", this::deleteForm).addTo(buttons);
+        btnDeleteForm = new Button("Delete Form", this::deleteForm).addTo(buttons);
         if(existInstance){
             if(form.getIsPublic()){
-                Button btnMakePrivate = new Button("Make Private", this::makePublic).addTo(buttons);
+                btnMakePrivate = new Button("Make Private", this::makePublic).addTo(buttons);
             }else{
-                Button btnMakePublic = new Button("Make Public", this::makePublic).addTo(buttons);
+                btnMakePublic = new Button("Make Public", this::makePublic).addTo(buttons);
             }
         }
-        Button btnShare = new Button("Share", this::share).addTo(buttons);
+        btnShare = new Button("Share", this::share).addTo(buttons);
         if(existInstance){
-            Button btnClearInstances = new Button("Clear Instances",this::clearInstances).addTo(buttons);
+            btnClearInstances = new Button("Clear Instances",this::clearInstances).addTo(buttons);
         }
         if(!existInstance){
-            Button btnReorder = new Button("Reorder", this::reorder).addTo(buttons);
+            btnReorder = new Button("Reorder", this::reorder).addTo(buttons);
         }
 
         if (existInstance) {
-            Button btnAnalyse = new Button("Analyse", this::analyse).addTo(buttons);
+            btnAnalyse = new Button("Analyse", this::analyse).addTo(buttons);
         }
-        new Button("Close", this::close).addTo(buttons);
+        close = new Button("Close", this::close).addTo(buttons);
+        saveOrder = new Button("Save Order", this::saveOrder).addTo(buttons).setVisible(false);
+        cancel = new Button("Cancel", this::cancel).addTo(buttons).setVisible(false);
 
         root.addComponent(buttons);
+    }
+
+    private void cancel() {
+        close();
+        controller.navigateTo(new ViewFormController(form));
     }
 
     private void clearInstances() {
@@ -157,6 +179,81 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void reorder() {
+        reorderMode = true;
+
+        if (btnNewQuestion != null) {
+            btnNewQuestion.setVisible(false);
+        }
+        if (btnEditForm != null) {
+            btnEditForm.setVisible(false);
+        }
+        if (btnDeleteForm != null) {
+            btnDeleteForm.setVisible(false);
+        }
+        if (btnMakePrivate != null) {
+            btnMakePrivate.setVisible(false);
+        }
+        if (btnMakePublic != null) {
+            btnMakePublic.setVisible(false);
+        }
+        if (btnShare != null) {
+            btnShare.setVisible(false);
+        }
+        if (btnClearInstances != null) {
+            btnClearInstances.setVisible(false);
+        }
+        if (btnReorder != null) {
+            btnReorder.setVisible(false);
+        }
+        if (btnAnalyse != null) {
+            btnAnalyse.setVisible(false);
+        }
+        if (close != null) {
+            close.setVisible(false);
+        }
+        saveOrder.setVisible(true);
+        cancel.setVisible(true);
+    }
+    public void changeOrder(List<Question> questions, int oldInd, int newInd){
+        Question old = questions.get(oldInd);
+        Question newQustion = questions.get(newInd);
+        questions.set(oldInd,newQustion);
+        questions.set(newInd,old);
+
+    }
+    private void saveOrder() {
+        form.reorderQuestions(questions);
+        close();
+        controller.navigateTo(new ViewFormController(form));
+    }
+    private void reorderSelect() {
+        if(!reoderSelect){
+            current = questionTable.getSelected();
+            questionTable.addSelectionChangeListener(new ObjectTable.SelectionChangeListener() {
+                @Override
+                public void onSelectionChanged(int oldRow, int newRow, boolean byUser) {
+                    if(!auto){
+                        changeOrder(questions,oldRow,newRow);
+                        questionTable.clear();
+                        questionTable.add(questions);
+                        auto = true;
+                        questionTable.setSelected(questions.get(newRow));
+                    }else {
+                        auto = false;
+                    }
+                }
+            });
+            reoderSelect = true;
+        }else {
+
+            reoderSelect = false;
+            questionTable.addSelectionChangeListener(new ObjectTable.SelectionChangeListener() {
+                @Override
+                public void onSelectionChanged(int oldRow, int newRow, boolean byUser) {
+                    System.out.println("okok");
+                }
+            });
+        }
 
     }
 

@@ -4,6 +4,7 @@ import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
 import tgpr.forms.view.ViewFormView;
 import tgpr.framework.Controller;
+import static org.mariadb.jdbc.pool.Pools.close;
 
 public class ViewFormController extends Controller<ViewFormView> {
 
@@ -19,9 +20,9 @@ public class ViewFormController extends Controller<ViewFormView> {
         if (askConfirmation("You are about to delete this form. Please confirm.","Delete form")){
             form.deleteAllInstances();
             form.delete();
-            view.close();
+            close();
+            navigateTo(new ViewFormsController());
         }
-
     }
 
     private Question updateQuestion(Question question) {
