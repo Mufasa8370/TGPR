@@ -55,4 +55,9 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         navigateTo(new ViewInstancesController(form));
     }
 
+    public void closeView() {
+        view.close();
+        navigateTo(new ViewFormController(form));
+    }
+
 }

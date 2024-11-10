@@ -109,7 +109,7 @@ public class ViewInstancesView extends DialogWindow {
             Button btnDeleteAll = new Button("Delete All", this::deleteAll).addTo(panel);
         }
 
-        Button btnClose = new Button("Close", this::close).addTo(panel);
+        Button btnClose = new Button("Close", controller::closeView).addTo(panel);
 
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
 

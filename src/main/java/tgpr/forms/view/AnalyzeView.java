@@ -104,7 +104,7 @@ public class AnalyzeView extends DialogWindow {
     private Panel createButtonsPanel() {
         var panel = Panel.horizontalPanel().center();
 
-        Button btnClose = new Button("Close", this::close).addTo(panel); // this fait référence à la vue AnalyzeView
+        Button btnClose = new Button("Close", controller::closeView).addTo(panel); // this fait référence à la vue AnalyzeView
 
         if (!form.getInstances().isEmpty()) {
             Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
