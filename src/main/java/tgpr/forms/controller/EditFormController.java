@@ -1,5 +1,6 @@
 package tgpr.forms.controller;
 
+import tgpr.forms.model.AccessType;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Security;
 import tgpr.forms.view.EditFormView;
@@ -35,6 +36,7 @@ public class EditFormController  extends Controller<EditFormView> {
                 // si il es connecté
                 this.form = new Form(title, description, Security.getLoggedUser(), isPublic);
                 this.form.save();
+                this.form.addAccess(this.form.getOwner(), AccessType.Editor);
                 // pour s'assurer que tout a bien été effectué.
                 return true;
             } else {
@@ -47,7 +49,7 @@ public class EditFormController  extends Controller<EditFormView> {
             if (Security.getLoggedUser() != null) {
                 this.form. setTitle(title);
                 this.form.setDescription(description);
-                if(!this.form.getIsPublic() &&  isPublic){
+                if(!this.form.getIsPublic() && isPublic){
 
                     if(askForConfirmation()){
                         this.form.setIsPublic(isPublic);
