@@ -30,7 +30,6 @@ public class ViewFormController extends Controller<ViewFormView> {
         return controller.getQuestion();
     }
 
-
     public void newQuestion(){
         Question question = null;
         var controller = new QuestionController(question, form);

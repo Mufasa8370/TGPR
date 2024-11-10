@@ -1,5 +1,4 @@
 package tgpr.forms.view;
-import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
@@ -15,7 +14,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import static tgpr.framework.Controller.askConfirmation;
-import static tgpr.framework.Controller.navigateTo;
 
 public class QuestionView extends DialogWindow {
 
@@ -84,7 +82,16 @@ public class QuestionView extends DialogWindow {
         Panel optionListPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         cboOptionList = new ComboBox<OptionList>().addTo(optionListPanel);
         if (question != null) {
-            cboOptionList.setSelectedItem(question.getOptionList());  // Pré-remplir le champ titre
+            for(OptionList optionList : OptionList.getAll()){
+                cboOptionList.addItem(optionList);
+            }
+            if(question.getOptionList()!= null)
+                cboOptionList.setSelectedItem(OptionList.getByKey(question.getOptionListId()));
+        }else {
+            for(OptionList optionList : OptionList.getAll()){
+                cboOptionList.addItem(optionList);
+            }
+            cboOptionList.setSelectedItem(null);
         }
         btnAdd = new Button("Add", this::add).addTo(optionListPanel);
         optionListPanel.addTo(fields);
@@ -98,9 +105,6 @@ public class QuestionView extends DialogWindow {
             Button btnDeleteQuestion = new Button("Delete", this::deleteQuestion).addTo(buttons);
         }
         btnCreate = new Button("Create", this::create);
-        if(question == null) {
-            question = new Question();
-        }
         if(question != null) {
             Button btnUpdate = new Button("Update",this::updateQuestion).addTo(buttons);
         }else{
@@ -109,26 +113,17 @@ public class QuestionView extends DialogWindow {
         }
         new Button("Cancel", this::close).addTo(buttons);
         root.addComponent(buttons, LinearLayout.createLayoutData(LinearLayout.Alignment.End));
+        validate();
     }
 
     private void updateQuestion() {
-        controller.update(
-                form.getId(),
-                question.getIdx(),
-                txtTitle.getText(),
-                txtDescription.getText(),
-                cboType.getSelectedItem(),
-                chkRequired.isChecked(),
-                cboOptionList.getSelectedItem()
-        );
+        question.setTitle(txtTitle.getText());
+        question.setDescription(txtDescription.getText());
+        question.setType(cboType.getSelectedItem());
+        question.setRequired(chkRequired.isChecked());
+        controller.update(question, cboOptionList.getSelectedItem());
+        reloadAfterDelete();
     }
-
-//    private Question updateQuestion() {
-//        var controller = new QuestionController(question);
-//        navigateTo(controller);
-//        return controller.getQuestion();
-//        //refresh();
-//    }
 
     private void deleteQuestion() {
         if (askConfirmation("You are about to delete this question. Please confirm.","Delete question")){
@@ -146,6 +141,14 @@ public class QuestionView extends DialogWindow {
         errDescription.setText(errors.getFirstErrorMessage(Question.Fields.Description));
         Question.Type selectedType = cboType.getSelectedItem();
         String optionListError = "";
+        if(selectedType != null && selectedType.requiresOptionList()){
+            cboOptionList.setEnabled(true);
+        }else {
+            cboOptionList.setEnabled(false);
+            if (cboOptionList.getSelectedItem() != null){
+                cboOptionList.setSelectedItem(null);
+            }
+        }
         if (selectedType != null && selectedType.requiresOptionList() && cboOptionList.getSelectedItem() == null) {
             optionListError = "required for this type";
         }
@@ -166,13 +169,14 @@ public class QuestionView extends DialogWindow {
     private void create() {
         controller.create(
                 form.getId(),
-                question.getIdx(),
+                form.getNextIdx(),
                 txtTitle.getText(),
                 txtDescription.getText(),
                 cboType.getSelectedItem(),
                 chkRequired.isChecked(),
                 cboOptionList.getSelectedItem()
         );
+        reloadAfterDelete();
     }
 
     private void add() {

@@ -14,6 +14,8 @@ import tgpr.forms.model.Question;
 import tgpr.framework.Controller;
 import java.util.List;
 
+import static tgpr.framework.Controller.askConfirmation;
+
 public class ViewFormView extends DialogWindow {
 
     private final ViewFormController controller;
@@ -103,6 +105,7 @@ public class ViewFormView extends DialogWindow {
         new EmptySpace().addTo(fields);
 
         Panel buttons = new Panel(new LinearLayout(Direction.HORIZONTAL));
+        buttons.setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
         if(!existInstance){
             Button btnNewQuestion = new Button("New Question", this::newQuestion).addTo(buttons);
             Button btnEditForm = new Button("Edit Form", this::editForm).addTo(buttons);
@@ -129,13 +132,16 @@ public class ViewFormView extends DialogWindow {
         new Button("Close", this::close).addTo(buttons);
 
         root.addComponent(buttons);
-
-        refresh();
-
     }
 
     private void clearInstances() {
-        Controller.navigateTo(new ViewInstancesController(form));
+        boolean confirmed = askConfirmation("Are you sure you want to delete all instances? " +
+                "Note: This will also delete instances currently being edited (not submitted).", "Delete All Instances");
+        if (confirmed) {
+            form.deleteAllInstances();
+            close();
+            controller.navigateTo(new ViewFormController(form));
+        }
     }
 
     private void makePublic() {
@@ -172,11 +178,6 @@ public class ViewFormView extends DialogWindow {
 
     private void refresh() {
         if(question != null){
-//            txtTitle.setText(question.getTitle());
-//            txtDescription.setText(question.getDescription());
-//            cboType.setSelectedItem(question.getType());
-//            chkRequired.setChecked(question.getRequired());
-//            cboOptionList.setSelectedItem(question.getOptionList());
 
             var questions = Question.getAll();
             pnlQuestions.removeAllComponents();
@@ -189,6 +190,4 @@ public class ViewFormView extends DialogWindow {
             }
         }
     }
-
-
 }

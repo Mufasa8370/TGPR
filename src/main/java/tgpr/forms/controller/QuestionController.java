@@ -7,11 +7,6 @@ import tgpr.forms.view.QuestionView;
 import tgpr.framework.Controller;
 import tgpr.framework.ErrorList;
 
-import javax.naming.ldap.Control;
-
-import static tgpr.framework.Tools.hash;
-import static tgpr.framework.Tools.toDate;
-
 public class QuestionController extends Controller<QuestionView> {
 
     private final QuestionView view;
@@ -50,17 +45,16 @@ public class QuestionController extends Controller<QuestionView> {
         if (errors.isEmpty()) {
             // Crée une nouvelle instance de Question
             question = new Question();
+            question.setFormId(formId);
+            question.setIdx(idx);
             question.setTitle(title);
             question.setDescription(description);
             question.setType(type);
             question.setRequired(required);
-            //question.setOptionList(optionList != null ? optionList.getId() : null); // Assurez-vous d'avoir l'ID de la liste d'options
+            question.setOptionListId(optionList != null ? optionList.getId() : null); // Assurez-vous d'avoir l'ID de la liste d'options
 
             // Enregistre la question
             question.save();
-
-            // Ferme la vue
-            view.close();
         } else {
             showError(String.valueOf(errors));
         }
@@ -70,11 +64,15 @@ public class QuestionController extends Controller<QuestionView> {
     }
 
     //pour update
-    public void update(int idForm, int idx,String title, String description, Question.Type type, boolean required, OptionList optionList) {
-        var errors = validate(title, description);
+    public void update(Question question, OptionList optionList) {
+        var errors = validate(question.getTitle(), question.getDescription());
         if (errors.isEmpty()) {
+            if (optionList != null){
+                question.setOptionListId(optionList.getId());
+            }else {
+                question.setOptionListId(null);
+            }
             question.save();
-            view.close();
         } else
             showErrors(errors);
     }
