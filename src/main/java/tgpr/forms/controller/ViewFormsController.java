@@ -24,7 +24,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void menuViewProfile() {
-        showMessage("Le use case view_profile est en préparation :)","Info","Close");
+        navigateTo(new ViewProfileController());
     }
 
     public void createNewForm() {
@@ -39,5 +39,6 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void manageYourDistributionList() {
+        navigateTo(new ManageDistListsController());
     }
 }

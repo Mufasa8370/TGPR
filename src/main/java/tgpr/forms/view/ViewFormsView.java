@@ -43,8 +43,10 @@ public class ViewFormsView extends BasicWindow {
         MenuBar menuBar = new MenuBar().addTo(root);
         Menu menuFile = new Menu("File");
         menuBar.add(menuFile);
-        MenuItem menuViewProfile = new MenuItem("View Profile", controller::menuViewProfile);
-        menuFile.add(menuViewProfile);
+        if(!getLoggedUser().isGuest()){
+            MenuItem menuViewProfile = new MenuItem("View Profile", controller::menuViewProfile);
+            menuFile.add(menuViewProfile);
+        }
         MenuItem menuLogout = new MenuItem("Logout", controller::logout);
         menuFile.add(menuLogout);
         MenuItem menuExit = new MenuItem("Exit", controller::exit);
@@ -91,7 +93,7 @@ public class ViewFormsView extends BasicWindow {
             }).addTo(footer);
         }
 
-        footer.addComponent(new EmptySpace(new TerminalSize(45, 1)));
+        footer.addComponent(new EmptySpace(new TerminalSize(42, 1)));
         footer.addComponent(paginator);
         //Start page 1
         reloadData(0);

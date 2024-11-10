@@ -48,7 +48,7 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
         selectedInstance = instance;
     }
 
-    public void testDelete() {
+    public void deleteSelectedInstance() {
         if (selectedInstance != null) {
             deleteInstance(selectedInstance);
             view.refresh();

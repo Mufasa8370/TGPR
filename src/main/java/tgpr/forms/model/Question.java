@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static tgpr.forms.controller.AnalyzeController.cutText;
+
 public class Question extends Model {
     public enum Fields {
         Id, Form, Idx, Title, Description, Type, Required, OptionList
@@ -92,6 +94,10 @@ public class Question extends Model {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getTitleForAnalyze() {
+        return cutText(title, 25);
     }
 
     public void setTitle(String title) {

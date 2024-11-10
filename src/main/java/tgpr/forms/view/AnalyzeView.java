@@ -65,29 +65,29 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createQuestionsPanel() {
-        var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
+        var pnlQuestions = Panel.gridPanel(1, Margin.of(1));
 
         questionsTable = new ObjectTable<>(
                 new ColumnSpec<Question>("Index", Question::getIdx)
                         .setMinWidth(5).alignRight(),
-                new ColumnSpec<Question>("Title", Question::getTitle)
+                new ColumnSpec<Question>("Title", Question::getTitleForAnalyze)
                         .setMinWidth(27).alignLeft()
-        ).addTo(panel);
+        ).addTo(pnlQuestions);
 
         questionsTable.addSelectionChangeListener(this::onQuestionSelectionChanged);
 
-        return panel;
+        return pnlQuestions;
     }
 
     private void onQuestionSelectionChanged(int oldValue, int newValue, boolean byUser) {
         Question selectedQuestion = questionsTable.getSelected();
         if (selectedQuestion != null) {
-            controller.answersPanel(answersTable, selectedQuestion);
+            controller.answersPanel(answersTable, selectedQuestion); // va remplir la table de réponses
         }
     }
 
     private Panel createAnswersPanel() {
-        var panel = pnlAnswers = Panel.gridPanel(1, Margin.of(1));
+        var pnlAnswers = Panel.gridPanel(1, Margin.of(1));
 
         answersTable = new ObjectTable<>(
                 new ColumnSpec<Stat>("Value", Stat::getValue )
@@ -96,33 +96,39 @@ public class AnalyzeView extends DialogWindow {
                         .setMinWidth(3).alignRight(),
                 new ColumnSpec<Stat>("Ratio", Stat::getRatio)
                         .setMinWidth(8).alignRight()
-        ).addTo(panel);
+        ).addTo(pnlAnswers);
 
-        return panel;
+        return pnlAnswers;
     }
 
     private Panel createButtonsPanel() {
-        var panel = new Panel()
-                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+        var panel = Panel.horizontalPanel().center();
 
-        Button btnClose = new Button("Close", this::close).addTo(panel);
+        Button btnClose = new Button("Close", this::close).addTo(panel); // this fait référence à la vue AnalyzeView
 
-        Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
+        if (!form.getInstances().isEmpty()) {
+            Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
+            addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
+        }
 
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
-        addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
 
         return panel;
     }
 
     private void refresh() {
         if (form != null) {
+            // Met à jour Fields
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
-            controller.questionsPanel(questionsTable);
-            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), false);
+            // Met à jour Questions
+            controller.questionsPanel(questionsTable); // va remplir la table de questions
+            // Met à jour Answers
+            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), true);
+                    // -1 signifie que la sélection précédente est inexistante
+                    // questionsTable.getSelectedRow() pour obtenir la ligne sélectionnée
+                    // true pour spécifier que la sélection est faite par l'utilisateur
         }
     }
 }
