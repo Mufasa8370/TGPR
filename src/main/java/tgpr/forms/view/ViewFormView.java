@@ -22,11 +22,11 @@ public class ViewFormView extends DialogWindow {
     private final Label lblDescription;
     private final Label lblCreatedBy;
     private final Label lblIsPublic;
-    private final Panel pnlQuestions;
+    public final Panel pnlQuestions;
     private final ObjectTable<Question> questionTable;
     private boolean existInstance;
     private Question question;
-
+    private Label lblNoQuestions;
 
     public ViewFormView(ViewFormController controller, Form form) {
         super("View Form Details");
@@ -85,12 +85,11 @@ public class ViewFormView extends DialogWindow {
             var selectedQuestion = questionTable.getSelected();
             if (selectedQuestion != null) {
                 Controller.navigateTo(new QuestionController(selectedQuestion)); // Assurez-vous d'ajouter cette méthode dans le contrôleur.
-                //refresh
+                //refresh();
             }
         });
 
-
-        Label lblNoQuestions = new Label("No question yet").setForegroundColor(TextColor.ANSI.RED);
+        lblNoQuestions = new Label("No question yet").setForegroundColor(TextColor.ANSI.RED);
         lblNoQuestions.setVisible(false);
         lblNoQuestions.addTo(pnlQuestions);
 
@@ -134,6 +133,8 @@ public class ViewFormView extends DialogWindow {
 
         root.addComponent(buttons);
 
+        //refresh();
+
     }
 
     private void clearInstances() {
@@ -172,5 +173,23 @@ public class ViewFormView extends DialogWindow {
         controller.newQuestion();
     }
 
+    private void refresh(){
+        if(question != null){
+//            txtTitle.setText(question.getTitle());
+//            txtDescription.setText(question.getDescription());
+//            cboType.setSelectedItem(question.getType());
+//            chkRequired.setChecked(question.getRequired());
+//            cboOptionList.setSelectedItem(question.getOptionList());
 
+            var questions = Question.getAll();
+            pnlQuestions.removeAllComponents();
+            if (questions.isEmpty()) {
+                pnlQuestions.addComponent(lblNoQuestions);
+            }else{
+                pnlQuestions.addComponent(questionTable);
+                questionTable.clear();
+                questionTable.add(questions);
+            }
+        }
+    }
 }
