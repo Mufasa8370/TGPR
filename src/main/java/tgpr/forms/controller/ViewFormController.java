@@ -23,7 +23,14 @@ public class ViewFormController extends Controller<ViewFormView> {
         }
 
     }
-    
+
+        private Question updateQuestion(Question question) {
+        var controller = new QuestionController(question);
+        navigateTo(controller);
+        return controller.getQuestion();
+    }
+
+
     public void newQuestion(){
         Question question = null;
         var controller = new QuestionController(question);

@@ -94,10 +94,10 @@ public class QuestionView extends DialogWindow {
         if(question != null) {
             Button btnDeleteQuestion = new Button("Delete", this::deleteQuestion).addTo(buttons);
         }
+        btnCreate = new Button("Create", this::create);
         if(question != null) {
             Button btnUpdate = new Button("Update",this::updateQuestion).addTo(buttons);
         }else{
-            btnCreate = new Button("Create", this::create);
             btnCreate.setEnabled(false);
             btnCreate.addTo(buttons);
         }
@@ -105,22 +105,22 @@ public class QuestionView extends DialogWindow {
         root.addComponent(buttons, LinearLayout.createLayoutData(LinearLayout.Alignment.End));
     }
 
-//    private void updateQuestion() {
-//        controller.create(
-//                txtTitle.getText(),
-//                txtDescription.getText(),
-//                cboType.getSelectedItem(),
-//                chkRequired.isChecked(),
-//                cboOptionList.getSelectedItem()
-//        );
-//    }
-
-    private Question updateQuestion() {
-        var controller = new QuestionController(question);
-        navigateTo(controller);
-        return controller.getQuestion();
-        //refresh();
+    private void updateQuestion() {
+        controller.save(
+                txtTitle.getText(),
+                txtDescription.getText(),
+                cboType.getSelectedItem(),
+                chkRequired.isChecked(),
+                cboOptionList.getSelectedItem()
+        );
     }
+
+//    private Question updateQuestion() {
+//        var controller = new QuestionController(question);
+//        navigateTo(controller);
+//        return controller.getQuestion();
+//        //refresh();
+//    }
 
     private void deleteQuestion() {
         if (askConfirmation("You are about to delete this question. Please confirm.","Delete question")){
@@ -154,6 +154,7 @@ public class QuestionView extends DialogWindow {
         boolean isFormValid = errors.isEmpty() && optionListError.isEmpty();
         btnCreate.setEnabled(isFormValid);
     }
+
     private void create() {
         controller.create(
                 txtTitle.getText(),
@@ -163,6 +164,7 @@ public class QuestionView extends DialogWindow {
                 cboOptionList.getSelectedItem()
         );
     }
+
     private void add() {
         Controller.showMessage("use case en cours de dev", "message", "ok");
     }
