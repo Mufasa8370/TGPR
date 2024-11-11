@@ -2,6 +2,7 @@ package tgpr.forms.controller;
 
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Instance;
+import tgpr.forms.view.AnalyzeView;
 import tgpr.forms.view.ViewInstancesView;
 import tgpr.framework.Controller;
 import java.util.Comparator;
@@ -12,14 +13,12 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
     private final ViewInstancesView view;
     private final Form form;
     private Instance selectedInstance;
-    private final AnalyzeController analyzeController;
 
     @Override
     public ViewInstancesView getView() { return view; }
 
-    public ViewInstancesController(Form form, AnalyzeController analyzeController) {
+    public ViewInstancesController(Form form) {
         this.form = form;
-        this.analyzeController = analyzeController; // (pour le système de refresh : étape 1) on récupère le contrôleur AnalyzeController
         view = new ViewInstancesView(this, form);
     }
 
@@ -59,9 +58,7 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
 
     public void closeView() {
         view.close();
-        if (analyzeController != null) {
-            analyzeController.refreshView(); // (pour le système de refresh : étape 2) on rafraîchit la vue AnalyzeView
-        }
+        AnalyzeView.getInstanceOfView().refresh();
     }
 
 }

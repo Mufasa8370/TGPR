@@ -22,11 +22,13 @@ public class AnalyzeView extends DialogWindow {
     private ObjectTable<Stat> answersTable;
     private Panel pnlQuestions;
     private Panel pnlAnswers;
+    private static AnalyzeView instanceOfView;
 
     public AnalyzeView(AnalyzeController controller, Form form){
         super("Statistical Analysis of Submitted Instances");
         this.controller = controller;
         this.form = form;
+        instanceOfView = this;
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
@@ -131,5 +133,9 @@ public class AnalyzeView extends DialogWindow {
                     // questionsTable.getSelectedRow() pour obtenir la ligne sélectionnée
                     // true pour spécifier que la sélection est faite par l'utilisateur
         }
+    }
+
+    public static AnalyzeView getInstanceOfView() {
+        return instanceOfView;
     }
 }
