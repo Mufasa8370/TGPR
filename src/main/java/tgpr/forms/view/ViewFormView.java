@@ -258,7 +258,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void share() {
-        Controller.navigateTo(new ManageSharesController());
+        Controller.navigateTo(new ManageSharesController(form));
     }
 
     private void deleteForm() {
