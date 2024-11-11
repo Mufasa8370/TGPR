@@ -26,12 +26,12 @@ public class SignupView extends DialogWindow {
         super("Sign Up");
         this.controller = controller;
 
-        setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
+        setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE)); // centre la fenetre et la fenetre doit avoir une taille fixe
         setCloseWindowWithEscape(true);
         setFixedSize(new TerminalSize(54, 11));
 
-        var root = Panel.verticalPanel();
-        setComponent(root);
+        var root = Panel.verticalPanel(); // création d'un panel vertical appelé root
+        setComponent(root); // on ajoute root à la fenetre
 
         createFieldsPanel().addTo(root);
         createButtonsPanel().addTo(root);
@@ -47,7 +47,7 @@ public class SignupView extends DialogWindow {
                 .sizeTo(23)
                 .setTextChangeListener((txt, byUser) -> validate());
         panel.addEmpty();
-        errMail.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
+        errMail.addTo(panel).setForegroundColor(TextColor.ANSI.RED); // label optionnel qui affiche les erreurs
 
         new Label("Full Name:").addTo(panel);
         txtFullName.addTo(panel).takeFocus()
@@ -104,7 +104,7 @@ public class SignupView extends DialogWindow {
         errMail.setText(errors.getFirstErrorMessage(User.Fields.Email));
         errFullName.setText(errors.getFirstErrorMessage(User.Fields.FullName));
         errPassword.setText(errors.getFirstErrorMessage(User.Fields.Password));
-        errConfirmPassword.setText(errors.getFirstErrorMessage(SignupController.Fields.PasswordConfirm)); // Assurez-vous d'utiliser le bon champ
+        errConfirmPassword.setText(errors.getFirstErrorMessage(SignupController.Fields.PasswordConfirm));
 
         btnSignup.setEnabled(errors.isEmpty());
     }

@@ -19,6 +19,13 @@ public class AnalyzeController extends Controller<AnalyzeView> {
         view = new AnalyzeView(this, form);
     }
 
+    public static String cutText(String text, int maxLength) {
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength - 3) + "...";
+    }
+
     public long getNbSubmittedInstances() {
         return form.getInstances().stream().filter(Instance::isCompleted).count();
     }
@@ -30,22 +37,27 @@ public class AnalyzeController extends Controller<AnalyzeView> {
     public void answersPanel(ObjectTable<Stat> answersTable, Question question) {
         answersTable.clear();
 
-        List<ValueStat> listAnswersValueStat = question.getStats();
+        List<ValueStat> listAnswersValueStat = question.getStats(); // value stat est une classe du modèle qui contient des données sur les réponses à une question
         DecimalFormat df = new DecimalFormat("0.0%");
         long nbAnswers = getNbSubmittedInstances();
 
         for (ValueStat valueStat : listAnswersValueStat) {
-            Stat stat = new Stat();
+            Stat stat = new Stat(); // j'ai créé un nouvel objet Stat dans le modèle pour stocker les données sur les réponses à une question
             stat.setValue(valueStat.getValue());
             stat.setCount(valueStat.getCount());
             double ratio = (double) valueStat.getCount() / nbAnswers;
             stat.setRatio(df.format(ratio));
-            answersTable.add(stat);
+            answersTable.add(stat); // j'ai ajouté l'objet Stat à la table des réponses
         }
     }
 
     public void viewInstances() {
         navigateTo(new ViewInstancesController(form));
+    }
+
+    public void closeView() {
+        view.close();
+        navigateTo(new ViewFormController(form));
     }
 
 }

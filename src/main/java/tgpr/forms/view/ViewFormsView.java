@@ -43,8 +43,10 @@ public class ViewFormsView extends BasicWindow {
         MenuBar menuBar = new MenuBar().addTo(root);
         Menu menuFile = new Menu("File");
         menuBar.add(menuFile);
-        MenuItem menuViewProfile = new MenuItem("View Profile", controller::menuViewProfile);
-        menuFile.add(menuViewProfile);
+        if(!getLoggedUser().isGuest()){
+            MenuItem menuViewProfile = new MenuItem("View Profile", controller::menuViewProfile);
+            menuFile.add(menuViewProfile);
+        }
         MenuItem menuLogout = new MenuItem("Logout", controller::logout);
         menuFile.add(menuLogout);
         MenuItem menuExit = new MenuItem("Exit", controller::exit);
@@ -91,14 +93,7 @@ public class ViewFormsView extends BasicWindow {
             }).addTo(footer);
         }
 
-        //TODO: bouton Share pour View Form Detail
-        // A déplacer par après une fois que View Form Detail sera fait XD.
-        // et supprimer la méthode SharesForm() mit dans ViewFormsController
-        Button buttonMAnageShares = new Button("Shares", ()->{
-            controller.SharesForm();
-        }) .addTo(footer);
-
-        footer.addComponent(new EmptySpace(new TerminalSize(45, 1)));
+        footer.addComponent(new EmptySpace(new TerminalSize(42, 1)));
         footer.addComponent(paginator);
         //Start page 1
         reloadData(0);
@@ -120,7 +115,7 @@ public class ViewFormsView extends BasicWindow {
         cardPanel.setLayoutManager(new GridLayout(3));
 
         for (Form form : forms) {
-            CardForFormsView card = new CardForFormsView(form, new CardForFormsController());
+            CardForFormsView card = new CardForFormsView(form, new CardForFormsController(), () -> {txtFilter.takeFocus();reloadData(page);});
             cardPanel.addComponent(card);
         }
         if (forms.isEmpty()) {

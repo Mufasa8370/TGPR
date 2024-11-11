@@ -88,7 +88,6 @@ public class DistListUser extends Model {
                 new Params("distlist", distListId).add("user", userId));
     }
 
-
     public static List<DistListUser> getAll() {
         return queryList(DistListUser.class, "select * from distlist_users");
     }

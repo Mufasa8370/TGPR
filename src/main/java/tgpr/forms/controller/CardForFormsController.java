@@ -2,7 +2,9 @@ package tgpr.forms.controller;
 
 
 import tgpr.forms.model.*;
+import tgpr.framework.Controller;
 
+import java.util.Collection;
 import java.util.List;
 
 import static tgpr.forms.model.Question.getAll;
@@ -75,6 +77,6 @@ public class CardForFormsController {
      }
 
     public void manage(Form form) {
-        showMessage("Ouverture du form "+form.getTitle()+".Le use case view_form est en préparation :)","Info","Close");
+        Controller.navigateTo(new ViewFormController(form));
     }
 }
