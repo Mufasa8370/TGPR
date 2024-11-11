@@ -32,7 +32,7 @@ public class ViewFormsController extends Controller<ViewFormsView> {
     }
 
     public void SharesForm(){
-        navigateTo(new ManageSharesController());
+        ManageSharesController.SharesForm();
     }
     public void manageYourOptionList() {
         //navigateTo(AddEditOptionListController());
