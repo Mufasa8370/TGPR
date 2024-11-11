@@ -7,7 +7,6 @@ import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.ChangePasswordController;
 import tgpr.forms.model.User;
-
 import java.util.List;
 
 public class ChangePasswordView extends DialogWindow {
@@ -22,6 +21,7 @@ public class ChangePasswordView extends DialogWindow {
     private final Label errConfirmPassword = new Label("");
 
     private Button btnSave;
+
 
     public ChangePasswordView(ChangePasswordController controller) {
         super("Change Password");
@@ -69,13 +69,12 @@ public class ChangePasswordView extends DialogWindow {
 
     private Panel createButtonsPanel() {
         var panel = Panel.horizontalPanel(1).center();
-        btnSave = new Button("Save", this::save).addTo(panel).setEnabled(false);
 
+        btnSave = new Button("Save", this::save).addTo(panel).setEnabled(false);
         Button btnCancel = new Button("Cancel", this::close).addTo(panel);
 
         addShortcut(btnSave, KeyStroke.fromString("<A-s>"));
         addShortcut(btnCancel, KeyStroke.fromString("<A-c>"));
-
 
         return panel;
     }

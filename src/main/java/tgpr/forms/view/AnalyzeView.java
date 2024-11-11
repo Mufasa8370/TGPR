@@ -15,19 +15,25 @@ import java.util.List;
 public class AnalyzeView extends DialogWindow {
     private final AnalyzeController controller;
     private Form form;
+
     private final Label lblTitle = new Label("");
     private final Label lblDescription = new Label("");
     private final Label lblNbInstances = new Label("");
+
     private ObjectTable<Question> questionsTable;
     private ObjectTable<Stat> answersTable;
+
     private Panel pnlQuestions;
     private Panel pnlAnswers;
+
     private static AnalyzeView instanceOfView;
+
 
     public AnalyzeView(AnalyzeController controller, Form form){
         super("Statistical Analysis of Submitted Instances");
         this.controller = controller;
         this.form = form;
+
         instanceOfView = this;
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
@@ -124,9 +130,11 @@ public class AnalyzeView extends DialogWindow {
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
+
             // Met à jour Questions
             questionsTable.clear();
             controller.questionsPanel(questionsTable); // va remplir la table de questions
+
             // Met à jour Answers
             onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), true);
                     // -1 signifie que la sélection précédente est inexistante

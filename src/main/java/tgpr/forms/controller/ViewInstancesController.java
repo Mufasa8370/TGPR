@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class ViewInstancesController extends Controller<ViewInstancesView> {
     private final ViewInstancesView view;
     private final Form form;
+
     private Instance selectedInstance;
 
     @Override

@@ -5,7 +5,6 @@ import tgpr.forms.model.User;
 import tgpr.forms.view.ChangePasswordView;
 import tgpr.framework.Controller;
 import tgpr.framework.ErrorList;
-
 import static tgpr.framework.Tools.hash;
 
 public class ChangePasswordController extends Controller<ChangePasswordView> {
@@ -19,10 +18,13 @@ public class ChangePasswordController extends Controller<ChangePasswordView> {
     public void save(String oldPassword, String password, String confirmPassword) {
         var errors = validate(oldPassword, password, confirmPassword);
         if (errors.isEmpty()) {
+            // sauvegarde
             var hashedPassword = password.isBlank() ? password : hash(password);
             User user = Security.getLoggedUser();
             user.setPassword(hashedPassword);
             user.save();
+
+            // fermeture de la vue
             view.close();
 
         } else

@@ -7,17 +7,18 @@ import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
 import tgpr.forms.controller.EditProfileController;
 import tgpr.forms.model.User;
-
 import java.util.List;
-
 import static tgpr.forms.model.Security.getLoggedUser;
 
 public class EditProfileView extends DialogWindow {
     private final EditProfileController controller;
+
     private final TextBox txtMail = new TextBox();
     private final TextBox txtFullName = new TextBox();
+
     private final Label errMail = new Label("");
     private final Label errFullName = new Label("");
+
     private Button btnSave;
 
     public EditProfileView(EditProfileController controller) {
@@ -61,8 +62,8 @@ public class EditProfileView extends DialogWindow {
 
     private Panel createButtonsPanel() {
         Panel panel = Panel.horizontalPanel(1).center();
-        btnSave = new Button("Save", this::saveProfile).addTo(panel).setEnabled(false);
 
+        btnSave = new Button("Save", this::saveProfile).addTo(panel).setEnabled(false);
         Button btnClose = new Button("Close", this::close).addTo(panel);
 
         addShortcut(btnSave, KeyStroke.fromString("<A-s>"));
@@ -76,6 +77,7 @@ public class EditProfileView extends DialogWindow {
                 txtMail.getText(),
                 txtFullName.getText()
         );
+
         errMail.setText(errors.getFirstErrorMessage(User.Fields.Email));
         errFullName.setText(errors.getFirstErrorMessage(User.Fields.FullName));
 

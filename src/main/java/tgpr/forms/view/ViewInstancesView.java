@@ -18,12 +18,16 @@ import static tgpr.framework.Tools.asString;
 
 public class ViewInstancesView extends DialogWindow {
     private final ViewInstancesController controller;
+    private Form form;
+
     private final Label lblTitle = new Label("");
     private final Label lblDescription = new Label("");
-    private Form form;
-    private ObjectTable<Instance> instancesTable;
-    private Panel pnlInstances;
     private final Label lblNoInstances = new Label("No instances");
+
+    private ObjectTable<Instance> instancesTable;
+
+    private Panel pnlInstances;
+
 
     public ViewInstancesView(ViewInstancesController controller, Form form){
         super("List of Submitted Instances");
