@@ -16,4 +16,6 @@ public class ViewProfileController extends Controller<ViewProfileView> {
     public void editProfile() {
         navigateTo(new EditProfileController());
     }
+
+    public void changePassword() { navigateTo(new ChangePasswordController());}
 }

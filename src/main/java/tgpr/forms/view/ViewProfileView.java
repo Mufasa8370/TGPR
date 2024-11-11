@@ -78,7 +78,7 @@ public class ViewProfileView extends DialogWindow {
         var panel = Panel.horizontalPanel().center();
 
         Button btnEditProfile = new Button("Edit Profile", this.controller::editProfile).addTo(panel);
-        Button btnChangePassword = new Button("Change Password").addTo(panel);
+        Button btnChangePassword = new Button("Change Password", this.controller::changePassword).addTo(panel);
         Button btnClose = new Button("Close", this::close).addTo(panel);
 
         addShortcut(btnEditProfile, KeyStroke.fromString("<A-e>"));
