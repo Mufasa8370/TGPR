@@ -5,11 +5,16 @@ import tgpr.forms.view.ManageOptionListsView;
 import tgpr.forms.view.ViewEditInstanceView;
 import tgpr.framework.Controller;
 
+import java.util.List;
+
 
 public class ManageOptionListsController extends Controller<ManageOptionListsView>{
     private final ManageOptionListsView view;
+    //private List<OptionList> listOfOptionLists;
+
 
     public ManageOptionListsController() {
+
         this.view = new ManageOptionListsView(this);
     }
 
@@ -19,13 +24,25 @@ public class ManageOptionListsController extends Controller<ManageOptionListsVie
     }
 
     public void newList(){
-        //navigateTo(new AddEditOptionList());
+        navigateTo(new AddEditOptionListController());
     }
     public void close(){
         navigateTo(new ViewFormsController());
     }
+
     public void editList(OptionList optionList){
-        //navigateTo(new AddEditOptionList(optionList));
+        navigateTo(new AddEditOptionListController(optionList));
+    }
+
+    public int getNumberOfCopies(OptionList optionList){
+        int nb = 0;
+        List<OptionList> listOfOptionLists = OptionList.getAll();
+        for (OptionList o : listOfOptionLists) {
+            if (o.equals(optionList)) {
+                ++nb;
+            }
+        }
+        return nb;
     }
 
 

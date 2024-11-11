@@ -36,15 +36,14 @@ public class OptionList extends Model {
                 new Params("id", id));
     }
 
+    public int getNumberOfValues() {
+        return getOptionValues().size();
+    }
+
 
     public List<OptionValue> getOptionValuesIndexAndLabelByName() { //à modifier pour utiliser le nom
         return queryList(OptionValue.class, "select idx,label from option_values where option_list=:id order by idx",
                 new Params("id", id));
-    }
-
-    public int getNumberOfValues() {
-        return getOptionValues().size();
-
     }
 
     public List<Question> getQuestions() {
