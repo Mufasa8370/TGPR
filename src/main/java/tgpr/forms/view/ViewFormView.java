@@ -144,7 +144,7 @@ public class ViewFormView extends DialogWindow {
         if (existInstance) {
             btnAnalyse = new Button("Analyse", this::analyse).addTo(buttons);
         }
-        close = new Button("Close", controller::closeView).addTo(buttons);
+        close = new Button("Close", this::close).addTo(buttons);
         saveOrder = new Button("Save Order", this::saveOrder).addTo(buttons).setVisible(false);
         cancel = new Button("Cancel", this::cancel).addTo(buttons).setVisible(false);
 

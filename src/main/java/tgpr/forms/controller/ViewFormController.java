@@ -36,8 +36,4 @@ public class ViewFormController extends Controller<ViewFormView> {
         return view;
     }
 
-    public void closeView() {
-        view.close();
-        navigateTo(new ViewFormsController());
-    }
 }
