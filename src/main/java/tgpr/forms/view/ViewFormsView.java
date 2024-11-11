@@ -26,18 +26,13 @@ public class ViewFormsView extends BasicWindow {
     private final Panel cardPanel = new Panel();
     private int currentPage = 1;
     User user = getLoggedUser();
+    private static ViewFormsView instanceOfView; // contient l'instance actuelle de la vue
 
     public ViewFormsView(ViewFormsController controller) {
+        instanceOfView = this;
         this.controller = controller;
         //Title
-        if (!user.isGuest()) {
-            setTitle("MyFomrs (" + user.getFullName() + " - " + user.getRole() + ")");
-        } else {
-            setTitle("MyFomrs (" + user.getRole() + ")");
-        }
-        setHints(List.of(Hint.EXPANDED));
-        root.setLayoutManager(new LinearLayout(Direction.VERTICAL));
-        setComponent(root);
+        refreshTitle();
 
         //Menu
         MenuBar menuBar = new MenuBar().addTo(root);
@@ -124,8 +119,21 @@ public class ViewFormsView extends BasicWindow {
         }
         root.addComponent(cardPanel);
         root.invalidate();
+    }
 
+    public void refreshTitle() {
+        if (!user.isGuest()) {
+            setTitle("MyFomrs (" + user.getFullName() + " - " + user.getRole() + ")");
+        } else {
+            setTitle("MyFomrs (" + user.getRole() + ")");
+        }
+        setHints(List.of(Hint.EXPANDED));
+        root.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+        setComponent(root);
+    }
 
+    public static ViewFormsView getInstance() { // permet d'onbtneir l'instance actuelle de la vue
+        return instanceOfView;
     }
 
 }

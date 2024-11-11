@@ -16,10 +16,15 @@ import java.util.List;
 
 public class ViewProfileView extends DialogWindow {
     private final ViewProfileController controller;
+    private Label lblFullName;
+    private Label lblEmail;
+    private static ViewProfileView instanceOfView; // contient l'instance actuelle de la vue
 
     public ViewProfileView(ViewProfileController controller) {
         super("View Profile");
         this.controller = controller;
+        instanceOfView = this;
+
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
@@ -41,7 +46,9 @@ public class ViewProfileView extends DialogWindow {
         ((LinearLayout) welcomePanel.getLayoutManager()).setSpacing(0);
 
         new Label(" Hey ").addTo(welcomePanel);
-        new Label(Security.getLoggedUser().getFullName()).setForegroundColor(TextColor.ANSI.BLUE_BRIGHT).addTo(welcomePanel);
+        lblFullName = new Label(Security.getLoggedUser().getFullName())
+                .setForegroundColor(TextColor.ANSI.BLUE_BRIGHT)
+                .addTo(welcomePanel);
         new Label("!").addTo(welcomePanel);
 
         welcomePanel.addTo(panel);
@@ -52,7 +59,9 @@ public class ViewProfileView extends DialogWindow {
         ((LinearLayout) emailPanel.getLayoutManager()).setSpacing(0);
 
         new Label(" I know your email address is ").addTo(emailPanel);
-        new Label(Security.getLoggedUser().getEmail()).setForegroundColor(TextColor.ANSI.BLUE_BRIGHT).addTo(emailPanel);
+        lblEmail = new Label(Security.getLoggedUser().getEmail())
+                .setForegroundColor(TextColor.ANSI.BLUE_BRIGHT)
+                .addTo(emailPanel);
         new Label(".").addTo(emailPanel);
 
         emailPanel.addTo(panel);
@@ -68,7 +77,7 @@ public class ViewProfileView extends DialogWindow {
     private Panel createButtonsPanel() {
         var panel = Panel.horizontalPanel().center();
 
-        Button btnEditProfile = new Button("Edit Profile").addTo(panel);
+        Button btnEditProfile = new Button("Edit Profile", this.controller::editProfile).addTo(panel);
         Button btnChangePassword = new Button("Change Password").addTo(panel);
         Button btnClose = new Button("Close", this::close).addTo(panel);
 
@@ -77,6 +86,15 @@ public class ViewProfileView extends DialogWindow {
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
 
         return panel;
+    }
+
+    public void refreshNameAndEmail() {
+        lblFullName.setText(Security.getLoggedUser().getFullName());
+        lblEmail.setText(Security.getLoggedUser().getEmail());
+    }
+
+    public static ViewProfileView getInstance() {
+        return instanceOfView;
     }
 
 }
