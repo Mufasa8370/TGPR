@@ -12,12 +12,14 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
     private final ViewInstancesView view;
     private final Form form;
     private Instance selectedInstance;
+    private final AnalyzeController analyzeController;
 
     @Override
     public ViewInstancesView getView() { return view; }
 
-    public ViewInstancesController(Form form) {
+    public ViewInstancesController(Form form, AnalyzeController analyzeController) {
         this.form = form;
+        this.analyzeController = analyzeController; // (pour le système de refresh : étape 1) on récupère le contrôleur AnalyzeController
         view = new ViewInstancesView(this, form);
     }
 
@@ -57,7 +59,9 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
 
     public void closeView() {
         view.close();
-        navigateTo(new AnalyzeController(form));
+        if (analyzeController != null) {
+            analyzeController.refreshView(); // (pour le système de refresh : étape 2) on rafraîchit la vue AnalyzeView
+        }
     }
 
 }

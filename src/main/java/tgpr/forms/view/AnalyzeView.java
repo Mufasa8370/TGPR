@@ -104,7 +104,7 @@ public class AnalyzeView extends DialogWindow {
     private Panel createButtonsPanel() {
         var panel = Panel.horizontalPanel().center();
 
-        Button btnClose = new Button("Close", controller::closeView).addTo(panel); // this fait référence à la vue AnalyzeView
+        Button btnClose = new Button("Close", this::close).addTo(panel); // this fait référence à la vue AnalyzeView
 
         if (!form.getInstances().isEmpty()) {
             Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
@@ -116,13 +116,14 @@ public class AnalyzeView extends DialogWindow {
         return panel;
     }
 
-    private void refresh() {
+    public void refresh() {
         if (form != null) {
             // Met à jour Fields
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
             // Met à jour Questions
+            questionsTable.clear();
             controller.questionsPanel(questionsTable); // va remplir la table de questions
             // Met à jour Answers
             onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), true);

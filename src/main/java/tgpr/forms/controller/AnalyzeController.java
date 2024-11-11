@@ -52,12 +52,12 @@ public class AnalyzeController extends Controller<AnalyzeView> {
     }
 
     public void viewInstances() {
-        navigateTo(new ViewInstancesController(form));
+        // (pour le système de refresh : étape 1) on passe l'objet courant this qui représente le contrôleur AnalyzeController à la vue ViewInstancesView
+        navigateTo(new ViewInstancesController(form, this));
     }
 
-    public void closeView() {
-        view.close();
-        navigateTo(new ViewFormController(form));
+    public void refreshView() {
+        view.refresh();  // (pour le système de refresh : étape 2) on rafraîchit la vue AnalyzeView
     }
 
 }
