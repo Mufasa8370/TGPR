@@ -18,7 +18,7 @@ public class ChangePasswordView extends DialogWindow {
     private final TextBox txtConfirmPassword = new TextBox();
 
     private final Label errOldPassword = new Label("");
-    private final Label errPassword = new Label(""); //
+    private final Label errPassword = new Label("");
     private final Label errConfirmPassword = new Label("");
 
     private Button btnSave;
@@ -29,7 +29,7 @@ public class ChangePasswordView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(40, 7));
+        setFixedSize(new TerminalSize(50, 9));
 
         var root = Panel.verticalPanel();
         setComponent(root);
@@ -44,22 +44,22 @@ public class ChangePasswordView extends DialogWindow {
         var panel = Panel.gridPanel(2, Margin.of(1));
 
         new Label("Old Password:").addTo(panel);
-        txtOldPassword.addTo(panel)
-                .sizeTo(23)
+        txtOldPassword.setMask('*').addTo(panel)
+                .sizeTo(24)
                 .setTextChangeListener((txt, byUser) -> validate());
         panel.addEmpty();
         errOldPassword.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("New Password:").addTo(panel);
-        txtPassword.addTo(panel)
-                .sizeTo(23)
+        txtPassword.setMask('*').addTo(panel)
+                .sizeTo(24)
                 .setTextChangeListener((txt, byUser) -> validate());
         panel.addEmpty();
         errPassword.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
 
         new Label("Confirm Password:").addTo(panel);
-        txtConfirmPassword.addTo(panel)
-                .sizeTo(23)
+        txtConfirmPassword.setMask('*').addTo(panel)
+                .sizeTo(24)
                 .setTextChangeListener((txt, byUser) -> validate());
         panel.addEmpty();
         errConfirmPassword.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
@@ -95,9 +95,9 @@ public class ChangePasswordView extends DialogWindow {
                 txtConfirmPassword.getText()
         );
 
-        errOldPassword.setText(errors.getFirstErrorMessage(User.Fields.Email));
-        errPassword.setText(errors.getFirstErrorMessage(User.Fields.FullName));
-        errConfirmPassword.setText(errors.getFirstErrorMessage(User.Fields.Password));
+        errOldPassword.setText(errors.getFirstErrorMessage(User.Fields.OldPassword));
+        errPassword.setText(errors.getFirstErrorMessage(User.Fields.Password));
+        errConfirmPassword.setText(errors.getFirstErrorMessage(User.Fields.ConfirmPassword));
 
         btnSave.setEnabled(errors.isEmpty());
     }

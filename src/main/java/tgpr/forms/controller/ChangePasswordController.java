@@ -20,6 +20,10 @@ public class ChangePasswordController extends Controller<ChangePasswordView> {
         var errors = validate(oldPassword, password, confirmPassword);
         if (errors.isEmpty()) {
             var hashedPassword = password.isBlank() ? password : hash(password);
+            User user = Security.getLoggedUser();
+            user.setPassword(hashedPassword);
+            user.save();
+            view.close();
 
         } else
             showErrors(errors);
