@@ -142,7 +142,7 @@ public class ViewFormView extends DialogWindow {
         }
 
         if (existInstance) {
-            btnAnalyse = new Button("Analyse", this::analyse).addTo(buttons);
+            btnAnalyse = new Button("Analyze", this::analyze).addTo(buttons);
         }
         close = new Button("Close", this::close).addTo(buttons);
         saveOrder = new Button("Save Order", this::saveOrder).addTo(buttons).setVisible(false);
@@ -174,8 +174,9 @@ public class ViewFormView extends DialogWindow {
         Controller.navigateTo(new ViewFormController(form));
     }
 
-    private void analyse() {
+    private void analyze() {
         Controller.navigateTo(new AnalyzeController(form));
+        close();
     }
 
     private void reorder() {
