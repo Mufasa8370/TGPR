@@ -7,6 +7,9 @@ import tgpr.framework.Controller;
 
 import java.util.List;
 
+import static org.mariadb.jdbc.pool.Pools.close;
+import static tgpr.forms.model.Security.getLoggedUser;
+
 
 public class AddEditOptionListController extends Controller<AddEditOptionListView> {
     private AddEditOptionListView view;
@@ -25,53 +28,51 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
 
-    /*
-            public Member save() {
-                var controller = new EditMemberController(member);
-                navigateTo(controller);
-                return controller.getMember();
-            }
-
-             */
-    /*
-    public void add(OptionValue value) {
-        optionList.addValue(value);
-    }
-
-     */
-    public void add(OptionList optionList, List<OptionValue> listOfAddedOptionValues) {
+    public void addForSave(OptionList optionList, List<OptionValue> listOfAddedOptionValues) {
         optionList.addValues(listOfAddedOptionValues);
     }
 
     public void reorder(OptionList optionList){}
+
     public void delete(OptionList optionList){
         boolean confirmed = askConfirmation("Are you sure you want to delete this option list?", "Delete");
         if (confirmed) {
             optionList.delete();
+            close();
+            navigateTo(new ManageOptionListsController());
         }
     }
 
-    public void duplicate(OptionList optionList,User forUser){
-        optionList.duplicate(forUser);
+    public void duplicate(OptionList optionList){
+        optionList.duplicate(getLoggedUser());
+        close();
+        navigateTo(new ManageOptionListsController());
     }
-    public void save(OptionList optionList){
+
+    public void save(OptionList optionList, List<OptionValue> listOfAddedOptionValues){
+        optionList.addValues(listOfAddedOptionValues);
         optionList.save();
     }
 
-    public boolean close(List<OptionValue> listOfAddedOptionValues){
+    /*
+    public boolean closeForController(List<OptionValue> listOfAddedOptionValues){
         if (!listOfAddedOptionValues.isEmpty()) {
             boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmed) {
+                close();
                 navigateTo(new ManageOptionListsController());
                 return true;
             }
         }
         else {
+            close();
             navigateTo(new ManageOptionListsController());
             return true;
         }
         return false;
     }
+
+     */
 
 
 

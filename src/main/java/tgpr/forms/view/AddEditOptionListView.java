@@ -4,14 +4,19 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.AddEditOptionListController;
+import tgpr.forms.controller.ManageOptionListsController;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.OptionValue;
 import tgpr.forms.model.User;
+import tgpr.framework.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mariadb.jdbc.pool.Pools.close;
 import static tgpr.forms.model.Security.getLoggedUser;
+import static tgpr.forms.model.Security.isAdmin;
+import static tgpr.framework.Controller.askConfirmation;
 
 
 public class AddEditOptionListView extends DialogWindow {
@@ -66,7 +71,6 @@ public class AddEditOptionListView extends DialogWindow {
 
         // Name + TextBox
 
-        //new Label("Name:").addTo(root);
         Label nameLabel = new Label("Name:");
         root.addComponent(nameLabel);
 
@@ -76,6 +80,22 @@ public class AddEditOptionListView extends DialogWindow {
 
         root.addComponent(txtName);
         root.addComponent(new EmptySpace());
+
+
+        // Admin :
+        if (isAdmin()) {
+            Panel systemPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+
+            Label systemLabel = new Label("System:");
+            root.addComponent(nameLabel);
+
+
+            Button check = new Button("[]", this::check);
+
+
+            root.addComponent(systemPanel);
+            root.addComponent(new EmptySpace());
+        }
 
         // Tableau de values
 
@@ -98,12 +118,12 @@ public class AddEditOptionListView extends DialogWindow {
 
         buttonsPanel = createButtonsPanelForUnusedOptionListForOwner();
         Button duplicate = new Button("Duplicate", this::duplicate).addTo(buttonsPanel);
-        close = new Button("Close", this::close).addTo(buttonsPanel);
+        close = new Button("Close", this::closeForView).addTo(buttonsPanel);
 
         buttonsPanel.addComponent(close);
         buttonsPanel.addComponent(duplicate);
 
-        root.addComponent(createButtonsPanelForUnusedOptionListForOwner());
+        root.addComponent(buttonsPanel);
 
     }
 
@@ -127,8 +147,8 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     private Panel tableOfValues(OptionList optionList){
-        tblOfValues = new ObjectTable<>(
-                new ColumnSpec<>("Index", OptionValue::getOptionListId),
+        tblOfValues = new ObjectTable<OptionValue>(
+                new ColumnSpec<>("Index", OptionValue::getIdx),
                 new ColumnSpec<>("Label", OptionValue::getLabel)
         );
 
@@ -182,7 +202,7 @@ public class AddEditOptionListView extends DialogWindow {
         buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
         Button duplicate = new Button("Duplicate", this::duplicate).addTo(buttonsPanel);
-        close = new Button("Close", this::close).addTo(buttonsPanel);
+        close = new Button("Close", this::closeForView).addTo(buttonsPanel);
 
         buttonsPanel.addComponent(close);
         buttonsPanel.addComponent(duplicate);
@@ -192,7 +212,7 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void duplicate(){
-        controller.duplicate(this.optionList, new User());
+        controller.duplicate(this.optionList);
     }
 
     public void delete(){
@@ -200,8 +220,10 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void save(){
-        controller.add(this.optionList,listOfAddedOptionValues);
-        //controller.save(this.optionList);
+        controller.addForSave(this.optionList,listOfAddedOptionValues);
+        listOfAddedOptionValues.clear();
+        close();
+        Controller.navigateTo(new ManageOptionListsController());
     }
 
     public void reorder(){
@@ -209,19 +231,34 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void add(){
-        //listOfOptionValues.add();
+        OptionValue newValue = new OptionValue(this.optionList,this.optionList.getNumberOfValues() + 1,txtNewValue.getText());
+        listOfOptionValues.add(newValue);
+        listOfAddedOptionValues.add(newValue);
         refresh();
     }
 
-    public void close(){
-        boolean closed = controller.close(this.listOfAddedOptionValues);
-        if (closed){
+    public void closeForView(){
+        if (!listOfAddedOptionValues.isEmpty()) {
+            boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
+            if (confirmed) {
+                listOfAddedOptionValues.clear();
+                close();
+                Controller.navigateTo(new ManageOptionListsController());
+            }
+        }
+        else {
             listOfAddedOptionValues.clear();
+            close();
+            Controller.navigateTo(new ManageOptionListsController());
         }
     }
 
-    public void refresh(){}
+    public void refresh(){
+        tblOfValues.clear();
+        tblOfValues.add(listOfOptionValues);
+    }
 
+    public void check(){}
 
 
 
