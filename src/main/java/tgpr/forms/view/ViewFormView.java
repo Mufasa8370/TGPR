@@ -175,8 +175,8 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void analyze() {
-        Controller.navigateTo(new AnalyzeController(form));
         close();
+        Controller.navigateTo(new AnalyzeController(form));
     }
 
     private void reorder() {
