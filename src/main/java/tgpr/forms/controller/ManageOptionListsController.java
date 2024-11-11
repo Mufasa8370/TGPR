@@ -31,7 +31,7 @@ public class ManageOptionListsController extends Controller<ManageOptionListsVie
     }
 
     public void editList(OptionList optionList){
-        navigateTo(new AddEditOptionListController(optionList));
+        navigateTo(new AddEditOptionListController(optionList,view));
     }
 
     public int getNumberOfCopies(OptionList optionList){

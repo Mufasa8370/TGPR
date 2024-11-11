@@ -48,12 +48,14 @@ public class AddEditOptionListView extends DialogWindow {
     //private Panel optionValuePanel;
 
     private Panel buttonsPanel;
+    private ManageOptionListsView viewManage;
 
 
     // Edit Option List
-    public AddEditOptionListView(AddEditOptionListController controller, OptionList optionList) {
+    public AddEditOptionListView(AddEditOptionListController controller, OptionList optionList,ManageOptionListsView manageOptionListsView) {
         //Titre de la fenêtre
         super("Update Option List");
+        this.viewManage = manageOptionListsView;
         this.controller = controller;
         this.optionList = optionList;
         this.listOfOptionValues = optionList.getOptionValues();
@@ -212,11 +214,13 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void duplicate(){
-        controller.duplicate(this.optionList);
+
+        controller.duplicate(this.optionList,this);
     }
 
     public void delete(){
-        controller.delete(this.optionList);
+        viewManage.close();
+        controller.delete(this.optionList,this);
     }
 
     public void save(){

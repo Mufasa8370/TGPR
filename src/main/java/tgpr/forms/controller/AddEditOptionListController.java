@@ -3,6 +3,7 @@ package tgpr.forms.controller;
 import tgpr.forms.model.*;
 import tgpr.forms.view.AddEditOptionListView;
 
+import tgpr.forms.view.ManageOptionListsView;
 import tgpr.framework.Controller;
 
 import java.util.List;
@@ -19,8 +20,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         this.view = new AddEditOptionListView(this);
     }
 
-    public AddEditOptionListController(OptionList optionList) {
-        this.view = new AddEditOptionListView(this,optionList);
+    public AddEditOptionListController(OptionList optionList, ManageOptionListsView view) {
+        this.view = new AddEditOptionListView(this,optionList,view);
     }
 
     public AddEditOptionListView getView() {
@@ -34,18 +35,18 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
     public void reorder(OptionList optionList){}
 
-    public void delete(OptionList optionList){
+    public void delete(OptionList optionList,AddEditOptionListView addEditOptionListView){
         boolean confirmed = askConfirmation("Are you sure you want to delete this option list?", "Delete");
         if (confirmed) {
             optionList.delete();
-            close();
+            addEditOptionListView.close();
             navigateTo(new ManageOptionListsController());
         }
     }
 
-    public void duplicate(OptionList optionList){
+    public void duplicate(OptionList optionList,AddEditOptionListView addEditOptionListView){
         optionList.duplicate(getLoggedUser());
-        close();
+        addEditOptionListView.close();
         navigateTo(new ManageOptionListsController());
     }
 
