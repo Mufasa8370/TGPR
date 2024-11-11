@@ -219,6 +219,7 @@ public class AddEditOptionListView extends DialogWindow {
             listOfAddedOptionValues.clear();
         }
     }
+
     public void refresh(){}
 
 
