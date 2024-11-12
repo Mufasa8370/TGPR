@@ -103,12 +103,7 @@ public class AddEditQuestionView extends DialogWindow {
             }
             cboOptionList.setSelectedItem(null);
         }
-        cboOptionList.addListener(new ComboBox.Listener() {
-            @Override
-            public void onSelectionChanged(int selectedIndex, int previousSelection, boolean changedByUserInteraction) {
-                System.out.println(cboOptionList.getSelectedItem());
-            }
-        });
+
         btnAdd = new Button("Add", this::add).addTo(optionListPanel);
         optionListPanel.addTo(fields);
         new EmptySpace().addTo(fields);
@@ -149,7 +144,6 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
     private void validate(){
-        System.out.println(cboOptionList);
         var errors = controller.validate(
                 txtTitle.getText(),
                 txtDescription.getText(),

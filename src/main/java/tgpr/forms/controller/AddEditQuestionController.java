@@ -36,7 +36,6 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         }
 
         if (type != null && type.requiresOptionList() && optionList == null) {
-            System.out.println("ERROR");
             errors.add("OptionList required for this type", Question.Fields.OptionList);
 
         }
