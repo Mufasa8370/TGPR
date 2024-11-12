@@ -136,9 +136,10 @@ public class AnalyzeView extends DialogWindow {
             controller.questionsPanel(questionsTable); // va remplir la table de questions
 
             // Pour que la table de réponses soit remplie dès l'ouverture de la vue Analyze
-            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), true);
+            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), false);
                     // -1 signifie que la sélection précédente est inexistante
                     // questionsTable.getSelectedRow() pour obtenir la ligne sélectionnée
+                    // false pour spécifier que la sélection n'a pas été faite par l'utilisateur
         }
     }
 
