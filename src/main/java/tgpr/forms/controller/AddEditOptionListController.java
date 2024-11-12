@@ -49,8 +49,10 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         navigateTo(new ManageOptionListsController());
     }
 
-    public void save(OptionList optionList, List<OptionValue> listOfAddedOptionValues){
+    public void save(OptionList optionList, List<OptionValue> listOfAddedOptionValues,String newName, boolean checked){
         optionList.addValues(listOfAddedOptionValues);
+        optionList.setName(newName);
+        check(optionList,checked);
         optionList.save();
     }
 /*
@@ -79,6 +81,18 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
      */
+
+    public void orderAlphabetically(List<OptionValue> listOfOptionValues){
+
+    }
+
+    public void check(OptionList optionList, boolean checked){
+        if (checked) {
+            optionList.setOwnerId(null); // à modifier
+        } else {
+            optionList.setOwnerId(getLoggedUser().getId());
+        }
+    }
 
 
 
