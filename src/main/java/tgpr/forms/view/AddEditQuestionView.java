@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static tgpr.forms.model.Security.getLoggedUser;
 import static tgpr.framework.Controller.askConfirmation;
 
 public class AddEditQuestionView extends DialogWindow {
@@ -85,13 +86,19 @@ public class AddEditQuestionView extends DialogWindow {
         cboOptionList = new ComboBox<OptionList>().addTo(optionListPanel);
         if (question != null) {
             for(OptionList optionList : OptionList.getAll()){
-                cboOptionList.addItem(optionList);
+                if (optionList.getOwner() == null || optionList.getOwner().equals(getLoggedUser())){
+
+                    cboOptionList.addItem(optionList);
+                }
             }
             if(question.getOptionList()!= null)
                 cboOptionList.setSelectedItem(OptionList.getByKey(question.getOptionListId()));
         }else {
             for(OptionList optionList : OptionList.getAll()){
-                cboOptionList.addItem(optionList);
+                if (optionList.getOwner() == null || optionList.getOwner().equals(getLoggedUser())){
+
+                    cboOptionList.addItem(optionList);
+                }
             }
             cboOptionList.setSelectedItem(null);
         }
@@ -123,8 +130,9 @@ public class AddEditQuestionView extends DialogWindow {
         question.setDescription(txtDescription.getText());
         question.setType(cboType.getSelectedItem());
         question.setRequired(chkRequired.isChecked());
-        controller.update(question, cboOptionList.getSelectedItem());
-        reloadAfterDelete();
+        if(controller.update(question, cboOptionList.getSelectedItem())){
+            reloadAfterDelete();
+        }
     }
 
     private void deleteQuestion() {
@@ -165,7 +173,7 @@ public class AddEditQuestionView extends DialogWindow {
         cboOptionList.addListener((comboBox, previousItem, newItem) -> validate());
         errOptionList.setText(optionListError);
         boolean isFormValid = errors.isEmpty() && optionListError.isEmpty();
-        btnCreate.setEnabled(isFormValid);
+
     }
 
     private void create() {

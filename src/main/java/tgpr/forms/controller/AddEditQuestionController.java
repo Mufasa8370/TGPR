@@ -39,7 +39,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     }
 
     //pour create
-    public void create(int formId, int idx,String title, String description, Question.Type type, boolean required, OptionList optionList) {
+    public boolean create(int formId, int idx,String title, String description, Question.Type type, boolean required, OptionList optionList) {
         // Valide les entrées
         var errors = validate(title, description);
 
@@ -56,8 +56,10 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
             // Enregistre la question
             question.save();
+            return true;
         } else {
             showError(String.valueOf(errors));
+            return false;
         }
     }
 
@@ -65,7 +67,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     }
 
     //pour update
-    public void update(Question question, OptionList optionList) {
+    public boolean update(Question question, OptionList optionList) {
         var errors = validate(question.getTitle(), question.getDescription());
         if (errors.isEmpty()) {
             if (optionList != null){
@@ -74,8 +76,12 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
                 question.setOptionListId(null);
             }
             question.save();
-        } else
+            return true;
+        } else{
             showErrors(errors);
+            return false;
+        }
+
     }
 
     @Override
