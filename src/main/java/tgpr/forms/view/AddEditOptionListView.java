@@ -1,13 +1,11 @@
 package tgpr.forms.view;
 
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.AddEditOptionListController;
 import tgpr.forms.controller.ManageOptionListsController;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.OptionValue;
-import tgpr.forms.model.User;
 import tgpr.framework.Controller;
 
 import java.util.ArrayList;
@@ -28,15 +26,8 @@ public class AddEditOptionListView extends DialogWindow {
 
     private List<OptionValue> listOfAddedOptionValues;
 
-/*
-    private final Button reorder;
-    private final Button delete;
-    private final Button duplicate;
-    private final Button save;
-
- */
     private final Button close;
-    private final Button add;
+    private Button add;
 
 
     // Attributs de classe pour les composants
@@ -44,10 +35,16 @@ public class AddEditOptionListView extends DialogWindow {
 
     private TextBox txtName;
     private TextBox txtNewValue;
-    //private Panel optionValuePanel;
+    private CheckBox checkBoxSystem;
+    private boolean checkBoxSystemIsChanged = false;
 
     private Panel buttonsPanel;
     private ManageOptionListsView viewManage;
+
+    /*
+    à ajouter : se mettre sur une valeur OptionValue et appuyer delete, pour supprimer la valeur. Les id changent avec
+                quand checkBoxSystemIsChanged est modifié
+     */
 
 
     // Edit Option List
@@ -84,10 +81,27 @@ public class AddEditOptionListView extends DialogWindow {
             Panel systemPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
             Label systemLabel = new Label("System:");
-            Button check = new Button("[]", this::check);
+            checkBoxSystem = new CheckBox();
+            //addKeyboardListener(checkSystem,this::check);
+            if (optionList.getOwner().isAdmin()){
+                checkBoxSystem.setChecked(true);
+            }
+
+            //Button check = new Button("[ ]", this::check);
 
             systemPanel.addComponent(systemLabel);
-            systemPanel.addComponent(check);
+            systemPanel.addComponent(checkBoxSystem);
+
+            /*
+            checkBoxSystem.addListener((boolean checked) -> {
+                if (checked) {
+                    optionList.setOwnerId(null); // à modifier
+                } else {
+                    optionList.setOwnerId(getLoggedUser().getId());
+                }
+            });
+
+             */
 
             root.addComponent(systemPanel);
             root.addComponent(new EmptySpace());
@@ -99,41 +113,52 @@ public class AddEditOptionListView extends DialogWindow {
         root.addComponent(new EmptySpace());
         setComponent(root);
 
-        // TextBox + bouton add
-        Panel addValue = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
-        txtNewValue = new TextBox();
+        if (canModify(optionList)) {
 
-        add = new Button("Add", this::add);
-        addValue.addComponent(txtNewValue);
-        addValue.addComponent(add);
-        root.addComponent(addValue);
-        root.addComponent(new EmptySpace());
+            // TextBox + bouton add
+            Panel addValue = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+
+            txtNewValue = new TextBox();
+
+            add = new Button("Add", this::add);
+            addValue.addComponent(txtNewValue);
+            addValue.addComponent(add);
+            root.addComponent(addValue);
+            root.addComponent(new EmptySpace());
+        }
 
         // Buttons
 
         buttonsPanel = createButtonsPanelForUnusedOptionListForOwner();
-        Button duplicate = new Button("Duplicate", this::duplicate).addTo(buttonsPanel);
-        close = new Button("Close", this::closeForView).addTo(buttonsPanel);
+        if (listOfAddedOptionValues.size() == 0) {
+            Button duplicate = new Button("Duplicate", this::duplicate).addTo(buttonsPanel);
+            buttonsPanel.addComponent(duplicate);
+        }
 
+        close = new Button("Close", this::closeForView).addTo(buttonsPanel);
         buttonsPanel.addComponent(close);
-        buttonsPanel.addComponent(duplicate);
 
         root.addComponent(buttonsPanel);
 
     }
 
+    private boolean canModify(OptionList optionList) {
+        return (optionList.getOwner().equals(getLoggedUser()) || getLoggedUser().isAdmin()) && !optionList.isUsed();
+    }
+
     private Panel createButtonsPanelForUnusedOptionListForOwner() {
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        User u = getLoggedUser();
 
-        if (u.equals(optionList.getOwner()) && !optionList.isUsed()) {
+        if (canModify(optionList)) {
 
-            Button reorder = new Button("Reorder", this::reorder).addTo(buttons);
+            if (optionList.getNumberOfValues() > 1) {
+                Button reorder = new Button("Reorder", this::reorder).addTo(buttons);
+                buttons.addComponent(reorder);
+            }
             Button delete = new Button("Delete", this::delete).addTo(buttons);
             Button save = new Button("Save", this::save).addTo(buttons);
 
-            buttons.addComponent(reorder);
             buttons.addComponent(delete);
             buttons.addComponent(save);
         }
@@ -151,7 +176,6 @@ public class AddEditOptionListView extends DialogWindow {
         tblOfValues.add(listOfOptionValues);
 
         return Panel.gridPanel(1, Margin.of(1)).addComponent(tblOfValues);
-
     }
 
 
@@ -214,11 +238,10 @@ public class AddEditOptionListView extends DialogWindow {
 
     public void create(){
         if (txtName.getText() != null && !listOfAddedOptionValues.isEmpty()) {
-            this.optionList.setName(txtName.getText());
-            this.optionList.setOwnerId(getLoggedUser().getId());
-            controller.save(optionList,listOfAddedOptionValues);
+            //this.optionList.setName(txtName.getText());
+            //this.optionList.setOwnerId(getLoggedUser().getId());
+            controller.save(optionList,listOfAddedOptionValues,txtName.getText(),true);
         }
-
     }
 
 
@@ -232,8 +255,7 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void save(){
-        controller.addForSave(this.optionList,listOfAddedOptionValues);
-        optionList.setName(txtName.getText());
+        controller.save(this.optionList,listOfAddedOptionValues,txtName.getText(),checkBoxSystem.isChecked());
         listOfAddedOptionValues.clear();
         close();
         Controller.navigateTo(new ManageOptionListsController());
@@ -248,6 +270,7 @@ public class AddEditOptionListView extends DialogWindow {
 
     public void closeForView(){
         if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName())) {
+            //if ((getLoggedUser().isAdmin() && checkBoxSystemisChanged) || !getLoggedUser().isAdmin()) {}
             boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmed) {
                 listOfAddedOptionValues.clear();
@@ -279,7 +302,9 @@ public class AddEditOptionListView extends DialogWindow {
 
         controller.reorder(this.optionList);
     }
-    public void orderAlphabetically(){}
+    public void orderAlphabetically(){
+        controller.orderAlphabetically(listOfOptionValues);
+    }
     public void confirmOrder(){
         // setValues(liste ordonnée)
         // reorderValues(liste ordonnée)
@@ -295,18 +320,6 @@ public class AddEditOptionListView extends DialogWindow {
     public void refresh(){
         tblOfValues.clear();
         tblOfValues.add(listOfOptionValues);
-    }
-
-
-
-    public void check(){
-        if (optionList.isSystem()){
-            // X
-        }
-        else {
-
-        }
-
     }
 
 
