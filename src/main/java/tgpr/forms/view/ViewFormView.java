@@ -266,7 +266,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void editForm() {
-        Controller.navigateTo(new EditFormController());
+        Controller.navigateTo(new EditFormController(form));
     }
 
     private void newQuestion() {
