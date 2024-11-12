@@ -17,6 +17,7 @@ public class ManageSharesView  extends DialogWindow {
     private final ManageSharesController controller;
     private final ObjectTable<Model> table;
     private final Button btnAddFilter;
+    private final Button btnClose;
     private final AutoCompleteComboBox<Model> addFilter;
     public ManageSharesView(ManageSharesController controller) {
         super("Manage Shares");
@@ -24,7 +25,6 @@ public class ManageSharesView  extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED));
         setFixedSize(new TerminalSize(66, 13));
-        setCloseWindowWithEscape(true);
         Panel root = new Panel();
         setComponent(root);
         new EmptySpace().addTo(root);
@@ -99,6 +99,15 @@ public class ManageSharesView  extends DialogWindow {
             controller.addAccess(beneficiary, accessType);
             reloadData();
         }).addTo(filter);
+
+        new EmptySpace().addTo(root);
+        new EmptySpace().addTo(root);
+
+        Panel closePanel = new Panel().addTo(root).setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        btnClose = new Button("Close", () -> {
+            this.close();
+        }).addTo(closePanel);
+        root.addComponent(btnClose, LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
         reloadData();
         addFilter.takeFocus();
