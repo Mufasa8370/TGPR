@@ -14,7 +14,6 @@ import static tgpr.forms.model.Security.getLoggedUser;
 
 public class AddEditOptionListController extends Controller<AddEditOptionListView> {
     private AddEditOptionListView view;
-    private OptionList optionList;
 
     public AddEditOptionListController() {
         this.view = new AddEditOptionListView(this);
@@ -54,7 +53,13 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionList.addValues(listOfAddedOptionValues);
         optionList.save();
     }
+/*
+    public void create(OptionList optionList, List<OptionValue> listOfAddedOptionValues){
+        optionList.addValues(listOfAddedOptionValues);
+        optionList.save();
+    }
 
+ */
     /*
     public boolean closeForController(List<OptionValue> listOfAddedOptionValues){
         if (!listOfAddedOptionValues.isEmpty()) {

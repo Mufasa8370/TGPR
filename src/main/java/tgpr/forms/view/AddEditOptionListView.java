@@ -41,7 +41,6 @@ public class AddEditOptionListView extends DialogWindow {
 
     // Attributs de classe pour les composants
     private final Panel root;
-    private Panel titlePanel;
 
     private TextBox txtName;
     private TextBox txtNewValue;
@@ -64,10 +63,6 @@ public class AddEditOptionListView extends DialogWindow {
         // permet de fermer la fenêtre en pressant la touche Esc
         setCloseWindowWithEscape(true);
 
-        /*
-        if (user is owner) = peut modifier
-            boutons = reorder, delete,save,close
-         */
 
         root = new Panel();
 
@@ -89,11 +84,10 @@ public class AddEditOptionListView extends DialogWindow {
             Panel systemPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
             Label systemLabel = new Label("System:");
-            root.addComponent(nameLabel);
-
-
             Button check = new Button("[]", this::check);
 
+            systemPanel.addComponent(systemLabel);
+            systemPanel.addComponent(check);
 
             root.addComponent(systemPanel);
             root.addComponent(new EmptySpace());
@@ -166,7 +160,8 @@ public class AddEditOptionListView extends DialogWindow {
         //Titre de la fenêtre
         super( "Create Option List");
         this.controller = controller;
-        //this.optionList = optionList;
+        this.optionList = new OptionList();
+        this.listOfOptionValues = new ArrayList<OptionValue>();
         this.listOfAddedOptionValues = new ArrayList<OptionValue>();
 
 
@@ -174,47 +169,60 @@ public class AddEditOptionListView extends DialogWindow {
         // permet de fermer la fenêtre en pressant la touche Esc
         setCloseWindowWithEscape(true);
         // définit une taille fixe pour la fenêtre de 20 lignes et 20 colonnes
-        setFixedSize(new TerminalSize(20, 20));
+        //setFixedSize(new TerminalSize(20, 20));
 
         root = new Panel();
 
         // Name + TextBox
 
-        //new Label("Name:").addTo(root);
         Label nameLabel = new Label("Name:");
         root.addComponent(nameLabel);
 
-        if (optionList != null) {
-            txtName = new TextBox(optionList.getName());
-        }
-        else {
-            txtName = new TextBox();
-        }
+
+        txtName = new TextBox();
+
+        root.addComponent(txtName);
+        //if (txtName == null){"name required"}
         root.addComponent(new EmptySpace());
 
 
-
         // TextBox + bouton add
+        Panel addValue = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        //if (listOfAddedOptionValues.isEmpty()){"at least one value required"}
+
         txtNewValue = new TextBox();
-        add = new Button("Add", this::add).addTo(root);
+
+        add = new Button("Add", this::add);
+        addValue.addComponent(txtNewValue);
+        addValue.addComponent(add);
+        root.addComponent(addValue);
         root.addComponent(new EmptySpace());
 
         // Buttons
 
         buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
-        Button duplicate = new Button("Duplicate", this::duplicate).addTo(buttonsPanel);
+        Button create = new Button("Create", this::create).addTo(buttonsPanel);
         close = new Button("Close", this::closeForView).addTo(buttonsPanel);
 
         buttonsPanel.addComponent(close);
-        buttonsPanel.addComponent(duplicate);
+        buttonsPanel.addComponent(create);
 
         root.addComponent(buttonsPanel);
 
     }
 
-    public void duplicate(){
+    public void create(){
+        if (txtName.getText() != null && !listOfAddedOptionValues.isEmpty()) {
+            this.optionList.setName(txtName.getText());
+            this.optionList.setOwnerId(getLoggedUser().getId());
+            controller.save(optionList,listOfAddedOptionValues);
+        }
 
+    }
+
+
+    public void duplicate(){
         controller.duplicate(this.optionList,this);
     }
 
@@ -225,13 +233,10 @@ public class AddEditOptionListView extends DialogWindow {
 
     public void save(){
         controller.addForSave(this.optionList,listOfAddedOptionValues);
+        optionList.setName(txtName.getText());
         listOfAddedOptionValues.clear();
         close();
         Controller.navigateTo(new ManageOptionListsController());
-    }
-
-    public void reorder(){
-        controller.reorder(this.optionList);
     }
 
     public void add(){
@@ -242,7 +247,7 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void closeForView(){
-        if (!listOfAddedOptionValues.isEmpty()) {
+        if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName())) {
             boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmed) {
                 listOfAddedOptionValues.clear();
@@ -257,13 +262,52 @@ public class AddEditOptionListView extends DialogWindow {
         }
     }
 
+    public void reorder(){
+        //Panel reorderButtons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+
+        buttonsPanel.removeAllComponents();
+
+        Button alphabetically = new Button("Alphabetcally", this::orderAlphabetically).addTo(buttonsPanel);
+        Button confirmOrder = new Button("Confirm Order", this::confirmOrder).addTo(buttonsPanel);
+        Button cancel = new Button("Cancel", this::cancel).addTo(buttonsPanel);
+
+        buttonsPanel.addComponent(alphabetically);
+        buttonsPanel.addComponent(confirmOrder);
+        buttonsPanel.addComponent(cancel);
+
+        root.addComponent(buttonsPanel);
+
+        controller.reorder(this.optionList);
+    }
+    public void orderAlphabetically(){}
+    public void confirmOrder(){
+        // setValues(liste ordonnée)
+        // reorderValues(liste ordonnée)
+    }
+    public void cancel(){
+        // change buttonsPanel
+        listOfOptionValues.clear();
+        listOfOptionValues = optionList.getOptionValues();
+    }
+
+
+
     public void refresh(){
         tblOfValues.clear();
         tblOfValues.add(listOfOptionValues);
     }
 
-    public void check(){}
 
+
+    public void check(){
+        if (optionList.isSystem()){
+            // X
+        }
+        else {
+
+        }
+
+    }
 
 
 
