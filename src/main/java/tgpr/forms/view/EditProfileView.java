@@ -27,7 +27,7 @@ public class EditProfileView extends DialogWindow {
 
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(40, 7));
+        setFixedSize(new TerminalSize(47, 7));
 
         var root = Panel.verticalPanel();
         setComponent(root);
