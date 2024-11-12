@@ -15,6 +15,7 @@ import java.util.List;
 
 import static tgpr.forms.model.Security.getLoggedUser;
 import static tgpr.framework.Controller.askConfirmation;
+import static tgpr.framework.Controller.showMessage;
 
 public class AddEditQuestionView extends DialogWindow {
 
@@ -102,6 +103,12 @@ public class AddEditQuestionView extends DialogWindow {
             }
             cboOptionList.setSelectedItem(null);
         }
+        cboOptionList.addListener(new ComboBox.Listener() {
+            @Override
+            public void onSelectionChanged(int selectedIndex, int previousSelection, boolean changedByUserInteraction) {
+                System.out.println(cboOptionList.getSelectedItem());
+            }
+        });
         btnAdd = new Button("Add", this::add).addTo(optionListPanel);
         optionListPanel.addTo(fields);
         new EmptySpace().addTo(fields);
@@ -117,7 +124,6 @@ public class AddEditQuestionView extends DialogWindow {
         if(question != null) {
             Button btnUpdate = new Button("Update",this::updateQuestion).addTo(buttons);
         }else{
-            btnCreate.setEnabled(false);
             btnCreate.addTo(buttons);
         }
         new Button("Cancel", this::close).addTo(buttons);
@@ -143,9 +149,12 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
     private void validate(){
+        System.out.println(cboOptionList);
         var errors = controller.validate(
                 txtTitle.getText(),
-                txtDescription.getText()
+                txtDescription.getText(),
+                cboOptionList.getSelectedItem(),
+                cboType.getSelectedItem()
         );
         errTitle.setText(errors.getFirstErrorMessage(Question.Fields.Title));
         errDescription.setText(errors.getFirstErrorMessage(Question.Fields.Description));
@@ -172,12 +181,11 @@ public class AddEditQuestionView extends DialogWindow {
         cboType.addListener((comboBox, previousItem, newItem) -> validate());
         cboOptionList.addListener((comboBox, previousItem, newItem) -> validate());
         errOptionList.setText(optionListError);
-        boolean isFormValid = errors.isEmpty() && optionListError.isEmpty();
 
     }
 
     private void create() {
-        controller.create(
+        if(controller.create(
                 form.getId(),
                 form.getNextIdx(),
                 txtTitle.getText(),
@@ -185,8 +193,10 @@ public class AddEditQuestionView extends DialogWindow {
                 cboType.getSelectedItem(),
                 chkRequired.isChecked(),
                 cboOptionList.getSelectedItem()
-        );
-        reloadAfterDelete();
+        )){
+
+            reloadAfterDelete();
+        }
     }
 
     private void add() {
