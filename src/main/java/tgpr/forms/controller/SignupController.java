@@ -23,13 +23,17 @@ public class SignupController extends Controller<SignupView> {
     public void save(String email, String fullName, String password, String confirmPassword) {
         var errors = validate(email, fullName, password, confirmPassword);
         if (errors.isEmpty()) {
+            // sauvegarde
             var hashedPassword = password.isBlank() ? password : hash(password);
             User user = new User(fullName, email, hashedPassword, User.Role.User);
             user.save();
+
+            // login
             Security.login(user);
+
+            // navigation vers nouvelle vue
             navigateTo(new ViewFormsController());
-        } else
-            showErrors(errors);
+        }
     }
 
     public static boolean emailExists(String email) {

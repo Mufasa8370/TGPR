@@ -26,9 +26,7 @@ public class ChangePasswordController extends Controller<ChangePasswordView> {
 
             // fermeture de la vue
             view.close();
-
-        } else
-            showErrors(errors);
+        }
     }
 
     public ErrorList validate(String oldPassword, String password, String confirmPassword) {

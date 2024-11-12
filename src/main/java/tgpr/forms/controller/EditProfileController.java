@@ -32,9 +32,6 @@ public class EditProfileController extends Controller<EditProfileView> {
 
             // fermeture de la vue
             view.close();
-
-        } else {
-            showErrors(errors);
         }
     }
 
