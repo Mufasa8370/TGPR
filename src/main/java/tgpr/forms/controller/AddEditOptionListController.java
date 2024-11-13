@@ -6,6 +6,7 @@ import tgpr.forms.view.AddEditOptionListView;
 import tgpr.forms.view.ManageOptionListsView;
 import tgpr.framework.Controller;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static org.mariadb.jdbc.pool.Pools.close;
@@ -55,35 +56,17 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         check(optionList,checked);
         optionList.save();
     }
-/*
-    public void create(OptionList optionList, List<OptionValue> listOfAddedOptionValues){
-        optionList.addValues(listOfAddedOptionValues);
+
+    public void create(OptionList optionList, List<OptionValue> listOfAddedOptionValues,String newName){
+        optionList.setName(newName);
+        optionList.setOwnerId(getLoggedUser().getId());
         optionList.save();
+        optionList.addValues(listOfAddedOptionValues);
     }
 
- */
-    /*
-    public boolean closeForController(List<OptionValue> listOfAddedOptionValues){
-        if (!listOfAddedOptionValues.isEmpty()) {
-            boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
-            if (confirmed) {
-                close();
-                navigateTo(new ManageOptionListsController());
-                return true;
-            }
-        }
-        else {
-            close();
-            navigateTo(new ManageOptionListsController());
-            return true;
-        }
-        return false;
-    }
-
-     */
 
     public void orderAlphabetically(List<OptionValue> listOfOptionValues){
-
+        listOfOptionValues.sort(Comparator.comparing(option -> option.getLabel().toLowerCase()));
     }
 
     public void check(OptionList optionList, boolean checked){

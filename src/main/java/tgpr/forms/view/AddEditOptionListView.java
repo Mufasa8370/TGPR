@@ -17,6 +17,7 @@ import static org.mariadb.jdbc.pool.Pools.close;
 import static tgpr.forms.model.Security.getLoggedUser;
 import static tgpr.forms.model.Security.isAdmin;
 import static tgpr.framework.Controller.askConfirmation;
+import static tgpr.framework.Controller.navigateTo;
 
 
 public class AddEditOptionListView extends DialogWindow {
@@ -61,6 +62,10 @@ public class AddEditOptionListView extends DialogWindow {
     private final Label errNoName = new Label("name required");
     private final Label errNoValueAdded = new Label("at least one value required");
 
+
+    private boolean reorderMode = false, reoderSelect = false;
+    private OptionValue current = null;
+    private boolean auto = false;
 
     /*
     à ajouter : se mettre sur une valeur OptionValue et appuyer delete, pour supprimer la valeur. Les id changent avec
@@ -258,6 +263,8 @@ public class AddEditOptionListView extends DialogWindow {
         buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
         create = new Button("Create", this::create).addTo(buttonsPanel);
+        create.setEnabled(txtName.getText().isEmpty());
+
         close = new Button("Close", this::closeForView).addTo(buttonsPanel);
 
         buttonsPanel.addComponent(close);
@@ -268,10 +275,11 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void create(){
-        if (txtName.getText() != null && !listOfAddedOptionValues.isEmpty()) {
-            //this.optionList.setName(txtName.getText());
-            //this.optionList.setOwnerId(getLoggedUser().getId());
-            controller.save(optionList,listOfAddedOptionValues,txtName.getText(),true);
+        if (!txtName.getText().equals("") && !listOfAddedOptionValues.isEmpty()) {
+            controller.create(optionList,listOfAddedOptionValues,txtName.getText());
+            listOfAddedOptionValues.clear();
+            close();
+            navigateTo(new ManageOptionListsController());
         }
     }
 
@@ -289,7 +297,7 @@ public class AddEditOptionListView extends DialogWindow {
         controller.save(this.optionList,listOfAddedOptionValues,txtName.getText(),checkBoxSystem.isChecked());
         listOfAddedOptionValues.clear();
         close();
-        Controller.navigateTo(new ManageOptionListsController());
+        navigateTo(new ManageOptionListsController());
     }
 
     public void add(){
@@ -314,75 +322,106 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void closeForView(){
-        if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName()) || checkBoxSystemIsChanged) {
+        if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName())) {
             //if ((getLoggedUser().isAdmin() && checkBoxSystemisChanged) || !getLoggedUser().isAdmin()) {}
             boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmed) {
                 listOfAddedOptionValues.clear();
                 close();
-                Controller.navigateTo(new ManageOptionListsController());
+                navigateTo(new ManageOptionListsController());
             }
         }
         else {
             listOfAddedOptionValues.clear();
             close();
-            Controller.navigateTo(new ManageOptionListsController());
+            navigateTo(new ManageOptionListsController());
         }
     }
 
     public void reorder(){
-        //Panel reorderButtons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-
+        reorderMode = true;
         buttonsPanel.removeAllComponents();
 
-        alphabetically = new Button("Alphabetcally", this::orderAlphabetically).addTo(buttonsPanel);
-        confirmOrder = new Button("Confirm Order", this::confirmOrder).addTo(buttonsPanel);
-        cancel = new Button("Cancel", this::cancel).addTo(buttonsPanel);
+        Button alphabetically = new Button("Alphabetcally", this::orderAlphabetically).addTo(buttonsPanel);
+        Button confirmOrder = new Button("Confirm Order", this::confirmOrder).addTo(buttonsPanel);
+        Button cancel = new Button("Cancel", this::cancel).addTo(buttonsPanel);
+        tblOfValues.takeFocus();
+        tblOfValues.setSelected(listOfOptionValues.getLast());
+
+        tblOfValues.setSelectAction(() -> {
+            reorderSelect();
+        });
 
         buttonsPanel.addComponent(alphabetically);
         buttonsPanel.addComponent(confirmOrder);
         buttonsPanel.addComponent(cancel);
 
         root.addComponent(buttonsPanel);
-
-        controller.reorder(this.optionList);
     }
+
     public void orderAlphabetically(){
         controller.orderAlphabetically(listOfOptionValues);
+        tblOfValues.clear();
+        tblOfValues.add(listOfOptionValues);
     }
+
     public void confirmOrder(){
-        // setValues(liste ordonnée)
-        // reorderValues(liste ordonnée)
+        optionList.reorderValues(listOfOptionValues);
+        optionList.save();
+        close();
+        navigateTo(new AddEditOptionListController(optionList,viewManage));
     }
+
+    public void changeOrder(List<OptionValue> values, int oldInd, int newInd){
+        OptionValue oldValue = values.get(oldInd);
+        OptionValue newValue = values.get(newInd);
+        values.set(oldInd,newValue);
+        values.set(newInd,oldValue);
+
+    }
+
+    private void reorderSelect() {
+        System.out.println(reoderSelect);
+        if(!reoderSelect){
+            current = tblOfValues.getSelected();
+
+            tblOfValues.addSelectionChangeListener(new ObjectTable.SelectionChangeListener() {
+                @Override
+                public void onSelectionChanged(int oldRow, int newRow, boolean byUser) {
+
+                    if(!auto){
+                        changeOrder(listOfOptionValues,oldRow,newRow);
+                        tblOfValues.clear();
+                        tblOfValues.add(listOfOptionValues);
+                        if(newRow != 0){
+                            auto = true;
+                        }
+
+                        tblOfValues.setSelected(listOfOptionValues.get(newRow));
+                    }else {
+                        auto = false;
+                    }
+                }
+            });
+            reoderSelect = true;
+        }else {
+
+            reoderSelect = false;
+            tblOfValues.addSelectionChangeListener(new ObjectTable.SelectionChangeListener() {
+                @Override
+                public void onSelectionChanged(int oldRow, int newRow, boolean byUser) {
+
+                }
+            });
+        }
+
+    }
+
+
     public void cancel(){
-        if (!listOfAddedOptionValues.isEmpty() || txtName.getText() != null) {
-            //if ((getLoggedUser().isAdmin() && checkBoxSystemisChanged) || !getLoggedUser().isAdmin()) {}
-            boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
-            if (confirmed) {
-                restoreButtonsPanel();
-                listOfAddedOptionValues.clear();
-                listOfOptionValues = optionList.getOptionValues();
-                close();
-                Controller.navigateTo(new ManageOptionListsController());
-            }
-        }
-        else {
-            restoreButtonsPanel();
-            listOfAddedOptionValues.clear();
-            listOfOptionValues = optionList.getOptionValues();
-            close();
-            Controller.navigateTo(new ManageOptionListsController());
-        }
+        close();
+        navigateTo(new AddEditOptionListController(optionList,viewManage));
     }
-
-    private void restoreButtonsPanel(){
-        buttonsPanel.removeAllComponents();
-        buttonsPanel = createButtonsPanelForUnusedOptionListForOwner();
-        buttonsPanel.addComponent(duplicate);
-        buttonsPanel.addComponent(close);
-    }
-
-
 
     public void refresh(){
         tblOfValues.clear();
