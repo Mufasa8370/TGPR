@@ -19,6 +19,17 @@
   
 * A compléter...
 
+# Use Cases par Membre
+
+| **Membre**                | **Use Cases**                                 |
+|---------------------------|--------------------------------------------------------|
+| **BOURAS Rasha Ines**     | - manage_option_lists<br>- add_edit_option_lists       |
+| **EL KOBIY Najwa**        | - view_form<br>- add_edit_question                     |
+| **HENIN Alexandre**       | - login<br>- view_forms<br>- view_edit_instance<br>- manage_distlists |
+| **LAPOUGE Charlie**       | - analyse<br>- view_instances<br>- signup<br>- view_profile<br>- edit_profile<br>- change_password |
+| **TCHOUANGUEP NGANSOP Jean-yves Ii** | - add_edit_form<br>- manage_shares |
+
+
 ### Liste des bugs connus
 
   * bug 1
