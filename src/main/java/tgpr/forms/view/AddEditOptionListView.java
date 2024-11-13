@@ -1,5 +1,6 @@
 package tgpr.forms.view;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.AddEditOptionListController;
@@ -28,6 +29,12 @@ public class AddEditOptionListView extends DialogWindow {
 
     private final Button close;
     private Button add;
+    private Button duplicate;
+    private Button save;
+    private Button reorder;
+    private Button delete;
+
+    private Button create;
 
 
     // Attributs de classe pour les composants
@@ -56,7 +63,6 @@ public class AddEditOptionListView extends DialogWindow {
         this.optionList = optionList;
         this.listOfOptionValues = optionList.getOptionValues();
         this.listOfAddedOptionValues = new ArrayList<OptionValue>();
-        setHints(List.of(Hint.CENTERED));
         // permet de fermer la fenêtre en pressant la touche Esc
         setCloseWindowWithEscape(true);
 
@@ -132,7 +138,7 @@ public class AddEditOptionListView extends DialogWindow {
 
         buttonsPanel = createButtonsPanelForUnusedOptionListForOwner();
         if (listOfAddedOptionValues.size() == 0) {
-            Button duplicate = new Button("Duplicate", this::duplicate).addTo(buttonsPanel);
+            duplicate = new Button("Duplicate", this::duplicate).addTo(buttonsPanel);
             buttonsPanel.addComponent(duplicate);
         }
 
@@ -151,13 +157,11 @@ public class AddEditOptionListView extends DialogWindow {
         Panel buttons = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
         if (canModify(optionList)) {
+            reorder = new Button("Reorder", this::reorder).addTo(buttons);
+            buttons.addComponent(reorder);
 
-            if (optionList.getNumberOfValues() > 1) {
-                Button reorder = new Button("Reorder", this::reorder).addTo(buttons);
-                buttons.addComponent(reorder);
-            }
-            Button delete = new Button("Delete", this::delete).addTo(buttons);
-            Button save = new Button("Save", this::save).addTo(buttons);
+            delete = new Button("Delete", this::delete).addTo(buttons);
+            save = new Button("Save", this::save).addTo(buttons);
 
             buttons.addComponent(delete);
             buttons.addComponent(save);
@@ -193,7 +197,7 @@ public class AddEditOptionListView extends DialogWindow {
         // permet de fermer la fenêtre en pressant la touche Esc
         setCloseWindowWithEscape(true);
         // définit une taille fixe pour la fenêtre de 20 lignes et 20 colonnes
-        //setFixedSize(new TerminalSize(20, 20));
+        setFixedSize(new TerminalSize(60, 15));
 
         root = new Panel();
 
@@ -208,6 +212,12 @@ public class AddEditOptionListView extends DialogWindow {
         root.addComponent(txtName);
         //if (txtName == null){"name required"}
         root.addComponent(new EmptySpace());
+
+        // Tableau de values
+
+        root.addComponent(tableOfValues(optionList));
+        root.addComponent(new EmptySpace());
+
 
 
         // TextBox + bouton add
@@ -226,14 +236,14 @@ public class AddEditOptionListView extends DialogWindow {
 
         buttonsPanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
-        Button create = new Button("Create", this::create).addTo(buttonsPanel);
+        create = new Button("Create", this::create).addTo(buttonsPanel);
         close = new Button("Close", this::closeForView).addTo(buttonsPanel);
 
         buttonsPanel.addComponent(close);
         buttonsPanel.addComponent(create);
 
         root.addComponent(buttonsPanel);
-
+        setComponent(root);
     }
 
     public void create(){
@@ -265,6 +275,9 @@ public class AddEditOptionListView extends DialogWindow {
         OptionValue newValue = new OptionValue(this.optionList,this.optionList.getNumberOfValues() + 1,txtNewValue.getText());
         listOfOptionValues.add(newValue);
         listOfAddedOptionValues.add(newValue);
+        if (optionList.getNumberOfValues() == 1){
+            buttonsPanel.removeComponent(duplicate);
+        }
         refresh();
     }
 
