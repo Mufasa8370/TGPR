@@ -51,6 +51,9 @@ public class AddEditOptionListView extends DialogWindow {
     private boolean checkBoxSystemIsChanged = false;
 
     private Panel buttonsPanel;
+    private Panel addValuePanel;
+    private Panel namePanel;
+    private final Label nameLabel = new Label("Name:");
     private ManageOptionListsView viewManage;
 
     private int compterIdx = 0;
@@ -74,6 +77,8 @@ public class AddEditOptionListView extends DialogWindow {
         this.optionList = optionList;
         this.listOfOptionValues = optionList.getOptionValues();
         this.listOfAddedOptionValues = new ArrayList<OptionValue>();
+
+        setHints(List.of(Hint.CENTERED));
         // permet de fermer la fenêtre en pressant la touche Esc
         setCloseWindowWithEscape(true);
 
@@ -82,14 +87,16 @@ public class AddEditOptionListView extends DialogWindow {
 
         // Name + TextBox
 
-        Label nameLabel = new Label("Name:");
-        root.addComponent(nameLabel);
+        namePanel = Panel.gridPanel(2, Margin.of(1));
+
+        namePanel.addComponent(nameLabel);
 
 
         txtName = new TextBox();
         txtName.setText(optionList.getName());
+        txtName.addTo(namePanel).takeFocus().sizeTo(40);
 
-        root.addComponent(txtName);
+        root.addComponent(namePanel);
         root.addComponent(new EmptySpace());
 
 
@@ -103,8 +110,6 @@ public class AddEditOptionListView extends DialogWindow {
             if (optionList.getOwner().isAdmin()){
                 checkBoxSystem.setChecked(true);
             }
-
-            //Button check = new Button("[ ]", this::check);
 
             systemPanel.addComponent(systemLabel);
             systemPanel.addComponent(checkBoxSystem);
@@ -134,14 +139,16 @@ public class AddEditOptionListView extends DialogWindow {
         if (canModify(optionList)) {
 
             // TextBox + bouton add
-            Panel addValue = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+            addValuePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
             txtNewValue = new TextBox();
 
             add = new Button("Add", this::add);
-            addValue.addComponent(txtNewValue);
-            addValue.addComponent(add);
-            root.addComponent(addValue);
+            txtNewValue.addTo(addValuePanel).takeFocus().sizeTo(40);
+
+            addValuePanel.addComponent(txtNewValue);
+            addValuePanel.addComponent(add);
+            root.addComponent(addValuePanel);
             root.addComponent(new EmptySpace());
         }
 
@@ -213,14 +220,13 @@ public class AddEditOptionListView extends DialogWindow {
         root = new Panel();
 
         // Name + TextBox
-        var namePanel = Panel.gridPanel(2, Margin.of(1));
+        namePanel = Panel.gridPanel(2, Margin.of(1));
 
         Label nameLabel = new Label("Name:");
         namePanel.addComponent(nameLabel);
 
         txtName = new TextBox();
-        txtName.addTo(namePanel).takeFocus().sizeTo(34);
-
+        txtName.addTo(namePanel).takeFocus().sizeTo(40);
         errNoName.addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
 
         root.addComponent(namePanel);
@@ -234,14 +240,17 @@ public class AddEditOptionListView extends DialogWindow {
 
 
         // TextBox + bouton add
-        Panel addValue = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
+        addValuePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
+        errNoValueAdded.addTo(addValuePanel).setForegroundColor(TextColor.ANSI.RED);
+        addValuePanel.addComponent(new EmptySpace());
         txtNewValue = new TextBox();
+        txtNewValue.addTo(addValuePanel).takeFocus().sizeTo(40);
 
         add = new Button("Add", this::addForCreate);
-        addValue.addComponent(txtNewValue);
-        addValue.addComponent(add);
-        root.addComponent(addValue);
+        addValuePanel.addComponent(add);
+
+        root.addComponent(addValuePanel);
         root.addComponent(new EmptySpace());
 
         // Buttons
@@ -305,7 +314,7 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void closeForView(){
-        if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName())) {
+        if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName()) || checkBoxSystemIsChanged) {
             //if ((getLoggedUser().isAdmin() && checkBoxSystemisChanged) || !getLoggedUser().isAdmin()) {}
             boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmed) {
