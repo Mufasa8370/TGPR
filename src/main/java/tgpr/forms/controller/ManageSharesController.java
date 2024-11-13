@@ -1,4 +1,5 @@
 package tgpr.forms.controller;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.model.*;
 import tgpr.framework.Controller;
 
@@ -21,7 +22,7 @@ public class ManageSharesController extends Controller<ManageSharesView> {
     private List<UserFormAccess> formsAccesses;
     public ManageSharesController(Form form){
         this.form = form;
-        view = new ManageSharesView(this);
+        view = new ManageSharesView(this,form);
 
     }
 
@@ -167,6 +168,10 @@ public class ManageSharesController extends Controller<ManageSharesView> {
         else if(beneficiary instanceof DistList){
             form.addAccess(((DistList) beneficiary), accessType);
         }
+    }
+
+    public void gotoEditConfirmationShares(Model model, KeyType type){
+        navigateTo(new EditConfirmationSharesController(model,type));
     }
     @Override
     public ManageSharesView getView() {return view;}
