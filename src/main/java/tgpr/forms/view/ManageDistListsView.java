@@ -121,7 +121,7 @@ public class ManageDistListsView extends DialogWindow {
         panelForCombo.addComponent(new Label("List: "));
         // Avec des éléments qui sont des strings
 
-         autoCompleteComboBox = new AutoCompleteComboBox<>("",distLists);
+        autoCompleteComboBox = new AutoCompleteComboBox<>("",distLists);
         autoCompleteComboBox.setPreferredSize(new TerminalSize(40,1));
         autoCompleteComboBox.addListener(new AutoCompleteComboBox.Listener() {
             @Override

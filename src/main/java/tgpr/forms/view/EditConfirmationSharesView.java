@@ -31,6 +31,7 @@ public class EditConfirmationSharesView extends DialogWindow {
                 this.close();
             }
             else if(controller.getType() == KeyType.Backspace){
+                controller.deleteAccess();
                 this.close();
             }
         }).addTo(buttons);

@@ -51,6 +51,15 @@ public class EditConfirmationSharesController  extends Controller<EditConfirmati
             }
         }
     }
+
+    public void deleteAccess(){
+        if( model instanceof UserFormAccess){
+            ((UserFormAccess)model).delete();
+        }
+        else if(model instanceof DistListFormAccess){
+            ((DistListFormAccess)model).delete();
+        }
+    }
     @Override
     public EditConfirmationSharesView getView() {return view;}
 }
