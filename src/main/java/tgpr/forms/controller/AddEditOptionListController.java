@@ -71,7 +71,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
     public void check(OptionList optionList, boolean checked){
         if (checked) {
-            optionList.setOwnerId(null); // à modifier
+            optionList.setOwnerId(null);
         } else {
             optionList.setOwnerId(getLoggedUser().getId());
         }

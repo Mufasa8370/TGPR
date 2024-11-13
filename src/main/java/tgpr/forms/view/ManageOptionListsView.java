@@ -7,12 +7,17 @@ import tgpr.forms.controller.ManageOptionListsController;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.OptionValue;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static tgpr.forms.model.Security.getLoggedUser;
 
 public class ManageOptionListsView extends DialogWindow {
     private final ManageOptionListsController controller;
     private final Panel root;
-    private List<OptionList> listOfOptionLists;
+    private List<OptionList> listOfOptionLists = new ArrayList<>();
+    private List<OptionList> listOfOptionListsAll;
+
 
     private final Panel buttonsPanel;
     private ObjectTable<OptionList> tbl;
@@ -25,7 +30,17 @@ public class ManageOptionListsView extends DialogWindow {
         //Titre de la fenêtre
         super("Option Lists Management");
         this.controller = controller;
-        this.listOfOptionLists = OptionList.getAll();
+        this.listOfOptionListsAll = OptionList.getAll();
+        if(getLoggedUser().isAdmin()){
+            listOfOptionLists = listOfOptionListsAll;
+
+        }else {
+            for (OptionList optionList : listOfOptionListsAll){
+                if (optionList.getOwner() == null || optionList.getOwner().equals(getLoggedUser())) {
+                    listOfOptionLists.add(optionList);
+                }
+            }
+        }
         setHints(List.of(Window.Hint.CENTERED));
         // permet de fermer la fenêtre en pressant la touche Esc
         setCloseWindowWithEscape(true);
@@ -53,7 +68,7 @@ public class ManageOptionListsView extends DialogWindow {
         tbl = new ObjectTable<>(
                 new ColumnSpec<>("Name", OptionList::getName),
                 new ColumnSpec<>("Values", OptionList::getNumberOfValues),
-                new ColumnSpec<>("Owner", OptionList::getOwner)
+                new ColumnSpec<>("Owner", OptionList::getOwnerForManage)
         );
         tbl.setSelectAction(this::editList);
 

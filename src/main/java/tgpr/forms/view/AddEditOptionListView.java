@@ -4,6 +4,8 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.controller.AddEditOptionListController;
 import tgpr.forms.controller.ManageOptionListsController;
 import tgpr.forms.model.OptionList;
@@ -22,7 +24,6 @@ import static tgpr.framework.Controller.navigateTo;
 
 public class AddEditOptionListView extends DialogWindow {
     private final AddEditOptionListController controller;
-    private final Panel panelForOptionListUpdate = new Panel();
     private OptionList optionList;
     private ObjectTable<OptionValue> tblOfValues;
     private List<OptionValue> listOfOptionValues;
@@ -111,32 +112,35 @@ public class AddEditOptionListView extends DialogWindow {
 
             Label systemLabel = new Label("System:");
             checkBoxSystem = new CheckBox();
-            //addKeyboardListener(checkSystem,this::check);
-            if (optionList.getOwner().isAdmin()){
+            if (optionList.getOwner() == null){
                 checkBoxSystem.setChecked(true);
             }
 
             systemPanel.addComponent(systemLabel);
             systemPanel.addComponent(checkBoxSystem);
 
-            /*
-            checkBoxSystem.addListener((boolean checked) -> {
-                if (checked) {
-                    optionList.setOwnerId(null); // à modifier
-                } else {
-                    optionList.setOwnerId(getLoggedUser().getId());
-                }
-            });
-
-             */
 
             root.addComponent(systemPanel);
             root.addComponent(new EmptySpace());
+        }
+        else {
+            checkBoxSystem = new CheckBox();
+            if (optionList.getOwner() == null){
+                checkBoxSystem.setChecked(true);
+            }
+            root.addComponent(checkBoxSystem).setVisible(false);
         }
 
         // Tableau de values
 
         root.addComponent(tableOfValues(optionList));
+        if (canModify(optionList)) {
+            addKeyboardListener(
+                    tblOfValues, (KeyStroke stroke) -> {
+                        return this.handleWeightKeyStroke(stroke);
+                    });
+        }
+
         root.addComponent(new EmptySpace());
         setComponent(root);
 
@@ -173,7 +177,7 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     private boolean canModify(OptionList optionList) {
-        return (optionList.getOwner().equals(getLoggedUser()) || getLoggedUser().isAdmin()) && !optionList.isUsed();
+        return (optionList.getOwner() == null && getLoggedUser().isAdmin()) ||(optionList.getOwner()!= null && optionList.getOwner().equals(getLoggedUser())) || (getLoggedUser().isAdmin()) && !optionList.isUsed();
     }
 
     private Panel createButtonsPanelForUnusedOptionListForOwner() {
@@ -231,6 +235,9 @@ public class AddEditOptionListView extends DialogWindow {
         namePanel.addComponent(nameLabel);
 
         txtName = new TextBox();
+        txtName.setTextChangeListener((newText, changedByUserInteraction) -> {
+            errNoName.setVisible(false);
+        });
         txtName.addTo(namePanel).takeFocus().sizeTo(40);
         errNoName.addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
 
@@ -242,12 +249,14 @@ public class AddEditOptionListView extends DialogWindow {
         root.addComponent(tableOfValues(optionList));
         root.addComponent(new EmptySpace());
 
-
+        addKeyboardListener(
+                tblOfValues, (KeyStroke stroke) -> {
+                    return this.handleWeightKeyStroke(stroke);
+                });
 
         // TextBox + bouton add
         addValuePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
-        errNoValueAdded.addTo(addValuePanel).setForegroundColor(TextColor.ANSI.RED);
         addValuePanel.addComponent(new EmptySpace());
         txtNewValue = new TextBox();
         txtNewValue.addTo(addValuePanel).takeFocus().sizeTo(40);
@@ -256,6 +265,7 @@ public class AddEditOptionListView extends DialogWindow {
         addValuePanel.addComponent(add);
 
         root.addComponent(addValuePanel);
+        errNoValueAdded.addTo(root).setForegroundColor(TextColor.ANSI.RED);
         root.addComponent(new EmptySpace());
 
         // Buttons
@@ -318,12 +328,12 @@ public class AddEditOptionListView extends DialogWindow {
         if (optionList.getNumberOfValues() == 1){
             buttonsPanel.removeComponent(duplicate);
         }
+        errNoValueAdded.setVisible(false);
         refresh();
     }
 
     public void closeForView(){
         if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName())) {
-            //if ((getLoggedUser().isAdmin() && checkBoxSystemisChanged) || !getLoggedUser().isAdmin()) {}
             boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmed) {
                 listOfAddedOptionValues.clear();
@@ -427,6 +437,22 @@ public class AddEditOptionListView extends DialogWindow {
         tblOfValues.clear();
         tblOfValues.add(listOfOptionValues);
     }
+
+    public boolean handleWeightKeyStroke(KeyStroke keyStroke){
+        KeyType type = keyStroke.getKeyType();
+        if(type == KeyType.Delete || type == KeyType.Backspace){
+            deleteValue();
+        }
+        return true;
+    }
+
+    public void deleteValue(){
+        //tblOfValues.getSelected().delete();
+        listOfOptionValues.remove(tblOfValues.getSelected());
+        optionList.reorderValues(listOfOptionValues);
+        refresh();
+    }
+
 
 
 

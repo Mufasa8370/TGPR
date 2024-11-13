@@ -69,6 +69,10 @@ public class OptionList extends Model {
         return ownerId == null ? null : User.getByKey(ownerId);
     }
 
+    public String getOwnerForManage() {
+        return ownerId == null ? "System" : User.getByKey(ownerId).getName();
+    }
+
     public boolean isSystem() {
         return id > 0 && (ownerId == null || ownerId <= 0);
     }
