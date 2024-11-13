@@ -82,7 +82,7 @@ public class ViewFormView extends DialogWindow {
                 new ColumnSpec<>("Title", Question::getTitle).setWidth(30).setOverflowHandling(ColumnSpec.OverflowHandling.Wrap),
                 new ColumnSpec<>("Type", Question::getType).setOverflowHandling(ColumnSpec.OverflowHandling.Wrap),
                 new ColumnSpec<>("Required", Question::getRequired).setOverflowHandling(ColumnSpec.OverflowHandling.Wrap),
-                new ColumnSpec<>("Option List", Question::getOptionList).setOverflowHandling(ColumnSpec.OverflowHandling.Wrap)
+                new ColumnSpec<>("Option List", Question::getOptionListForViewForm).setOverflowHandling(ColumnSpec.OverflowHandling.Wrap)
         ).addTo(pnlQuestions);
 
         questions = form.getQuestions();
@@ -109,8 +109,11 @@ public class ViewFormView extends DialogWindow {
 
         if (questions == null || questions.isEmpty()) {
             lblNoQuestions.setVisible(true);
+            questionTable.setVisible(false);
+            setFixedSize(new TerminalSize(80, 13));
         } else {
             lblNoQuestions.setVisible(false);
+            questionTable.setVisible(true);
             questionTable.add(questions);
         }
 
@@ -133,16 +136,19 @@ public class ViewFormView extends DialogWindow {
                 btnMakePublic = new Button("Make Public", this::makePublic).addTo(buttons);
             }
         }
-        btnShare = new Button("Share", this::share).addTo(buttons);
+        if(!form.getIsPublic()){
+            btnShare = new Button("Share", this::share).addTo(buttons);
+        }
+
         if(existInstance){
             btnClearInstances = new Button("Clear Instances",this::clearInstances).addTo(buttons);
         }
-        if(!existInstance){
+        if(!existInstance && !questions.isEmpty()){
             btnReorder = new Button("Reorder", this::reorder).addTo(buttons);
         }
 
         if (existInstance) {
-            btnAnalyse = new Button("Analyse", this::analyse).addTo(buttons);
+            btnAnalyse = new Button("Analyze", this::analyze).addTo(buttons);
         }
         close = new Button("Close", this::close).addTo(buttons);
         saveOrder = new Button("Save Order", this::saveOrder).addTo(buttons).setVisible(false);
@@ -157,7 +163,7 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void clearInstances() {
-        boolean confirmed = askConfirmation("Are you sure you want to delete all instances? " +
+        boolean confirmed = askConfirmation("Are you sure you want to delete all instances?\n" +
                 "Note: This will also delete instances currently being edited (not submitted).", "Delete All Instances");
         if (confirmed) {
             form.deleteAllInstances();
@@ -174,7 +180,8 @@ public class ViewFormView extends DialogWindow {
         Controller.navigateTo(new ViewFormController(form));
     }
 
-    private void analyse() {
+    private void analyze() {
+        close();
         Controller.navigateTo(new AnalyzeController(form));
     }
 
@@ -213,6 +220,8 @@ public class ViewFormView extends DialogWindow {
         }
         saveOrder.setVisible(true);
         cancel.setVisible(true);
+        questionTable.takeFocus();
+        questionTable.setSelected(questions.getLast());
     }
     public void changeOrder(List<Question> questions, int oldInd, int newInd){
         Question old = questions.get(oldInd);
@@ -229,14 +238,20 @@ public class ViewFormView extends DialogWindow {
     private void reorderSelect() {
         if(!reoderSelect){
             current = questionTable.getSelected();
+
             questionTable.addSelectionChangeListener(new ObjectTable.SelectionChangeListener() {
                 @Override
                 public void onSelectionChanged(int oldRow, int newRow, boolean byUser) {
+                    System.out.println("ok :"+ auto);
                     if(!auto){
+                        System.out.println("ok");
                         changeOrder(questions,oldRow,newRow);
                         questionTable.clear();
                         questionTable.add(questions);
-                        auto = true;
+                        if(newRow != 0){
+                            auto = true;
+                        }
+
                         questionTable.setSelected(questions.get(newRow));
                     }else {
                         auto = false;
@@ -250,7 +265,7 @@ public class ViewFormView extends DialogWindow {
             questionTable.addSelectionChangeListener(new ObjectTable.SelectionChangeListener() {
                 @Override
                 public void onSelectionChanged(int oldRow, int newRow, boolean byUser) {
-                    System.out.println("okok");
+
                 }
             });
         }

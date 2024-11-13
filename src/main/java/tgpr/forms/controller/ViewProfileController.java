@@ -12,4 +12,10 @@ public class ViewProfileController extends Controller<ViewProfileView> {
     public ViewProfileController() {
         view = new ViewProfileView(this);
     }
+
+    public void editProfile() {
+        navigateTo(new EditProfileController());
+    }
+
+    public void changePassword() { navigateTo(new ChangePasswordController());}
 }

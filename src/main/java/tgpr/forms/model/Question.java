@@ -149,6 +149,11 @@ public class Question extends Model {
             return null;
         return OptionList.getByKey(optionListId);
     }
+    public String getOptionListForViewForm() {
+        if (optionListId == null)
+            return "";
+        return OptionList.getByKey(optionListId).toString();
+    }
 
     @Override
     public boolean equals(Object o) {

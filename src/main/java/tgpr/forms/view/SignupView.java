@@ -9,18 +9,21 @@ import tgpr.forms.controller.SignupController;
 import tgpr.forms.model.User;
 import java.util.List;
 
-
 public class SignupView extends DialogWindow {
     private final SignupController controller;
+
     private final TextBox txtMail = new TextBox();
     private final TextBox txtFullName = new TextBox();
     private final TextBox txtPassword = new TextBox();
     private final TextBox txtConfirmPassword = new TextBox();
+
     private final Label errMail = new Label("");
     private final Label errFullName = new Label("");
     private final Label errPassword = new Label("");
     private final Label errConfirmPassword = new Label("");
+
     private Button btnSignup;
+
 
     public SignupView(SignupController controller){
         super("Sign Up");
@@ -75,8 +78,8 @@ public class SignupView extends DialogWindow {
 
     private Panel createButtonsPanel() {
         Panel panel = Panel.horizontalPanel(1).center();
-        btnSignup = new Button("Signup", this::signup).addTo(panel).setEnabled(false);
 
+        btnSignup = new Button("Signup", this::signup).addTo(panel).setEnabled(false);
         Button btnClose = new Button("Close", this::close).addTo(panel);
 
         addShortcut(btnSignup, KeyStroke.fromString("<A-s>"));
@@ -101,10 +104,11 @@ public class SignupView extends DialogWindow {
                 txtPassword.getText(),
                 txtConfirmPassword.getText()
         );
+
         errMail.setText(errors.getFirstErrorMessage(User.Fields.Email));
         errFullName.setText(errors.getFirstErrorMessage(User.Fields.FullName));
         errPassword.setText(errors.getFirstErrorMessage(User.Fields.Password));
-        errConfirmPassword.setText(errors.getFirstErrorMessage(SignupController.Fields.PasswordConfirm));
+        errConfirmPassword.setText(errors.getFirstErrorMessage(User.Fields.ConfirmPassword));
 
         btnSignup.setEnabled(errors.isEmpty());
     }

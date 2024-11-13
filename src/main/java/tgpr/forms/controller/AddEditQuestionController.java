@@ -22,7 +22,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         return question;
     }
 
-    public ErrorList validate(String title, String description) {
+    public ErrorList validate(String title, String description, OptionList optionList, Question.Type type) {
         var errors = new ErrorList();
         if (title == null || title.isEmpty()) {
             errors.add("Title required", Question.Fields.Title);
@@ -34,14 +34,19 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
         if(description.length() < 3){
             errors.add("Minimum 3 chars", Question.Fields.Description);
         }
+
+        if (type != null && type.requiresOptionList() && optionList == null) {
+            errors.add("OptionList required for this type", Question.Fields.OptionList);
+
+        }
         //ajout option list
         return errors;
     }
 
     //pour create
-    public void create(int formId, int idx,String title, String description, Question.Type type, boolean required, OptionList optionList) {
+    public boolean create(int formId, int idx,String title, String description, Question.Type type, boolean required, OptionList optionList) {
         // Valide les entrées
-        var errors = validate(title, description);
+        var errors = validate(title, description, optionList,type);
 
         if (errors.isEmpty()) {
             // Crée une nouvelle instance de Question
@@ -56,8 +61,10 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
             // Enregistre la question
             question.save();
+            return true;
         } else {
             showError(String.valueOf(errors));
+            return false;
         }
     }
 
@@ -65,8 +72,8 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
     }
 
     //pour update
-    public void update(Question question, OptionList optionList) {
-        var errors = validate(question.getTitle(), question.getDescription());
+    public boolean update(Question question, OptionList optionList) {
+        var errors = validate(question.getTitle(), question.getDescription(), optionList,question.getType());
         if (errors.isEmpty()) {
             if (optionList != null){
                 question.setOptionListId(optionList.getId());
@@ -74,8 +81,12 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
                 question.setOptionListId(null);
             }
             question.save();
-        } else
+            return true;
+        } else{
             showErrors(errors);
+            return false;
+        }
+
     }
 
     @Override

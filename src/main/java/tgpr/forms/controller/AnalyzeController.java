@@ -57,7 +57,8 @@ public class AnalyzeController extends Controller<AnalyzeView> {
 
     public void closeView() {
         view.close();
-        navigateTo(new ViewFormController(form));
+        navigateTo(new ViewFormController(form)); // ici je n'utilise pas le meme système de refresh car je close la vue View Form quand analyze est appelé depuis View Form
+        // je peux donc simplement naviguer vers un nouveau contrôleur ViewFormController. je peux me permettre de faire cela car la fenetre analyse est plus grande que la fenetre view form
     }
 
 }
