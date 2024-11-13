@@ -1,6 +1,7 @@
 package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.AddEditOptionListController;
@@ -31,8 +32,12 @@ public class AddEditOptionListView extends DialogWindow {
     private Button add;
     private Button duplicate;
     private Button save;
-    private Button reorder;
     private Button delete;
+
+    private Button reorder;
+    private Button alphabetically;
+    private Button confirmOrder;
+    private Button cancel;
 
     private Button create;
 
@@ -47,6 +52,12 @@ public class AddEditOptionListView extends DialogWindow {
 
     private Panel buttonsPanel;
     private ManageOptionListsView viewManage;
+
+    private int compterIdx = 0;
+
+    private final Label errNoName = new Label("name required");
+    private final Label errNoValueAdded = new Label("at least one value required");
+
 
     /*
     à ajouter : se mettre sur une valeur OptionValue et appuyer delete, pour supprimer la valeur. Les id changent avec
@@ -202,15 +213,17 @@ public class AddEditOptionListView extends DialogWindow {
         root = new Panel();
 
         // Name + TextBox
+        var namePanel = Panel.gridPanel(2, Margin.of(1));
 
         Label nameLabel = new Label("Name:");
-        root.addComponent(nameLabel);
-
+        namePanel.addComponent(nameLabel);
 
         txtName = new TextBox();
+        txtName.addTo(namePanel).takeFocus().sizeTo(34);
 
-        root.addComponent(txtName);
-        //if (txtName == null){"name required"}
+        errNoName.addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
+
+        root.addComponent(namePanel);
         root.addComponent(new EmptySpace());
 
         // Tableau de values
@@ -222,11 +235,10 @@ public class AddEditOptionListView extends DialogWindow {
 
         // TextBox + bouton add
         Panel addValue = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
-        //if (listOfAddedOptionValues.isEmpty()){"at least one value required"}
 
         txtNewValue = new TextBox();
 
-        add = new Button("Add", this::add);
+        add = new Button("Add", this::addForCreate);
         addValue.addComponent(txtNewValue);
         addValue.addComponent(add);
         root.addComponent(addValue);
@@ -281,6 +293,17 @@ public class AddEditOptionListView extends DialogWindow {
         refresh();
     }
 
+    public void addForCreate(){
+        ++compterIdx;
+        OptionValue newValue = new OptionValue(this.optionList,compterIdx,txtNewValue.getText());
+        listOfOptionValues.add(newValue);
+        listOfAddedOptionValues.add(newValue);
+        if (optionList.getNumberOfValues() == 1){
+            buttonsPanel.removeComponent(duplicate);
+        }
+        refresh();
+    }
+
     public void closeForView(){
         if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName())) {
             //if ((getLoggedUser().isAdmin() && checkBoxSystemisChanged) || !getLoggedUser().isAdmin()) {}
@@ -303,9 +326,9 @@ public class AddEditOptionListView extends DialogWindow {
 
         buttonsPanel.removeAllComponents();
 
-        Button alphabetically = new Button("Alphabetcally", this::orderAlphabetically).addTo(buttonsPanel);
-        Button confirmOrder = new Button("Confirm Order", this::confirmOrder).addTo(buttonsPanel);
-        Button cancel = new Button("Cancel", this::cancel).addTo(buttonsPanel);
+        alphabetically = new Button("Alphabetcally", this::orderAlphabetically).addTo(buttonsPanel);
+        confirmOrder = new Button("Confirm Order", this::confirmOrder).addTo(buttonsPanel);
+        cancel = new Button("Cancel", this::cancel).addTo(buttonsPanel);
 
         buttonsPanel.addComponent(alphabetically);
         buttonsPanel.addComponent(confirmOrder);
@@ -323,9 +346,31 @@ public class AddEditOptionListView extends DialogWindow {
         // reorderValues(liste ordonnée)
     }
     public void cancel(){
-        // change buttonsPanel
-        listOfOptionValues.clear();
-        listOfOptionValues = optionList.getOptionValues();
+        if (!listOfAddedOptionValues.isEmpty() || txtName.getText() != null) {
+            //if ((getLoggedUser().isAdmin() && checkBoxSystemisChanged) || !getLoggedUser().isAdmin()) {}
+            boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
+            if (confirmed) {
+                restoreButtonsPanel();
+                listOfAddedOptionValues.clear();
+                listOfOptionValues = optionList.getOptionValues();
+                close();
+                Controller.navigateTo(new ManageOptionListsController());
+            }
+        }
+        else {
+            restoreButtonsPanel();
+            listOfAddedOptionValues.clear();
+            listOfOptionValues = optionList.getOptionValues();
+            close();
+            Controller.navigateTo(new ManageOptionListsController());
+        }
+    }
+
+    private void restoreButtonsPanel(){
+        buttonsPanel.removeAllComponents();
+        buttonsPanel = createButtonsPanelForUnusedOptionListForOwner();
+        buttonsPanel.addComponent(duplicate);
+        buttonsPanel.addComponent(close);
     }
 
 
