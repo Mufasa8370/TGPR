@@ -1,16 +1,21 @@
 package tgpr.forms.view;
 
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.graphics.AbstractTextGraphics;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
+import tgpr.forms.controller.EditConfirmationSharesController;
 import tgpr.forms.controller.ManageSharesController;
 import tgpr.forms.model.AccessType;
 import tgpr.forms.model.DistListFormAccess;
 import tgpr.forms.model.UserFormAccess;
 import tgpr.framework.Model;
-
+import tgpr.forms.model.Form;
 import java.util.List;
 
+import static tgpr.framework.Controller.navigateTo;
 import static tgpr.framework.Tools.asString;
 
 public class ManageSharesView  extends DialogWindow {
@@ -19,10 +24,11 @@ public class ManageSharesView  extends DialogWindow {
     private final Button btnAddFilter;
     private final Button btnClose;
     private final AutoCompleteComboBox<Model> addFilter;
-    public ManageSharesView(ManageSharesController controller) {
+    private final Form form;
+    public ManageSharesView(ManageSharesController controller,Form form) {
         super("Manage Shares");
         this.controller = controller;
-
+        this.form = form;
         setHints(List.of(Hint.CENTERED));
         setFixedSize(new TerminalSize(66, 13));
         Panel root = new Panel();
@@ -82,6 +88,12 @@ public class ManageSharesView  extends DialogWindow {
                     }
                 })
         );
+        addKeyboardListener(
+                table, (KeyStroke stroke)->{
+                    return this.handleWeightKeyStroke(stroke);
+
+                }
+        );
 
         content.addComponent(table);
         new EmptySpace().addTo(root);
@@ -120,6 +132,15 @@ public class ManageSharesView  extends DialogWindow {
         table.add(controller.getAccesses());
     }
 
-
+    public boolean handleWeightKeyStroke(KeyStroke keyStroke){
+        KeyType type = keyStroke.getKeyType();
+        // Backspace -> touch delete
+        // Enter -> touch enter
+        if(type ==KeyType.Backspace || (type == KeyType.Enter && form.getIsPublic() == true)){
+            controller.gotoEditConfirmationShares(table.getSelected(),type);
+            reloadData();
+        }
+        return true;
+    }
 }
 
