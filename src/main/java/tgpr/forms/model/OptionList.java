@@ -6,6 +6,7 @@ import tgpr.framework.Params;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -231,6 +232,18 @@ public class OptionList extends Model {
             value.setIdx(i++);
             value.save();
         }
+    }
+
+    public List<OptionValue> reorderValuesList(List<OptionValue> values) {
+        List<OptionValue> optionValues = new ArrayList<>();
+        int i = 1;
+        for (var value : values) {
+            if (value.getOptionListId() <= 0)
+                value.setOptionListId(id);
+            value.setIdx(i++);
+            optionValues.add(value);
+        }
+        return optionValues;
     }
 
     public OptionList duplicate(User forUser) {

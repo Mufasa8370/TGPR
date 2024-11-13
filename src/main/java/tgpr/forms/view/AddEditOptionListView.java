@@ -128,7 +128,8 @@ public class AddEditOptionListView extends DialogWindow {
             if (optionList.getOwner() == null){
                 checkBoxSystem.setChecked(true);
             }
-            root.addComponent(checkBoxSystem).setVisible(false);
+            checkBoxSystem.addTo(root);
+            checkBoxSystem.setVisible(false);
         }
 
         // Tableau de values
@@ -449,11 +450,9 @@ public class AddEditOptionListView extends DialogWindow {
     public void deleteValue(){
         //tblOfValues.getSelected().delete();
         listOfOptionValues.remove(tblOfValues.getSelected());
-        optionList.reorderValues(listOfOptionValues);
+        listOfOptionValues = optionList.reorderValuesList(listOfOptionValues);
         refresh();
     }
-
-
 
 
 }
