@@ -30,7 +30,7 @@ public class ManageSharesView  extends DialogWindow {
         this.controller = controller;
         this.form = form;
         setHints(List.of(Hint.CENTERED));
-        setFixedSize(new TerminalSize(66, 13));
+        setFixedSize(new TerminalSize(66, 10));
         Panel root = new Panel();
         setComponent(root);
         new EmptySpace().addTo(root);
@@ -136,7 +136,7 @@ public class ManageSharesView  extends DialogWindow {
         KeyType type = keyStroke.getKeyType();
         // Backspace -> touch delete
         // Enter -> touch enter
-        if(type ==KeyType.Backspace || (type == KeyType.Enter && form.getIsPublic() == true)){
+        if(type ==KeyType.Backspace || (type == KeyType.Enter && form.getIsPublic() == false)){
             controller.gotoEditConfirmationShares(table.getSelected(),type);
             reloadData();
         }
