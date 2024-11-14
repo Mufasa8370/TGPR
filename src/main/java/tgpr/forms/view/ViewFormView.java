@@ -8,6 +8,7 @@ import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.controller.*;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
@@ -172,9 +173,12 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void makePublic() {
+        if (!form.getIsPublic()) {
+            Controller.navigateTo(new FormEditConfirmationController());
+            close();
+        }
         form.setIsPublic(!form.getIsPublic());
         form.save();
-        //temp
         close();
         Controller.navigateTo(new ViewFormController(form));
     }
