@@ -16,8 +16,8 @@ import static tgpr.forms.model.Security.getLoggedUser;
 public class AddEditOptionListController extends Controller<AddEditOptionListView> {
     private AddEditOptionListView view;
 
-    public AddEditOptionListController() {
-        this.view = new AddEditOptionListView(this);
+    public AddEditOptionListController(ManageOptionListsView view) {
+        this.view = new AddEditOptionListView(this, view);
     }
 
     public AddEditOptionListController(OptionList optionList, ManageOptionListsView view) {
@@ -44,9 +44,10 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         }
     }
 
-    public void duplicate(OptionList optionList,AddEditOptionListView addEditOptionListView){
+    public void duplicate(OptionList optionList,AddEditOptionListView addEditOptionListView, ManageOptionListsView manageOptionListsView){
         optionList.duplicate(getLoggedUser());
         addEditOptionListView.close();
+        manageOptionListsView.close();
         navigateTo(new ManageOptionListsController());
     }
 

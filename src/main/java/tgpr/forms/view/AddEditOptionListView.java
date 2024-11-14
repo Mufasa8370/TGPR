@@ -212,10 +212,11 @@ public class AddEditOptionListView extends DialogWindow {
 
 
     // Add Option List
-    public AddEditOptionListView(AddEditOptionListController controller) {
+    public AddEditOptionListView(AddEditOptionListController controller, ManageOptionListsView view) {
         //Titre de la fenêtre
         super( "Create Option List");
         this.controller = controller;
+        this.viewManage = view;
         this.optionList = new OptionList();
         this.listOfOptionValues = new ArrayList<OptionValue>();
         this.listOfAddedOptionValues = new ArrayList<OptionValue>();
@@ -290,13 +291,14 @@ public class AddEditOptionListView extends DialogWindow {
             controller.create(optionList,listOfAddedOptionValues,txtName.getText());
             listOfAddedOptionValues.clear();
             close();
+            viewManage.close();
             navigateTo(new ManageOptionListsController());
         }
     }
 
 
     public void duplicate(){
-        controller.duplicate(this.optionList,this);
+        controller.duplicate(this.optionList,this, viewManage);
     }
 
     public void delete(){
@@ -308,6 +310,7 @@ public class AddEditOptionListView extends DialogWindow {
         controller.save(this.optionList,listOfAddedOptionValues,txtName.getText(),checkBoxSystem.isChecked());
         listOfAddedOptionValues.clear();
         close();
+        viewManage.close();
         navigateTo(new ManageOptionListsController());
     }
 
@@ -339,12 +342,14 @@ public class AddEditOptionListView extends DialogWindow {
             if (confirmed) {
                 listOfAddedOptionValues.clear();
                 close();
+                viewManage.close();
                 navigateTo(new ManageOptionListsController());
             }
         }
         else {
             listOfAddedOptionValues.clear();
             close();
+            viewManage.close();
             navigateTo(new ManageOptionListsController());
         }
     }

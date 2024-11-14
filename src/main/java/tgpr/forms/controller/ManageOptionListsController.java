@@ -24,7 +24,7 @@ public class ManageOptionListsController extends Controller<ManageOptionListsVie
     }
 
     public void newList(){
-        navigateTo(new AddEditOptionListController());
+        navigateTo(new AddEditOptionListController(view));
     }
     public void close(){
         navigateTo(new ViewFormsController());
