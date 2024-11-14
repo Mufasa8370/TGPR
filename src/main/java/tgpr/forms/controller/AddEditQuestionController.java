@@ -31,7 +31,7 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
             errors.add("Minimum 3 chars", Question.Fields.Title);
         }
 
-        if(description.length() < 3){
+        if(description != null && !description.isEmpty() && description.length() < 3){
             errors.add("Minimum 3 chars", Question.Fields.Description);
         }
 

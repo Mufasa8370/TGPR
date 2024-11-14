@@ -136,9 +136,8 @@ public class ViewFormView extends DialogWindow {
                 btnMakePublic = new Button("Make Public", this::makePublic).addTo(buttons);
             }
         }
-        if(!form.getIsPublic()){
-            btnShare = new Button("Share", this::share).addTo(buttons);
-        }
+
+        btnShare = new Button("Share", this::share).addTo(buttons);
 
         if(existInstance){
             btnClearInstances = new Button("Clear Instances",this::clearInstances).addTo(buttons);
@@ -282,6 +281,8 @@ public class ViewFormView extends DialogWindow {
 
     private void editForm() {
         Controller.navigateTo(new EditFormController(form));
+        close();
+        Controller.navigateTo(new ViewFormController(form));
     }
 
     private void newQuestion() {
