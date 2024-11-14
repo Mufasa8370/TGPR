@@ -38,11 +38,17 @@ public class EditProfileController extends Controller<EditProfileView> {
     public ErrorList validate(String email, String fullName) {
         var errors = new ErrorList();
 
+        // Vérifier que le nom contient au moins 3 caractères
         if (fullName.length() < 3)
             errors.add("minimum 3 char", User.Fields.FullName);
 
+        // Vérifier que l'email a un format valide (ex: exemple@domaine.com)
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"))
             errors.add("invalid email", User.Fields.Email);
+
+        // Vérifier que l'email n'existe pas déjà
+        if (User.getByEmail(email) != null && !email.equals(Security.getLoggedUser().getEmail()))
+            errors.add("email already exists", User.Fields.Email);
 
         return errors;
     }
