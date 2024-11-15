@@ -6,6 +6,7 @@ import tgpr.framework.Params;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +37,10 @@ public class OptionList extends Model {
                 new Params("id", id));
     }
 
+    public int getNumberOfValues() {
+        return getOptionValues().size();
+    }
+
     public List<Question> getQuestions() {
         return queryList(Question.class, "select * from questions where option_list=:id",
                 new Params("id", id));
@@ -63,6 +68,10 @@ public class OptionList extends Model {
 
     public User getOwner() {
         return ownerId == null ? null : User.getByKey(ownerId);
+    }
+
+    public String getOwnerForManage() {
+        return ownerId == null ? "System" : User.getByKey(ownerId).getName();
     }
 
     public boolean isSystem() {
@@ -223,6 +232,18 @@ public class OptionList extends Model {
             value.setIdx(i++);
             value.save();
         }
+    }
+
+    public List<OptionValue> reorderValuesList(List<OptionValue> values) {
+        List<OptionValue> optionValues = new ArrayList<>();
+        int i = 1;
+        for (var value : values) {
+            if (value.getOptionListId() <= 0)
+                value.setOptionListId(id);
+            value.setIdx(i++);
+            optionValues.add(value);
+        }
+        return optionValues;
     }
 
     public OptionList duplicate(User forUser) {
