@@ -197,6 +197,15 @@ public class AddEditQuestionView extends DialogWindow {
 
     private void add() {
         Controller.navigateTo(new AddEditOptionListController(manageOptionListsView));
+        System.out.println("test");
+        cboOptionList.clearItems();
+        for(OptionList optionList : OptionList.getAll()){
+            if (optionList.getOwner() == null || optionList.getOwner().equals(getLoggedUser())){
+
+                cboOptionList.addItem(optionList);
+            }
+        }
+        cboOptionList.setSelectedItem(null);
     }
 
     private void reloadAfterDelete(){

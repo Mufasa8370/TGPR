@@ -322,8 +322,12 @@ public class AddEditOptionListView extends DialogWindow {
             controller.create(optionList,listOfAddedOptionValues,txtName.getText());
             listOfAddedOptionValues.clear();
             close();
-            viewManage.close();
-            navigateTo(new ManageOptionListsController());
+            if(viewManage!=null){
+                viewManage.close();
+                navigateTo(new ManageOptionListsController());
+            }else{
+
+            }
         }
     }
 
