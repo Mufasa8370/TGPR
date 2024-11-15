@@ -10,12 +10,10 @@ import tgpr.forms.controller.AddEditOptionListController;
 import tgpr.forms.controller.ManageOptionListsController;
 import tgpr.forms.model.OptionList;
 import tgpr.forms.model.OptionValue;
-import tgpr.framework.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mariadb.jdbc.pool.Pools.close;
 import static tgpr.forms.model.Security.getLoggedUser;
 import static tgpr.forms.model.Security.isAdmin;
 import static tgpr.framework.Controller.askConfirmation;
@@ -30,6 +28,8 @@ public class AddEditOptionListView extends DialogWindow {
 
     private List<OptionValue> listOfAddedOptionValues;
 
+    private final Panel root;
+
     private final Button close;
     private Button add;
     private Button duplicate;
@@ -37,21 +37,16 @@ public class AddEditOptionListView extends DialogWindow {
     private Button delete;
 
     private Button reorder;
-    private Button alphabetically;
-    private Button confirmOrder;
-    private Button cancel;
 
     private Button create;
 
 
-    // Attributs de classe pour les composants
-    private final Panel root;
 
     private TextBox txtName;
     private TextBox txtNewValue;
     private CheckBox checkBoxSystem;
-    private boolean checkBoxSystemIsChanged = false;
 
+    private Panel tableOfValuesPanel;
     private Panel buttonsPanel;
     private Panel addValuePanel;
     private Panel namePanel;
@@ -60,18 +55,20 @@ public class AddEditOptionListView extends DialogWindow {
 
     private int compterIdx = 0;
 
-    private final Label errNoName = new Label("name required");
-    private final Label errNoValueAdded = new Label("at least one value required");
+    private final Label errOptionListName = new Label("");
+    private final Label errAtLeastOneOptionValueRequired = new Label("");
+    private final Label errAddValueLabel = new Label("");
 
 
     private boolean reorderMode = false, reoderSelect = false;
     private OptionValue current = null;
     private boolean auto = false;
 
-    /*
-    à ajouter : se mettre sur une valeur OptionValue et appuyer delete, pour supprimer la valeur. Les id changent avec
-                quand checkBoxSystemIsChanged est modifié
-     */
+
+    private boolean deletedAnOptionValue = false;
+    private boolean addedAnOptionValueForCreate = false;
+
+    private boolean newOptionListMode = false, editOptionListMode = false;
 
 
     // Edit Option List
@@ -101,6 +98,11 @@ public class AddEditOptionListView extends DialogWindow {
         txtName = new TextBox();
         txtName.setText(optionList.getName());
         txtName.addTo(namePanel).takeFocus().sizeTo(40);
+
+        txtName.setTextChangeListener((newText, changedText) -> validate());
+
+        namePanel.addEmpty();
+        errOptionListName.addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
 
         root.addComponent(namePanel);
         root.addComponent(new EmptySpace());
@@ -134,7 +136,15 @@ public class AddEditOptionListView extends DialogWindow {
 
         // Tableau de values
 
-        root.addComponent(tableOfValues(optionList));
+        tableOfValuesPanel = tableOfValues(optionList);
+
+
+        tableOfValuesPanel.addEmpty();
+        errAddValueLabel.addTo(tableOfValuesPanel).setForegroundColor(TextColor.ANSI.RED);
+
+
+        root.addComponent(tableOfValuesPanel);
+
         if (canModify(optionList)) {
             addKeyboardListener(
                     tblOfValues, (KeyStroke stroke) -> {
@@ -147,11 +157,16 @@ public class AddEditOptionListView extends DialogWindow {
 
 
         if (canModify(optionList)) {
+            editOptionListMode = true;
 
             // TextBox + bouton add
             addValuePanel = new Panel().setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
 
             txtNewValue = new TextBox();
+            txtNewValue.addTo(addValuePanel).takeFocus().sizeTo(40);
+            addValuePanel.addEmpty();
+            txtNewValue.setTextChangeListener((newText, changedText) -> validate());
+
 
             add = new Button("Add", this::add);
             txtNewValue.addTo(addValuePanel).takeFocus().sizeTo(40);
@@ -178,7 +193,7 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     private boolean canModify(OptionList optionList) {
-        return (optionList.getOwner() == null && getLoggedUser().isAdmin()) ||(optionList.getOwner()!= null && optionList.getOwner().equals(getLoggedUser())) || (getLoggedUser().isAdmin()) && !optionList.isUsed();
+        return !optionList.isUsed() && ( (optionList.getOwner() == null && getLoggedUser().isAdmin()) ||(optionList.getOwner() != null && optionList.getOwner().equals(getLoggedUser())) || (getLoggedUser().isAdmin()) ) ;
     }
 
     private Panel createButtonsPanelForUnusedOptionListForOwner() {
@@ -194,8 +209,6 @@ public class AddEditOptionListView extends DialogWindow {
             buttons.addComponent(delete);
             buttons.addComponent(save);
         }
-
-
         return buttons;
     }
 
@@ -221,6 +234,7 @@ public class AddEditOptionListView extends DialogWindow {
         this.listOfOptionValues = new ArrayList<OptionValue>();
         this.listOfAddedOptionValues = new ArrayList<OptionValue>();
 
+        this.newOptionListMode = true;
 
         setHints(List.of(Hint.CENTERED));
         // permet de fermer la fenêtre en pressant la touche Esc
@@ -238,17 +252,29 @@ public class AddEditOptionListView extends DialogWindow {
 
         txtName = new TextBox();
         txtName.setTextChangeListener((newText, changedByUserInteraction) -> {
-            errNoName.setVisible(false);
+            errOptionListName.setVisible(false);
         });
+
         txtName.addTo(namePanel).takeFocus().sizeTo(40);
-        errNoName.addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
+
+        txtName.setTextChangeListener((newText, changedText) -> validate());
+
+        namePanel.addEmpty();
+        errOptionListName.addTo(namePanel).setForegroundColor(TextColor.ANSI.RED);
 
         root.addComponent(namePanel);
         root.addComponent(new EmptySpace());
 
         // Tableau de values
 
-        root.addComponent(tableOfValues(optionList));
+        tableOfValuesPanel = tableOfValues(optionList);
+
+
+        tableOfValuesPanel.addEmpty();
+        errAtLeastOneOptionValueRequired.addTo(tableOfValuesPanel).setForegroundColor(TextColor.ANSI.RED);
+
+
+        root.addComponent(tableOfValuesPanel);
         root.addComponent(new EmptySpace());
 
         addKeyboardListener(
@@ -262,12 +288,17 @@ public class AddEditOptionListView extends DialogWindow {
         addValuePanel.addComponent(new EmptySpace());
         txtNewValue = new TextBox();
         txtNewValue.addTo(addValuePanel).takeFocus().sizeTo(40);
+        addValuePanel.addEmpty();
+        txtNewValue.setTextChangeListener((newText, changedText) -> validate());
+
 
         add = new Button("Add", this::addForCreate);
         addValuePanel.addComponent(add);
 
+        addValuePanel.addEmpty();
+        errAddValueLabel.addTo(addValuePanel).setForegroundColor(TextColor.ANSI.RED);
+
         root.addComponent(addValuePanel);
-        errNoValueAdded.addTo(root).setForegroundColor(TextColor.ANSI.RED);
         root.addComponent(new EmptySpace());
 
         // Buttons
@@ -325,6 +356,7 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void addForCreate(){
+        addedAnOptionValueForCreate = true;
         ++compterIdx;
         OptionValue newValue = new OptionValue(this.optionList,compterIdx,txtNewValue.getText());
         listOfOptionValues.add(newValue);
@@ -332,12 +364,11 @@ public class AddEditOptionListView extends DialogWindow {
         if (optionList.getNumberOfValues() == 1){
             buttonsPanel.removeComponent(duplicate);
         }
-        errNoValueAdded.setVisible(false);
         refresh();
     }
 
     public void closeForView(){
-        if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName())) {
+        if (!listOfAddedOptionValues.isEmpty() || !txtName.getText().equals(optionList.getName()) || deletedAnOptionValue) {
             boolean confirmed = askConfirmation("Are you sure you want to cancel?", "Cancel");
             if (confirmed) {
                 listOfAddedOptionValues.clear();
@@ -358,7 +389,7 @@ public class AddEditOptionListView extends DialogWindow {
         reorderMode = true;
         buttonsPanel.removeAllComponents();
 
-        Button alphabetically = new Button("Alphabetcally", this::orderAlphabetically).addTo(buttonsPanel);
+        Button alphabetically = new Button("Alphabetically", this::orderAlphabetically).addTo(buttonsPanel);
         Button confirmOrder = new Button("Confirm Order", this::confirmOrder).addTo(buttonsPanel);
         Button cancel = new Button("Cancel", this::cancel).addTo(buttonsPanel);
         tblOfValues.takeFocus();
@@ -453,11 +484,44 @@ public class AddEditOptionListView extends DialogWindow {
     }
 
     public void deleteValue(){
-        //tblOfValues.getSelected().delete();
+        deletedAnOptionValue = true;
         listOfOptionValues.remove(tblOfValues.getSelected());
         listOfOptionValues = optionList.reorderValuesList(listOfOptionValues);
         refresh();
     }
 
+    private void validate() {
+        var errors = controller.validate(
+                optionList,
+                listOfOptionValues,
+                listOfAddedOptionValues,
+                txtName.getText(),
+                txtNewValue.getText(),
+                addedAnOptionValueForCreate,
+                editOptionListMode,
+                newOptionListMode
+        );
+
+        errOptionListName.setText(errors.getFirstErrorMessage(OptionList.Fields.Name));
+        errAtLeastOneOptionValueRequired.setText(errors.getFirstErrorMessage(OptionList.Fields.Values));
+        errAddValueLabel.setText(errors.getFirstErrorMessage(OptionValue.Fields.Label));
+
+/*
+        if (errors.getFirstErrorMessage(OptionValue.Fields.Label) == null) {
+            add.setEnabled(true);
+        } else {
+            add.setEnabled(false);
+        }
+ */
+
+        if (newOptionListMode) {
+            create.setEnabled(errors.isEmpty());
+        }
+        else if (editOptionListMode) {
+            save.setEnabled(errors.isEmpty());
+            duplicate.setEnabled(errors.isEmpty());
+        }
+
+    }
 
 }

@@ -5,6 +5,7 @@ import tgpr.forms.view.AddEditOptionListView;
 
 import tgpr.forms.view.ManageOptionListsView;
 import tgpr.framework.Controller;
+import tgpr.framework.ErrorList;
 
 import java.util.Comparator;
 import java.util.List;
@@ -79,6 +80,71 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
 
+    private boolean optionListWithThisNameAlreadyExistsForUser(OptionList optionList, String name, boolean editOptionListMode, boolean newOptionListMode){
+        List<OptionList> lst = optionList.getForUser(getLoggedUser());
+        for (OptionList l : lst) {
+            if (l.getName().equals(name)) {
+                if (editOptionListMode && optionList.getId() != l.getId()) {
+                    return true;
+                }
+                else if (newOptionListMode) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean optionValueWithThisLabelAlreadyExistsInThisOptionList(List<OptionValue> listOfOptionValues, List<OptionValue> listOfAddedOptionValues, String label){
+        for (OptionValue o : listOfOptionValues) {
+            if (o.getLabel().equals(label)) {
+                return true;
+            }
+        }
+        for (OptionValue o : listOfAddedOptionValues) {
+            if (o.getLabel().equals(label)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public ErrorList validate(OptionList optionList, List<OptionValue> listOfOptionValues, List<OptionValue> listOfAddedOptionValues, String newOptionListName, String newValueLabel,boolean addedAnOptionValueForCreate, boolean editOptionListMode, boolean newOptionListMode) {
+        var errors = new ErrorList();
+
+        // Vérifier que le nom de l'option list est donné
+        if (newOptionListName.length() == 0){
+            errors.add("name required", OptionList.Fields.Name);
+        }
+
+        // Vérifier que le nom de l'option list contient au moins 3 caractères
+        if (newOptionListName.length() < 3){
+            errors.add("minimum 3 char", OptionList.Fields.Name);
+        }
+
+        // Vérifier que le couple (owner, name) est unique
+        if (optionListWithThisNameAlreadyExistsForUser(optionList, newOptionListName, editOptionListMode, newOptionListMode)){
+            errors.add("an option list with this name already exists for user", OptionList.Fields.Name);
+        }
+
+        // Vérifier qu'au moins une valeur est ajoutée
+        if ((newOptionListMode && !addedAnOptionValueForCreate) || (editOptionListMode && (listOfOptionValues.isEmpty() && listOfAddedOptionValues.isEmpty()))){
+            errors.add("at least one value required", OptionList.Fields.Values);
+        }
+
+        // Vérifier que le label de la valeur ajoutée contient au moins 3 caractères
+        if (newValueLabel.length() > 0 && newValueLabel.length() < 3){
+            errors.add("minimum 3 char", OptionValue.Fields.Label);
+        }
+
+        // Vérifier que le couple (option_list, label) est unique
+        if (optionValueWithThisLabelAlreadyExistsInThisOptionList(listOfOptionValues, listOfAddedOptionValues, newValueLabel)){
+            errors.add("an option value with this label already exists for this option list", OptionValue.Fields.Label);
+        }
+
+        return errors;
+    }
 
 
 }
