@@ -40,7 +40,6 @@ public class EditFormView extends DialogWindow {
         root.setLayoutManager(new GridLayout(2).setTopMarginSize(1));
 
         new Label("Title:").addTo(root);
-
         txtTitle = new TextBox(new TerminalSize(11, 1)).addTo(root).takeFocus()
                 .setTextChangeListener((txt, byUser) -> isValid());
         new EmptySpace().addTo(root);
@@ -75,6 +74,7 @@ public class EditFormView extends DialogWindow {
     }
 
 
+
     public void save(){
         if (isValid()) {
             if (this.controller.save(txtTitle.getText(), txtDescription.getText(), isPublicBox.isChecked())) {
@@ -88,13 +88,19 @@ public class EditFormView extends DialogWindow {
         if (!controller.isValidTitle(
                 txtTitle.getText()
         )) {
-            errTitle.setText("title required");
+            errTitle.setText("title required and minimum 3 characters.");
             return false;
-        } else {
+        }
+        else if(controller.titleUsed(txtTitle.getText())){
+            errTitle.setText("title already used.");
+            return false;
+        }
+        else {
             errTitle.setText("");
             return true;
         }
     }
+
 
 
 }

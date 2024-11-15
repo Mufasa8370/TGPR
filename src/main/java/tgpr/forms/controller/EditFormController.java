@@ -6,6 +6,9 @@ import tgpr.forms.model.Security;
 import tgpr.forms.view.EditFormView;
 import tgpr.framework.Controller;
 
+import java.util.ArrayList;
+import java.util.Objects;
+
 public class EditFormController  extends Controller<EditFormView> {
 
     private final EditFormView view;
@@ -22,13 +25,42 @@ public class EditFormController  extends Controller<EditFormView> {
     }
 
     public boolean isValidTitle(String title){
-        return !(title.isEmpty() || title.isBlank());
+        return !(title.isEmpty() || title.isBlank()) && !(title.length() < 3) ;
     }
     @Override
     public EditFormView getView() {
         return view;
     }
 
+
+    public boolean titleUsed(String title){
+        if( isNew){
+            // lors d'une creation d'un formulaire
+            for( Form elem:  Form.getAll()){
+                if(elem.getOwnerId() == Security.getLoggedUserId()){
+                    if(Objects.equals(elem.getTitle(), title)){
+                        return true;
+                    }
+                }
+            }
+        }
+        else{
+            // lors de l'edition
+            if(form. getTitle() == title){
+                return false;
+            }
+            else{
+                for( Form elem:  Form.getAll()){
+                    if(elem.getOwnerId() == Security.getLoggedUserId()){
+                        if(Objects.equals(elem.getTitle(), title)){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
     public boolean save(String title, String description, boolean isPublic){
         if (isNew) {
             // si c'est un nouveau formulaire
@@ -43,9 +75,6 @@ public class EditFormController  extends Controller<EditFormView> {
                 return false;
             }
         } else {
-            // TODO: ajouter, en mode édition, la box de confirmation quand
-            // un formulaire est rendu public alors qu'au départ il est privé.
-            // Rendre public un formulaire supprime tous les partages précédents.
             if (Security.getLoggedUser() != null) {
                 this.form. setTitle(title);
                 this.form.setDescription(description);

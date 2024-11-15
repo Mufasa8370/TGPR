@@ -11,6 +11,7 @@ import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import tgpr.forms.controller.*;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
+import tgpr.forms.model.Security;
 import tgpr.framework.Controller;
 import java.util.List;
 
@@ -136,7 +137,8 @@ public class ViewFormView extends DialogWindow {
                 btnMakePublic = new Button("Make Public", this::makePublic).addTo(buttons);
             }
         }
-        if(!form.getIsPublic()){
+
+        if (ManageSharesController.amIanEditor(form)) {
             btnShare = new Button("Share", this::share).addTo(buttons);
         }
 
@@ -174,6 +176,7 @@ public class ViewFormView extends DialogWindow {
 
     private void makePublic() {
         form.setIsPublic(!form.getIsPublic());
+        ManageSharesController.makePublic(form);
         form.save();
         //temp
         close();

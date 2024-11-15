@@ -278,7 +278,6 @@ public class AddEditOptionListView extends DialogWindow {
         create.setEnabled(txtName.getText().isEmpty());
 
         close = new Button("Close", this::closeForView).addTo(buttonsPanel);
-
         buttonsPanel.addComponent(close);
         buttonsPanel.addComponent(create);
 
