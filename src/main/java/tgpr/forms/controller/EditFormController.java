@@ -46,7 +46,7 @@ public class EditFormController  extends Controller<EditFormView> {
         }
         else{
             // lors de l'edition
-            if(form. getTitle() == title){
+            if(Objects.equals(form.getTitle(), title)){
                 return false;
             }
             else{
