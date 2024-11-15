@@ -157,9 +157,6 @@ public class ManageSharesController extends Controller<ManageSharesView> {
     public List<DistListFormAccess> getDistListFormAccess(){
         return distlistAccessesFiltered;
     }
-    public static void SharesForm(){
-        navigateTo(new ManageSharesController(Form.getByKey(14)));
-    }
 
     public void addAccess(Model beneficiary, AccessType accessType) {
         if (beneficiary instanceof User) {
@@ -173,6 +170,49 @@ public class ManageSharesController extends Controller<ManageSharesView> {
     public void gotoEditConfirmationShares(Model model, KeyType type){
         navigateTo(new EditConfirmationSharesController(model,type));
     }
+
+
+    public static boolean amIanEditor(Form form) {
+        var accesses = form.getAccesses();
+        for(var access: accesses) {
+            if (access instanceof UserFormAccess typedAccess) {
+                if (typedAccess.getAccessType() == AccessType.Editor) {
+                    if (typedAccess.getUserId() == Security.getLoggedUserId()){
+                        return true;
+                    }
+                }
+            }
+            if (access instanceof DistListFormAccess typedAccess) {
+                if (typedAccess.getAccessType() == AccessType.Editor) {
+                    var users = typedAccess.getDistList().getUsers();
+                    for(var user: users) {
+                        if (user.getId() == Security.getLoggedUserId()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public static void makePublic(Form form) {
+        if (form.getIsPublic()) {
+            var accesses = form.getAccesses();
+            for(var access: accesses) {
+                if (access instanceof UserFormAccess typedAccess) {
+                    if(typedAccess.getAccessType()== AccessType.User) {
+                        typedAccess.delete();
+                    }
+                }
+                if (access instanceof DistListFormAccess typedAccess) {
+                    if (typedAccess.getAccessType() == AccessType.User) {
+                        typedAccess.delete();
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public ManageSharesView getView() {return view;}
 }

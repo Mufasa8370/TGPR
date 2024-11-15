@@ -31,10 +31,6 @@ public class ViewFormsController extends Controller<ViewFormsView> {
         navigateTo(new EditFormController());
     }
 
-    public void SharesForm(){
-        ManageSharesController.SharesForm();
-    }
-
     public void manageYourOptionList() {
         navigateTo(new ManageOptionListsController());
     }
