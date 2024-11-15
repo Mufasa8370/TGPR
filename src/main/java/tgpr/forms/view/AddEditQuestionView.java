@@ -3,6 +3,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import tgpr.forms.controller.AddEditOptionListController;
 import tgpr.forms.controller.AddEditQuestionController;
 import tgpr.forms.controller.ViewFormController;
 import tgpr.forms.model.Form;
@@ -20,6 +21,7 @@ import static tgpr.framework.Controller.showMessage;
 public class AddEditQuestionView extends DialogWindow {
 
     private final AddEditQuestionController controller;
+    ManageOptionListsView manageOptionListsView;
     private final TextBox txtTitle;
     private final TextBox txtDescription;
     private final ComboBox<Question.Type> cboType;
@@ -194,7 +196,7 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
     private void add() {
-        Controller.showMessage("use case en cours de dev", "message", "ok");
+        Controller.navigateTo(new AddEditOptionListController(manageOptionListsView));
     }
 
     private void reloadAfterDelete(){
