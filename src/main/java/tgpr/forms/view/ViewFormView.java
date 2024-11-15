@@ -8,6 +8,7 @@ import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.input.KeyType;
 import tgpr.forms.controller.*;
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Question;
@@ -137,10 +138,10 @@ public class ViewFormView extends DialogWindow {
                 btnMakePublic = new Button("Make Public", this::makePublic).addTo(buttons);
             }
         }
-
-        if (ManageSharesController.amIanEditor(form)) {
-            btnShare = new Button("Share", this::share).addTo(buttons);
-        }
+//        if (ManageSharesController.amIanEditor(form)) {
+//            btnShare = new Button("Share", this::share).addTo(buttons);
+//        }
+        btnShare = new Button("Share", this::share).addTo(buttons);
 
         if(existInstance){
             btnClearInstances = new Button("Clear Instances",this::clearInstances).addTo(buttons);
@@ -175,10 +176,16 @@ public class ViewFormView extends DialogWindow {
     }
 
     private void makePublic() {
-        form.setIsPublic(!form.getIsPublic());
-        ManageSharesController.makePublic(form);
-        form.save();
-        //temp
+        if (!form.getIsPublic()) {
+            boolean confirmed = askConfirmation("Are you sure you want to make this form public ?\n This will delete all existing shares.","Comfirmation");
+            if (confirmed) {
+                form.setIsPublic(true);
+                form.save();
+            }
+        }else{
+            form.setIsPublic(!form.getIsPublic());
+            form.save();
+        }
         close();
         Controller.navigateTo(new ViewFormController(form));
     }
@@ -285,6 +292,8 @@ public class ViewFormView extends DialogWindow {
 
     private void editForm() {
         Controller.navigateTo(new EditFormController(form));
+        close();
+        Controller.navigateTo(new ViewFormController(form));
     }
 
     private void newQuestion() {
