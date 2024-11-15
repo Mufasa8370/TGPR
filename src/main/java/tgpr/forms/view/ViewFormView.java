@@ -174,11 +174,15 @@ public class ViewFormView extends DialogWindow {
 
     private void makePublic() {
         if (!form.getIsPublic()) {
-            Controller.navigateTo(new FormEditConfirmationController());
-            close();
+            boolean confirmed = askConfirmation("Are you sure you want to make this form public ?\n This will delete all existing shares.","Comfirmation");
+            if (confirmed) {
+                form.setIsPublic(true);
+                form.save();
+            }
+        }else{
+            form.setIsPublic(!form.getIsPublic());
+            form.save();
         }
-        form.setIsPublic(!form.getIsPublic());
-        form.save();
         close();
         Controller.navigateTo(new ViewFormController(form));
     }
