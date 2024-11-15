@@ -38,7 +38,7 @@ public class EditFormController  extends Controller<EditFormView> {
             // lors d'une creation d'un formulaire
             for( Form elem:  Form.getAll()){
                 if(elem.getOwnerId() == Security.getLoggedUserId()){
-                    if(Objects.equals(elem.getTitle(), title)  && elem.getId() != form.getId()){
+                    if(Objects.equals(elem.getTitle(), title)){
                         return true;
                     }
                 }
@@ -52,7 +52,7 @@ public class EditFormController  extends Controller<EditFormView> {
             else{
                 for( Form elem:  Form.getAll()){
                     if(elem.getOwnerId() == Security.getLoggedUserId()){
-                        if(Objects.equals(elem.getTitle(), title)){
+                        if(Objects.equals(elem.getTitle(), title) && elem.getId() != form.getId()){
                             return true;
                         }
                     }
