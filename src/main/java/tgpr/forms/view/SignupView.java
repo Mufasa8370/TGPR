@@ -9,29 +9,32 @@ import tgpr.forms.controller.SignupController;
 import tgpr.forms.model.User;
 import java.util.List;
 
-
 public class SignupView extends DialogWindow {
     private final SignupController controller;
+
     private final TextBox txtMail = new TextBox();
     private final TextBox txtFullName = new TextBox();
     private final TextBox txtPassword = new TextBox();
     private final TextBox txtConfirmPassword = new TextBox();
+
     private final Label errMail = new Label("");
     private final Label errFullName = new Label("");
     private final Label errPassword = new Label("");
     private final Label errConfirmPassword = new Label("");
+
     private Button btnSignup;
+
 
     public SignupView(SignupController controller){
         super("Sign Up");
         this.controller = controller;
 
-        setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
+        setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE)); // centre la fenetre et la fenetre doit avoir une taille fixe
         setCloseWindowWithEscape(true);
         setFixedSize(new TerminalSize(54, 11));
 
-        var root = Panel.verticalPanel();
-        setComponent(root);
+        var root = Panel.verticalPanel(); // création d'un panel vertical appelé root
+        setComponent(root); // on ajoute root à la fenetre
 
         createFieldsPanel().addTo(root);
         createButtonsPanel().addTo(root);
@@ -47,7 +50,7 @@ public class SignupView extends DialogWindow {
                 .sizeTo(23)
                 .setTextChangeListener((txt, byUser) -> validate());
         panel.addEmpty();
-        errMail.addTo(panel).setForegroundColor(TextColor.ANSI.RED);
+        errMail.addTo(panel).setForegroundColor(TextColor.ANSI.RED); // label optionnel qui affiche les erreurs
 
         new Label("Full Name:").addTo(panel);
         txtFullName.addTo(panel).takeFocus()
@@ -75,8 +78,8 @@ public class SignupView extends DialogWindow {
 
     private Panel createButtonsPanel() {
         Panel panel = Panel.horizontalPanel(1).center();
-        btnSignup = new Button("Signup", this::signup).addTo(panel).setEnabled(false);
 
+        btnSignup = new Button("Signup", this::signup).addTo(panel).setEnabled(false);
         Button btnClose = new Button("Close", this::close).addTo(panel);
 
         addShortcut(btnSignup, KeyStroke.fromString("<A-s>"));
@@ -101,10 +104,11 @@ public class SignupView extends DialogWindow {
                 txtPassword.getText(),
                 txtConfirmPassword.getText()
         );
+
         errMail.setText(errors.getFirstErrorMessage(User.Fields.Email));
         errFullName.setText(errors.getFirstErrorMessage(User.Fields.FullName));
         errPassword.setText(errors.getFirstErrorMessage(User.Fields.Password));
-        errConfirmPassword.setText(errors.getFirstErrorMessage(SignupController.Fields.PasswordConfirm)); // Assurez-vous d'utiliser le bon champ
+        errConfirmPassword.setText(errors.getFirstErrorMessage(User.Fields.ConfirmPassword));
 
         btnSignup.setEnabled(errors.isEmpty());
     }

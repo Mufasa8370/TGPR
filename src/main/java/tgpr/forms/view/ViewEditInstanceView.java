@@ -12,6 +12,7 @@ import tgpr.forms.model.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
@@ -41,6 +42,7 @@ public class ViewEditInstanceView extends DialogWindow {
     private Panel panelError; // Pour l'erreur
     private RadioBoxList<Object> radioBoxList; // Pour les options radio
     private ComboBox<OptionValue> cbo1; // Pour la combobox
+    private CheckBoxList<OptionValue> check; // Pour la combobox
     private Button close;
     private Button previous;
     private Button cancel;
@@ -51,6 +53,8 @@ public class ViewEditInstanceView extends DialogWindow {
     private TextBox email;
     CheckBoxList<OptionValue> lstOptionsValues;
     private TextBox longTextBox;
+
+    private List<Integer> indexed = new ArrayList<>();
 
 
     // Si instance existe
@@ -115,6 +119,7 @@ public class ViewEditInstanceView extends DialogWindow {
         labelPanel.addComponent(new Label("Description:"));
         labelPanel.addComponent(new Label("Started on:"));
         labelPanel.addComponent(new Label("Submitted on:"));
+        labelPanel.addComponent(new Label("Submitted by:"));
         titlePanel.addComponent(labelPanel);
         titlePanel.addComponent(new EmptySpace());
 
@@ -124,6 +129,7 @@ public class ViewEditInstanceView extends DialogWindow {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         valuesPanel.addComponent(new Label(instance.getStarted().format(formatter)).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
         valuesPanel.addComponent(new Label(instance.getCompleted().format(formatter)).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
+        valuesPanel.addComponent(new Label(instance.getUser().getName()).setForegroundColor(TextColor.ANSI.BLACK_BRIGHT));
         titlePanel.addComponent(valuesPanel);
 
         root.addComponent(titlePanel);
@@ -269,12 +275,21 @@ public class ViewEditInstanceView extends DialogWindow {
         String reponse = currentQuestion.getAnswerValue(instance);
         if (reponse != null){
             if (currentQuestion.getType().toString().equals("Check")){
-                reponse = reponse.replace("[","").replace("]","");
-                List<String> reponses = List.of(reponse.split(","));
-                for (String rep : reponses){
-                    questionPanel.addComponent(new Label(rep.trim()));
+                List<OptionValue> optionValues = currentQuestion.getAnswerValues(instance);
+                for (OptionValue op : optionValues){
+                    questionPanel.addComponent(new Label(op.getLabel()));
                 }
-            }else{
+            }else if (currentQuestion.getType().toString().equals("Combo")){
+                OptionValue o = OptionValue.getByKey(Integer.parseInt(reponse),currentQuestion.getOptionList().getId());
+                questionPanel.addComponent(new Label(o.getLabel()));
+            }else if (currentQuestion.getType().toString().equals("Radio")){
+                OptionValue o = OptionValue.getByKey(Integer.parseInt(reponse),currentQuestion.getOptionList().getId());
+                questionPanel.addComponent(new Label(o.getLabel()));
+            }
+
+
+
+            else{
                 questionPanel.addComponent(new Label(reponse));
             }
 
@@ -366,7 +381,7 @@ public class ViewEditInstanceView extends DialogWindow {
         radioBoxList.takeFocus();
         radioBoxList.addListener((selectedIndex, previousSelection) -> {
             if(radioBoxList.getCheckedItem() != null){
-                Answer answer = new Answer(instance,currentQuestion, String.valueOf(radioBoxList.getCheckedItemIndex()));
+                Answer answer = new Answer(instance,currentQuestion, String.valueOf(radioBoxList.getCheckedItemIndex()+1));
                 answer.save();
                 removeError();
 
@@ -402,30 +417,44 @@ public class ViewEditInstanceView extends DialogWindow {
 
 
         lstOptionsValues.addListener((itemIndex, checked) -> {
-            if( !lstOptionsValues.getCheckedItems().isEmpty()){
+            if( !lstOptionsValues.getCheckedItems().isEmpty() && checked){
                 removeError();
-                Answer answer = new Answer(instance, currentQuestion,String.valueOf(lstOptionsValues.getCheckedItems()));
-                answer.save();
-            }else {
-                Answer answer = instance.getAnswer(currentQuestion);
-                answer.delete();
-                if (currentQuestion.getRequired()){
-                    getRequired();
+                indexed.add(itemIndex + 1);
+                for (Integer i : indexed){
+                    System.out.println(i);
                 }
+                currentQuestion.saveAnswer(instance,indexed);
+            }else {
+
+
+                indexed.clear();
+                int indexTemp = 1;
+                for (OptionValue optionValue : optionValues){
+                    if(lstOptionsValues.isChecked(optionValue)){
+                        indexed.add(indexTemp);
+                    }
+                    indexTemp++;
+                }
+                for (Integer i : indexed){
+                    System.out.println(i);
+                }
+                currentQuestion.saveAnswer(instance,indexed);
+
+
+            }
+            if (currentQuestion.getRequired() && indexed.isEmpty()){
+                getRequired();
             }
 
         });
+
         for (OptionValue optionValue : optionValues) {
             lstOptionsValues.addItem(optionValue);
         }
         if (currentQuestion.getAnswerValue(instance) != null){
-            String answers = currentQuestion.getAnswerValue(instance);
-            List<String> answersSep = Stream.of(answers.replace("[", "").replace("]", "").split(",")).map(String::trim).toList();
-            for (OptionValue optionValue : optionValues) {
-                String optionLabel = optionValue.toString().trim();
-                if (answersSep.contains(optionLabel)) {
-                    lstOptionsValues.setChecked(optionValue, true);
-                }
+            List<OptionValue> optionValuesChecked = currentQuestion.getAnswerValues(instance);
+            for (OptionValue optionValue : optionValuesChecked) {
+                lstOptionsValues.setChecked(optionValue, true);
             }
         }else {
             if (currentQuestion.getRequired()){
@@ -458,7 +487,7 @@ public class ViewEditInstanceView extends DialogWindow {
         cbo1.addListener((newIndex, oldIndex, byUser) -> {
             if(cbo1.getSelectedItem() != null && cbo1.getSelectedIndex() != 0){
                 removeError();
-                Answer answer = new Answer(instance,currentQuestion, String.valueOf(newIndex));
+                Answer answer = new Answer(instance,currentQuestion, String.valueOf(newIndex + 1));
                 answer.save();
             }else {
                 Answer answer = instance.getAnswer(currentQuestion);

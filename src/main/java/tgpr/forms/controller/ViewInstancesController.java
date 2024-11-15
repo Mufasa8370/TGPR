@@ -2,6 +2,7 @@ package tgpr.forms.controller;
 
 import tgpr.forms.model.Form;
 import tgpr.forms.model.Instance;
+import tgpr.forms.view.AnalyzeView;
 import tgpr.forms.view.ViewInstancesView;
 import tgpr.framework.Controller;
 import java.util.Comparator;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 public class ViewInstancesController extends Controller<ViewInstancesView> {
     private final ViewInstancesView view;
     private final Form form;
+
     private Instance selectedInstance;
 
     @Override
@@ -26,9 +28,9 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
         return form.getInstances().stream().filter(Instance::isCompleted).sorted(Comparator.comparing(Instance::getCompleted).reversed()).collect(Collectors.toList());
     }
 
-//    public void viewEditInstance(Instance instance){
-//        navigateTo(new ViewEditInstanceController(instance));
-//    }
+    public void viewEditInstance(Instance instance){
+        navigateTo(new ViewEditInstanceController(form, instance));
+    }
 
     public void deleteAll(){
         if (askConfirmation("Are you sure you want to delete all the submitted instances?\n" +
@@ -48,11 +50,16 @@ public class ViewInstancesController extends Controller<ViewInstancesView> {
         selectedInstance = instance;
     }
 
-    public void testDelete() {
+    public void deleteSelectedInstance() {
         if (selectedInstance != null) {
             deleteInstance(selectedInstance);
             view.refresh();
         }
+    }
+
+    public void closeView() {
+        view.close();
+        AnalyzeView.getInstanceOfView().refresh();
     }
 
 }

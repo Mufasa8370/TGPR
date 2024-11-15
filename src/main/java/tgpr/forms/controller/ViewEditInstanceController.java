@@ -25,28 +25,24 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
     }
 
     public ViewEditInstanceController(Instance i, Form form) {
-        System.out.println("ok2" + getLoggedUser().getFullName());
         this.form = form;
         if(i != null){
             this.instance = i;
-            System.out.println(i.getCompleted());
             if(i.getCompleted() != null){
-                System.out.println("ok");
 
                 view = new ViewEditInstanceView(this, i, form);
             }else {
                 //Instance non completée
                 view = new ViewEditInstanceView(this,form,instance,1);
-                System.out.println("ok1");
 
             }
 
         }else {
-
-            System.out.println("acune instance");
+            Instance instanceNew = new Instance(form, getLoggedUser());
+            this.instance = instanceNew;
 
             //Aucune instance
-            view = new ViewEditInstanceView(this,form, new Instance(form, getLoggedUser()),1);
+            view = new ViewEditInstanceView(this,form, instanceNew,1);
         }
 
     }
@@ -72,11 +68,13 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
     //public Question getNextQuestion()
 
     public void viewSubmission() {
+        close();
         navigateTo(new ViewEditInstanceController(form,instance));
 
     }
 
     public void submitAgain() {
+        close();
         navigateTo(new ViewEditInstanceController(null,form));
     }
 
@@ -106,7 +104,7 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         if(isGuest()){
             cancel(instance);
         }else{
-            navigateTo(new ViewFormsController());
+            view.close();
         }
     }
 
@@ -115,10 +113,12 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         for(int i = 0; i < questions.size(); i++){
             if(!verifyQuestionRequired(questions.get(i),instance)){
                 showMessage("You must correct all errors before submitting the form.","Error","OK");
+                close();
                 navigateTo(new ViewEditInstanceController(instance,form,i+1));
             }
             if(!verifyQuestionFormat(questions.get(i),instance)){
                 showMessage("You must correct all errors before submitting the form.","Error","OK");
+                close();
                 navigateTo(new ViewEditInstanceController(instance,form,i+1));
             }
 
@@ -127,6 +127,7 @@ public class ViewEditInstanceController extends Controller<ViewEditInstanceView>
         if (confirmed) {
             instance.submit();
             showMessage("The form has been successyfully submitted", "Information", "OK");
+            close();
             navigateTo(new ViewFormsController());
 
         }

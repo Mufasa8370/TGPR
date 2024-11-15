@@ -18,12 +18,16 @@ import static tgpr.framework.Tools.asString;
 
 public class ViewInstancesView extends DialogWindow {
     private final ViewInstancesController controller;
+    private Form form;
+
     private final Label lblTitle = new Label("");
     private final Label lblDescription = new Label("");
-    private Form form;
-    private ObjectTable<Instance> instancesTable;
-    private Panel pnlInstances;
     private final Label lblNoInstances = new Label("No instances");
+
+    private ObjectTable<Instance> instancesTable;
+
+    private Panel pnlInstances;
+
 
     public ViewInstancesView(ViewInstancesController controller, Form form){
         super("List of Submitted Instances");
@@ -63,24 +67,24 @@ public class ViewInstancesView extends DialogWindow {
                         .setMinWidth(4).alignRight(),
                 new ColumnSpec<>("User", Instance::getUser)
                         .setMinWidth(30),
-                new ColumnSpec<>("Submitted", i -> asString(i.getCompleted()))
-                        //.setMinWidth(20) --> produit une erreur si j'insère cette ligne de code
+                new ColumnSpec<Instance>("Submitted", i -> asString(i.getCompleted()))
+                        .setMinWidth(20)
         ).addTo(panel);
 
-//        instancesTable.setSelectAction(() -> {
-//            var instance = instancesTable.getSelected();
-//            controller.viewEditInstance(instance);
-//        });
+        instancesTable.setSelectAction(() -> { // définit l'action à effectuer lorsqu'une instance est sélectionnée
+            var instance = instancesTable.getSelected();
+            controller.viewEditInstance(instance);
+        });
 
-        this.addWindowListener(new WindowListenerAdapter() {
+        this.addWindowListener(new WindowListenerAdapter() { // ajoute un écouteur de fenêtre pour gérer les entrées clavier
             @Override
             public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
                 var instance = instancesTable.getSelected();
-                if (keyStroke.getKeyType() == KeyType.Backspace) {
+                if (keyStroke.getKeyType() == KeyType.Backspace /* pour macOS */ || keyStroke.getKeyType() == KeyType.Delete /* pour Windows*/) {
                     if (instance != null) {
                         controller.deleteInstance(instance);
                         refresh();
-                        hasBeenHandled.set(true);
+                        hasBeenHandled.set(true); // indique que l'événement a été traité
                     }
                 }
             }
@@ -104,12 +108,12 @@ public class ViewInstancesView extends DialogWindow {
                 .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
 
         if (!controller.getSubmittedInstances().isEmpty()){
-            Button btnDeleteSelected = new Button("Delete Selected", this.controller::testDelete).addTo(panel);
+            Button btnDeleteSelected = new Button("Delete Selected", this.controller::deleteSelectedInstance).addTo(panel);
 
             Button btnDeleteAll = new Button("Delete All", this::deleteAll).addTo(panel);
         }
 
-        Button btnClose = new Button("Close", this::close).addTo(panel);
+        Button btnClose = new Button("Close", controller::closeView).addTo(panel);
 
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
 
@@ -118,19 +122,21 @@ public class ViewInstancesView extends DialogWindow {
 
     public void refresh() {
         if (form != null) {
+            // met à jour Fields
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
 
+            // met à jour submitted instances
             var instances = controller.getSubmittedInstances();
             pnlInstances.removeAllComponents();
             if (instances.isEmpty()) {
                 pnlInstances.addComponent(lblNoInstances);
             } else {
-                pnlInstances.addComponent(instancesTable);
                 instancesTable.clear();
+                pnlInstances.addComponent(instancesTable);
                 instancesTable.add(instances);
             }
-            onInstanceSelectionChanged(-1, instancesTable.getSelectedRow(), false);
+            onInstanceSelectionChanged(-1, instancesTable.getSelectedRow(), true);
         }
     }
 

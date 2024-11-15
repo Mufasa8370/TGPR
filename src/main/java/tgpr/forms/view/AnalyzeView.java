@@ -15,35 +15,43 @@ import java.util.List;
 public class AnalyzeView extends DialogWindow {
     private final AnalyzeController controller;
     private Form form;
+
     private final Label lblTitle = new Label("");
     private final Label lblDescription = new Label("");
     private final Label lblNbInstances = new Label("");
+
     private ObjectTable<Question> questionsTable;
     private ObjectTable<Stat> answersTable;
+
     private Panel pnlQuestions;
     private Panel pnlAnswers;
+
+    private static AnalyzeView instanceOfView;
+
 
     public AnalyzeView(AnalyzeController controller, Form form){
         super("Statistical Analysis of Submitted Instances");
         this.controller = controller;
         this.form = form;
 
+        instanceOfView = this;
+
         setHints(List.of(Hint.CENTERED, Hint.FIXED_SIZE));
         setCloseWindowWithEscape(true);
-        setFixedSize(new TerminalSize(90, 20));
+        setFixedSize(new TerminalSize(90, 23));
 
         var root = Panel.verticalPanel();
         setComponent(root);
 
         createFields().addTo(root);
-        createQuestionsAndAnswersPanel().sizeTo(ViewManager.getTerminalColumns(),15).addTo(root);
+        createQuestionsAndAnswersPanel().sizeTo(ViewManager.getTerminalColumns(),17).addTo(root);
         createButtonsPanel().addTo(root);
 
         refresh();
     }
 
     private Panel createFields(){
-        var panel = Panel.gridPanel(2, Margin.of(1));
+        var panel = Panel.gridPanel(2, Margin.of(1,1,1,0));
 
         new Label("Title:").addTo(panel);
         lblTitle.addTo(panel).addStyle(SGR.BOLD);
@@ -56,7 +64,7 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createQuestionsAndAnswersPanel() {
-        var panel = Panel.gridPanel(2, Margin.of(1));
+        var panel = Panel.gridPanel(2, Margin.of(0));
 
         createQuestionsPanel().addTo(panel);
         createAnswersPanel().addTo(panel);
@@ -65,29 +73,29 @@ public class AnalyzeView extends DialogWindow {
     }
 
     private Panel createQuestionsPanel() {
-        var panel = pnlQuestions = Panel.gridPanel(1, Margin.of(1));
+        var pnlQuestions = Panel.gridPanel(1, Margin.of(1));
 
         questionsTable = new ObjectTable<>(
                 new ColumnSpec<Question>("Index", Question::getIdx)
                         .setMinWidth(5).alignRight(),
-                new ColumnSpec<Question>("Title", Question::getTitle)
+                new ColumnSpec<Question>("Title", Question::getTitleForAnalyze)
                         .setMinWidth(27).alignLeft()
-        ).addTo(panel);
+        ).addTo(pnlQuestions);
 
         questionsTable.addSelectionChangeListener(this::onQuestionSelectionChanged);
 
-        return panel;
+        return pnlQuestions;
     }
 
     private void onQuestionSelectionChanged(int oldValue, int newValue, boolean byUser) {
         Question selectedQuestion = questionsTable.getSelected();
         if (selectedQuestion != null) {
-            controller.answersPanel(answersTable, selectedQuestion);
+            controller.answersPanel(answersTable, selectedQuestion); // va remplir la table de réponses
         }
     }
 
     private Panel createAnswersPanel() {
-        var panel = pnlAnswers = Panel.gridPanel(1, Margin.of(1));
+        var pnlAnswers = Panel.gridPanel(1, Margin.of(1));
 
         answersTable = new ObjectTable<>(
                 new ColumnSpec<Stat>("Value", Stat::getValue )
@@ -96,33 +104,46 @@ public class AnalyzeView extends DialogWindow {
                         .setMinWidth(3).alignRight(),
                 new ColumnSpec<Stat>("Ratio", Stat::getRatio)
                         .setMinWidth(8).alignRight()
-        ).addTo(panel);
+        ).addTo(pnlAnswers);
 
-        return panel;
+        return pnlAnswers;
     }
 
     private Panel createButtonsPanel() {
-        var panel = new Panel()
-                .setLayoutManager(new LinearLayout(Direction.HORIZONTAL))
-                .setLayoutData(LinearLayout.createLayoutData(LinearLayout.Alignment.Center));
+        var panel = Panel.horizontalPanel().center();
 
-        Button btnClose = new Button("Close", this::close).addTo(panel);
+        Button btnClose = new Button("Close", this.controller::closeView).addTo(panel); // this fait référence à la vue AnalyzeView
 
-        Button viewInstances = new Button("View Instances").addTo(panel);
+        if (!form.getInstances().isEmpty()) {
+            Button viewInstances = new Button("View Instances", this.controller::viewInstances).addTo(panel);
+            addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
+        }
 
         addShortcut(btnClose, KeyStroke.fromString("<A-c>"));
-        addShortcut(viewInstances, KeyStroke.fromString("<A-v>"));
 
         return panel;
     }
 
-    private void refresh() {
+    public void refresh() {
         if (form != null) {
+            // Met à jour Fields
             lblTitle.setText(form.getTitle());
             lblDescription.setText(form.getDescription());
             lblNbInstances.setText(String.valueOf(controller.getNbSubmittedInstances()));
-            controller.questionsPanel(questionsTable);
-            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), false);
+
+            // Met à jour Questions
+            questionsTable.clear();
+            controller.questionsPanel(questionsTable); // va remplir la table de questions
+
+            // Pour que la table de réponses soit remplie dès l'ouverture de la vue Analyze
+            onQuestionSelectionChanged(-1, questionsTable.getSelectedRow(), true);
+                    // -1 signifie que la sélection précédente est inexistante
+                    // questionsTable.getSelectedRow() pour obtenir la ligne sélectionnée
+                    // false pour spécifier que la sélection n'a pas été faite par l'utilisateur
         }
+    }
+
+    public static AnalyzeView getInstanceOfView() {
+        return instanceOfView;
     }
 }
