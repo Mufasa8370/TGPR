@@ -19,9 +19,9 @@ public class LoginController extends Controller<LoginView> {
         System.exit(0);
     }
 
-    public boolean login(String pseudo, String password) {
+    public boolean login(String pseudo, String password, boolean shortcut) {
         var errors = new ErrorList();
-        if(pseudo.equals("guest@epfc.eu")){
+        if(pseudo.equals("guest@epfc.eu") && !shortcut){
             errors.add(new Error("The email address does not exist"));
         }
         if (!Objects.equals(pseudo, "guest@epfc.eu")) {
