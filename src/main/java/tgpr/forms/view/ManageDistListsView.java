@@ -83,6 +83,7 @@ public class ManageDistListsView extends DialogWindow {
     private Label goodLabel =new Label("(*)").setVisible(false);
     private boolean listExist = false;
     private String nameCurrentDst = "";
+    Label errorName ;
 
 
     public ManageDistListsView(ManageDistListsController controller) {
@@ -96,6 +97,8 @@ public class ManageDistListsView extends DialogWindow {
         root.addComponent(new EmptySpace());
 
         root.addComponent(createViewComboBox());
+        errorName = new Label("Min 3 characters").setForegroundColor(TextColor.ANSI.RED).setVisible(false);
+        root.addComponent(errorName);
         panelForTable.setLayoutManager(new LinearLayout(Direction.HORIZONTAL));
         panelForTable.setPreferredSize(new TerminalSize(100,100));
 
@@ -123,13 +126,13 @@ public class ManageDistListsView extends DialogWindow {
 
         autoCompleteComboBox = new AutoCompleteComboBox<>("",distLists);
         autoCompleteComboBox.setPreferredSize(new TerminalSize(40,1));
+
+
         autoCompleteComboBox.addListener(new AutoCompleteComboBox.Listener() {
             @Override
             public void onSelectionChanged(int selectedIndex, int previousSelection, boolean changedByUserInteraction) {
-
                 for (DistList ds:distLists) {
                     if (ds.getName().equals(autoCompleteComboBox.getText())){
-                        System.out.println(autoCompleteComboBox.getText());
                         usersInList = ds.getUsers();
                         current = ds;
 
@@ -144,6 +147,13 @@ public class ManageDistListsView extends DialogWindow {
                 }else {
                     noItemInList.setVisible(false);
                     delete.setVisible(true);
+                }
+
+                if(!listExist && autoCompleteComboBox.getText().length() <3){
+                    errorName.setVisible(true);
+
+                }else {
+                    errorName.setVisible(false);
                 }
 
                 nameCurrentDst = autoCompleteComboBox.getText();
