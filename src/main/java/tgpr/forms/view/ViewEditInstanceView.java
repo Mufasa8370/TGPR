@@ -381,11 +381,14 @@ public class ViewEditInstanceView extends DialogWindow {
         radioBoxList.takeFocus();
         radioBoxList.addListener((selectedIndex, previousSelection) -> {
             if(radioBoxList.getCheckedItem() != null){
-                Answer answer = new Answer(instance,currentQuestion, String.valueOf(radioBoxList.getCheckedItemIndex()+1));
+                System.out.println("1:::"+String.valueOf(radioBoxList.getCheckedItemIndex()));
+                Answer answer = new Answer(instance,currentQuestion, String.valueOf(radioBoxList.getCheckedItemIndex() + 1));
                 answer.save();
                 removeError();
 
             }else {
+
+                System.out.println("2:::"+String.valueOf(radioBoxList.getCheckedItemIndex()));
                 if (currentQuestion.getRequired()){
                     getRequired();
                 }
@@ -397,7 +400,7 @@ public class ViewEditInstanceView extends DialogWindow {
         });
         panelRadio.addComponent(radioBoxList);
         if (currentQuestion.getAnswerValue(instance) != null){
-            radioBoxList.setCheckedItemIndex(Integer.parseInt(currentQuestion.getAnswerValue(instance)));
+            radioBoxList.setCheckedItemIndex(Integer.parseInt(currentQuestion.getAnswerValue(instance)) -1);
         }else {
             if(currentQuestion.getRequired()){
                 getRequired();
