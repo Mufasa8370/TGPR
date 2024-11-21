@@ -8,13 +8,17 @@ import tgpr.forms.view.ViewFormView;
 import tgpr.framework.Controller;
 import tgpr.framework.ErrorList;
 
+import java.util.List;
+
 public class AddEditQuestionController extends Controller<AddEditQuestionView> {
 
     private final AddEditQuestionView view;
+    private final Form form;
     private Question question;
 
     public AddEditQuestionController(Question question, Form form, ViewFormView formView) {
         this.question = question;
+        this.form = form;
         view = new AddEditQuestionView(this, question, form, formView);
     }
 
@@ -39,8 +43,23 @@ public class AddEditQuestionController extends Controller<AddEditQuestionView> {
             errors.add("OptionList required for this type", Question.Fields.OptionList);
 
         }
+
+        if (titleExists(title)) {
+            errors.add("Title already exists", Question.Fields.Title);
+        }
+
         //ajout option list
         return errors;
+    }
+
+    public boolean titleExists(String newTitle){
+        List<Question> listOfQuestions = form.getQuestions();
+        for(Question q : listOfQuestions){
+            if(q.getTitle().equalsIgnoreCase(newTitle) && q.getId() != question.getId()){
+               return true;
+            }
+        }
+        return false;
     }
 
     //pour create

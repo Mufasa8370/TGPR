@@ -196,7 +196,8 @@ public class AddEditQuestionView extends DialogWindow {
     }
 
     private void add() {
-        Controller.navigateTo(new AddEditOptionListController(manageOptionListsView));
+        AddEditOptionListController controller = new AddEditOptionListController(manageOptionListsView);
+        Controller.navigateTo(controller);
         System.out.println("test");
         cboOptionList.clearItems();
         for(OptionList optionList : OptionList.getAll()){
@@ -205,7 +206,7 @@ public class AddEditQuestionView extends DialogWindow {
                 cboOptionList.addItem(optionList);
             }
         }
-        cboOptionList.setSelectedItem(null);
+        cboOptionList.setSelectedItem(controller.getOptionList());
     }
 
     private void reloadAfterDelete(){

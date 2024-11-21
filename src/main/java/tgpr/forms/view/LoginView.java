@@ -59,15 +59,15 @@ public class LoginView extends BasicWindow {
     }
 
     private void logAsGuest() {
-        controller.login(Configuration.get("default.user.mail.guest"), Configuration.get("default.user.password"));
+        controller.login(Configuration.get("default.user.mail.guest"), Configuration.get("default.user.password"),true);
     }
 
     private void logAsXavierPigeolet() {
-        controller.login(Configuration.get("default.user.mail.xavier"), Configuration.get("default.user.password"));
+        controller.login(Configuration.get("default.user.mail.xavier"), Configuration.get("default.user.password"),true);
     }
 
     private void logAsMaMichel() {
-        controller.login(Configuration.get("default.user.mail.mamichel"), Configuration.get("default.user.password"));
+        controller.login(Configuration.get("default.user.mail.mamichel"), Configuration.get("default.user.password"),true);
     }
 
     private void seedData() {
@@ -80,7 +80,7 @@ public class LoginView extends BasicWindow {
     }
 
     private void login() {
-        var errors = controller.login(txtEmail.getText(), txtPassword.getText());
+        var errors = controller.login(txtEmail.getText(), txtPassword.getText(),false);
         if (!errors) {
             txtEmail.takeFocus();
         }
@@ -92,10 +92,10 @@ public class LoginView extends BasicWindow {
     }
 
     private void logAsDefaultAdmin() {
-        controller.login(Configuration.get("default.admin.mail"), Configuration.get("default.admin.password"));
+        controller.login(Configuration.get("default.admin.mail"), Configuration.get("default.admin.password"),true);
     }
 
     private void logAsBePenelle() {
-        controller.login(Configuration.get("default.user.mail"), Configuration.get("default.user.password"));
+        controller.login(Configuration.get("default.user.mail"), Configuration.get("default.user.password"),true);
     }
 }

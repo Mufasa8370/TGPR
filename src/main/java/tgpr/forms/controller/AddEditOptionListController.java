@@ -16,6 +16,11 @@ import static tgpr.forms.model.Security.getLoggedUser;
 
 public class AddEditOptionListController extends Controller<AddEditOptionListView> {
     private AddEditOptionListView view;
+    private OptionList optionList;
+
+    public OptionList getOptionList() {
+        return optionList;
+    }
 
     public AddEditOptionListController(ManageOptionListsView view) {
         this.view = new AddEditOptionListView(this, view);
@@ -52,7 +57,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         optionList.addValues(listOfOptionValues);
         optionList.setName(newName);
         check(optionList,checked);
-        optionList.save();
+        this.optionList = optionList.save();
     }
 
     public void create(OptionList optionList, List<OptionValue> listOfOptionValues,String newName, boolean checked){
@@ -60,6 +65,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         check(optionList,checked);
         optionList.save();
         optionList.addValues(listOfOptionValues);
+        this.optionList = optionList;
     }
 
 
