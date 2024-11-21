@@ -103,14 +103,13 @@ public class ManageSharesView  extends DialogWindow {
         addFilter = new AutoCompleteComboBox<>();
         addFilter.addTo(filter);
         addFilter.setPreferredSize(new TerminalSize(15, 1)).addTo(filter);
-        var cboType = new ComboBox<AccessType>(AccessType.Editor, AccessType.User).addTo(filter);
 
-        btnAddFilter = new Button("Add", () -> {
-            var beneficiary = addFilter.getSelectedItem();
-            var accessType = cboType.getSelectedItem();
-            controller.addAccess(beneficiary, accessType);
-            reloadData();
-        }).addTo(filter);
+//        btnAddFilter = new Button("Add", () -> {
+//            var beneficiary = addFilter.getSelectedItem();
+//            var accessType = cboType.getSelectedItem();
+//            controller.addAccess(beneficiary, accessType);
+//            reloadData();
+//        }).addTo(filter);
 
         new EmptySpace().addTo(root);
         new EmptySpace().addTo(root);
