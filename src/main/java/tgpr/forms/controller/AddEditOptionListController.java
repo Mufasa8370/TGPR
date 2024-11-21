@@ -16,6 +16,11 @@ import static tgpr.forms.model.Security.getLoggedUser;
 
 public class AddEditOptionListController extends Controller<AddEditOptionListView> {
     private AddEditOptionListView view;
+    private OptionList optionList;
+
+    public OptionList getOptionList() {
+        return optionList;
+    }
 
     public AddEditOptionListController(ManageOptionListsView view) {
         this.view = new AddEditOptionListView(this, view);
@@ -30,11 +35,6 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
 
-    public void addForSave(OptionList optionList, List<OptionValue> listOfAddedOptionValues) {
-        optionList.addValues(listOfAddedOptionValues);
-    }
-
-    public void reorder(OptionList optionList){}
 
     public void delete(OptionList optionList,AddEditOptionListView addEditOptionListView){
         boolean confirmed = askConfirmation("Are you sure you want to delete this option list?", "Delete");
@@ -52,18 +52,20 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
         navigateTo(new ManageOptionListsController());
     }
 
-    public void save(OptionList optionList, List<OptionValue> listOfAddedOptionValues,String newName, boolean checked){
-        optionList.addValues(listOfAddedOptionValues);
+    public void save(OptionList optionList,List<OptionValue> listOfOptionValues,String newName, boolean checked){
+        optionList.deleteAllValues();
+        optionList.addValues(listOfOptionValues);
+        optionList.setName(newName);
+        check(optionList,checked);
+        this.optionList = optionList.save();
+    }
+
+    public void create(OptionList optionList, List<OptionValue> listOfOptionValues,String newName, boolean checked){
         optionList.setName(newName);
         check(optionList,checked);
         optionList.save();
-    }
-
-    public void create(OptionList optionList, List<OptionValue> listOfAddedOptionValues,String newName){
-        optionList.setName(newName);
-        optionList.setOwnerId(getLoggedUser().getId());
-        optionList.save();
-        optionList.addValues(listOfAddedOptionValues);
+        optionList.addValues(listOfOptionValues);
+        this.optionList = optionList;
     }
 
 
@@ -81,8 +83,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
 
 
     private boolean optionListWithThisNameAlreadyExistsForUser(OptionList optionList, String name, boolean editOptionListMode, boolean newOptionListMode){
-        List<OptionList> lst = optionList.getForUser(getLoggedUser());
-        for (OptionList l : lst) {
+        List<OptionList> listForUser = optionList.getForUser(getLoggedUser());
+        for (OptionList l : listForUser) {
             if (l.getName().equals(name)) {
                 if (editOptionListMode && optionList.getId() != l.getId()) {
                     return true;
@@ -110,7 +112,7 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
     }
 
 
-    public ErrorList validate(OptionList optionList, List<OptionValue> listOfOptionValues, List<OptionValue> listOfAddedOptionValues, String newOptionListName, String newValueLabel,boolean addedAnOptionValueForCreate, boolean editOptionListMode, boolean newOptionListMode) {
+    public ErrorList validate(OptionList optionList, List<OptionValue> listOfOptionValues, List<OptionValue> listOfAddedOptionValues, String newOptionListName, String newValueLabel,boolean atLeastOneValue, boolean editOptionListMode, boolean newOptionListMode) {
         var errors = new ErrorList();
 
         // Vérifier que le nom de l'option list est donné
@@ -128,8 +130,8 @@ public class AddEditOptionListController extends Controller<AddEditOptionListVie
             errors.add("an option list with this name already exists for user", OptionList.Fields.Name);
         }
 
-        // Vérifier qu'au moins une valeur est ajoutée
-        if ((newOptionListMode && !addedAnOptionValueForCreate) || (editOptionListMode && (listOfOptionValues.isEmpty() && listOfAddedOptionValues.isEmpty()))){
+        // Vérifier qu'au moins une valeur existe dans l'option list (dans le tableau)
+        if (!atLeastOneValue){
             errors.add("at least one value required", OptionList.Fields.Values);
         }
 
